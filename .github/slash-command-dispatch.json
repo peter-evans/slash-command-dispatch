@@ -15,12 +15,12 @@
     "command": "do-something-remotely",
     "permission": "write",
     "issue_type": "both",
-    "repository": "peter-evans/actions-playground",
+    "repository": "peter-evans/slash-command-dispatch-processor",
     "event_type_suffix": "-cmd"
   },
   {
     "command": "send-to-multiple-repos",
-    "repository": "peter-evans/actions-playground"
+    "repository": "peter-evans/slash-command-dispatch-processor"
   },
   {
     "command": "send-to-multiple-repos",

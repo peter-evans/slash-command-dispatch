@@ -39,13 +39,13 @@ jobs:
                 "command": "hello-world-remote",
                 "permission": "none",
                 "issue_type": "issue",
-                "repository": "peter-evans/actions-playground"
+                "repository": "peter-evans/slash-command-dispatch-processor"
               },
               {
                 "command": "ping-remote",
                 "permission": "none",
                 "issue_type": "issue",
-                "repository": "peter-evans/actions-playground"
+                "repository": "peter-evans/slash-command-dispatch-processor"
               }
             ]
 
