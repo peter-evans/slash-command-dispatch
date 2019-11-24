@@ -29,7 +29,7 @@ jobs:
 
       - name: Update comment
         #uses: peter-evans/create-or-update-comment@v1
-        uses: .github/create-or-update-comment/
+        uses: ./.github/create-or-update-comment
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
