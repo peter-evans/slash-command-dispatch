@@ -12,7 +12,7 @@ inputs:
     description: 'A comma separated list of commands to dispatch.'
     required: true
   permission:
-    description: 'The permission level required by the user to dispatch commands.'
+    description: 'The repository permission level required by the user to dispatch commands.'
   issue-type:
     description: 'The issue type required for commands.'
   allow-edits:
