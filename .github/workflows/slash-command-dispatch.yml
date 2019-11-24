@@ -26,7 +26,6 @@ jobs:
           commands: hello-world, ping
           permission: none
           issue-type: issue
-          repository: peter-evans/actions-playground
 
       # Advanced JSON configuration
       - name: Slash Command Dispatch (JSON)

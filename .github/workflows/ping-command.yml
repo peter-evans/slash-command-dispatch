@@ -17,6 +17,16 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
 
+      # For debugging purposes. Remove this in production.
+      - name: Output Command
+        run: |
+          echo ${{ github.event.client_payload.slash_command.command }}
+          echo ${{ github.event.client_payload.slash_command.args }}
+          echo ${{ github.event.client_payload.slash_command.arg1 }}
+          echo ${{ github.event.client_payload.slash_command.arg2 }}
+          echo ${{ github.event.client_payload.slash_command.arg3 }}
+          # etc.
+
       - name: Update comment
         #uses: peter-evans/create-or-update-comment@v1
         uses: .github/create-or-update-comment
@@ -24,5 +34,5 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
           body: |
-            >pong
+            >pong ${{ github.event.client_payload.slash_command.args }}
           reaction-type: hooray
