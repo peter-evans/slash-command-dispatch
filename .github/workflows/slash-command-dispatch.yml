@@ -23,31 +23,32 @@ jobs:
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
           reaction-token: ${{ secrets.GITHUB_TOKEN }}
-          commands: hello-world
+          commands: hello-world, ping
           permission: none
           issue-type: issue
           repository: peter-evans/actions-playground
 
-      # # Advanced JSON configuration
-      # - name: Slash Command Dispatch (JSON)
-      #   uses: ./
-      #   with:
-      #     token: ${{ secrets.REPO_ACCESS_TOKEN }}
-      #     reaction-token: ${{ secrets.GITHUB_TOKEN }}
-      #     config: >
-      #       [
-      #         {
-      #           "command": "hello-world",
-      #           "permission": "none",
-      #           "issue_type": "issue",
-      #           "repository": "peter-evans/actions-playground",
-      #           "event_type_suffix": "-command"
-      #         },
-      #         {
-      #           "command": "ping",
-      #           "event_type_suffix": "-command"
-      #         }
-      #       ]
+      # Advanced JSON configuration
+      - name: Slash Command Dispatch (JSON)
+        uses: ./
+        with:
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          reaction-token: ${{ secrets.GITHUB_TOKEN }}
+          config: >
+            [
+              {
+                "command": "hello-world-remote",
+                "permission": "none",
+                "issue_type": "issue",
+                "repository": "peter-evans/actions-playground"
+              },
+              {
+                "command": "ping-remote",
+                "permission": "none",
+                "issue_type": "issue",
+                "repository": "peter-evans/actions-playground"
+              }
+            ]
 
       # # Advanced JSON configuration from file
       # - name: Slash Command Dispatch (JSON file)
