@@ -11,7 +11,7 @@ When a valid command is found it creates a repository dispatch event that includ
 ### Why repository dispatch?
 
 "ChatOps" with slash commands can work in a basic way by parsing the commands during `issue_comment` events and immediately processing the command.
-In repositories with a lot of activity, the workflow queue will get backed up very quickly if it is trying to handle new comments for commands, **and** process the commands themselves.
+In repositories with a lot of activity, the workflow queue will get backed up very quickly if it is trying to handle new comments for commands *and* process the commands themselves.
 
 Dispatching commands to be processed elsewhere keeps the workflow queue moving quickly. It essentially allows you to run multiple workflow queues in parallel.
 
@@ -46,7 +46,6 @@ jobs:
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
           commands: rebase, integration-test, create-ticket
-          repository: peter-evans/slash-command-dispatch-processor
 ```
 
 ### Action inputs
@@ -55,9 +54,9 @@ jobs:
 | --- | --- | --- |
 | `token` | (**required**) A `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). | |
 | `reaction-token` | `GITHUB_TOKEN` or a `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). | |
-| `reactions` | Add reactions to comments containing commands. | `true` |
+| `reactions` | Add reactions. :eyes: = seen, :rocket: = dispatched | `true` |
 | `commands` | (**required**) A comma separated list of commands to dispatch. | |
-| `permission` | The permission level required by the user to dispatch commands. (`none`, `read`, `write`, `admin`) | `write` |
+| `permission` | The repository permission level required by the user to dispatch commands. (`none`, `read`, `write`, `admin`) | `write` |
 | `issue-type` | The issue type required for commands. (`issue`, `pull-request`, `both`) | `both` |
 | `allow-edits` | Allow edited comments to trigger command dispatches. | `false` |
 | `repository` | The full name of the repository to send the dispatch events. | Current repository |
@@ -93,9 +92,11 @@ This means that reactions to comments will appear to be made by the user account
 
 ### Advanced configuration
 
-Using JSON configuration allows the options for each command to be customised.
+Using JSON configuration allows the options for each command to be specified individually.
 
 Note that it's recommended to write the JSON configuration directly in the workflow rather than use a file. Using the `config-from-file` input will be slightly slower due to requiring the repository to be checked out with `actions/checkout` so the file can be accessed.
+
+Here is an example workflow. Take care to use the correct property names. The JSON property names differ from the action inputs by using underscores in place of hyphens.
 
 ```yml
 name: Slash Command Dispatch
