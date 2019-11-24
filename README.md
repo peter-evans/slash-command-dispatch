@@ -1,2 +1,3 @@
 # slash-command-dispatch
-Facilitates "ChatOps" by creating repository dispatch events for slash commands
+
+A GitHub action that facilitates "ChatOps" by creating repository dispatch events for slash commands
