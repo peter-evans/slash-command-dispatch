@@ -49,11 +49,11 @@ jobs:
               }
             ]
 
-      # # Advanced JSON configuration from file
-      # - name: Slash Command Dispatch (JSON file)
-      #   uses: ./
-      #   with:
-      #     token: ${{ secrets.REPO_ACCESS_TOKEN }}
-      #     reaction-token: ${{ secrets.GITHUB_TOKEN }}
-      #     reactions: false
-      #     config-from-file: .github/slash-command-dispatch.json
+      # Advanced JSON configuration from file
+      - name: Slash Command Dispatch (JSON file)
+        uses: ./
+        with:
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          reaction-token: ${{ secrets.GITHUB_TOKEN }}
+          reactions: false
+          config-from-file: .github/slash-command-dispatch.json
