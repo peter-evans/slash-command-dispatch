@@ -1,0 +1,33 @@
+name: 'Slash Commmand Dispatch'
+description: 'Facilitates "ChatOps" by creating repository dispatch events for slash commands'
+inputs:
+  token:
+    description: 'A repo scoped GitHub Personal Access Token.'
+    required: true
+  reaction-token:
+    description: 'An optional GitHub token to use for reactions.'
+  reactions:
+    description: 'Add reactions to comments containing commands.'
+  commands:
+    description: 'A comma separated list of commands to dispatch.'
+    required: true
+  permission:
+    description: 'The permission level required by the user to dispatch commands.'
+  issue-type:
+    description: 'The issue type required for commands.'
+  allow-edits:
+    description: 'Allow edited comments to trigger command dispatches.'
+  repository:
+    description: 'The full name of the repository to send the dispatch events.'
+  event-type-suffix:
+    description: 'The repository dispatch event type suffix for the commands.'
+  config:
+    description: 'JSON configuration for the action.'
+  config-from-file:
+    description: 'JSON configuration from a file for the action.'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
+branding:
+  icon: 'target'  
+  color: 'gray-dark'

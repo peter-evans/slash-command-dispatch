@@ -1,0 +1,31 @@
+{
+  "name": "slash-command-dispatch",
+  "version": "1.0.0",
+  "description": "Create repository dispatch events for slash commands",
+  "main": "src/index.js",
+  "scripts": {
+    "lint": "eslint src/index.js",
+    "package": "ncc build src/index.js -o dist",
+    "test": "eslint src/index.js && jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/peter-evans/slash-command-dispatch.git"
+  },
+  "keywords": [],
+  "author": "Peter Evans",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/peter-evans/slash-command-dispatch/issues"
+  },
+  "homepage": "https://github.com/peter-evans/slash-command-dispatch#readme",
+  "dependencies": {
+    "@actions/core": "^1.1.1",
+    "@actions/github": "^1.1.0"
+  },
+  "devDependencies": {
+    "@zeit/ncc": "^0.20.5",
+    "eslint": "^6.3.0",
+    "jest": "^24.9.0"
+  }
+}
