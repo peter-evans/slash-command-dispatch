@@ -1,0 +1,59 @@
+name: Slash Command Dispatch
+on:
+  issue_comment:
+    types: [created, edited]
+jobs:
+  slashCommandDispatch:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout is necessary here due to referencing a local action.
+      # It's also necessary when using the 'config-from-file' option.
+      # Otherwise, avoid using checkout to keep this workflow fast.
+      - uses: actions/checkout@v1
+
+      # For debugging purposes. Remove this in production.
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
+      # Basic configuration
+      - name: Slash Command Dispatch
+        uses: ./
+        with:
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          reaction-token: ${{ secrets.GITHUB_TOKEN }}
+          commands: hello-world
+          permission: none
+          issue-type: issue
+          repository: peter-evans/actions-playground
+
+      # # Advanced JSON configuration
+      # - name: Slash Command Dispatch (JSON)
+      #   uses: ./
+      #   with:
+      #     token: ${{ secrets.REPO_ACCESS_TOKEN }}
+      #     reaction-token: ${{ secrets.GITHUB_TOKEN }}
+      #     config: >
+      #       [
+      #         {
+      #           "command": "hello-world",
+      #           "permission": "none",
+      #           "issue_type": "issue",
+      #           "repository": "peter-evans/actions-playground",
+      #           "event_type_suffix": "-command"
+      #         },
+      #         {
+      #           "command": "ping",
+      #           "event_type_suffix": "-command"
+      #         }
+      #       ]
+
+      # # Advanced JSON configuration from file
+      # - name: Slash Command Dispatch (JSON file)
+      #   uses: ./
+      #   with:
+      #     token: ${{ secrets.REPO_ACCESS_TOKEN }}
+      #     reaction-token: ${{ secrets.GITHUB_TOKEN }}
+      #     reactions: false
+      #     config-from-file: .github/slash-command-dispatch.json
