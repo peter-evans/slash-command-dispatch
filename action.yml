@@ -22,9 +22,9 @@ inputs:
   event-type-suffix:
     description: 'The repository dispatch event type suffix for the commands.'
   config:
-    description: 'JSON configuration for the action.'
+    description: 'JSON configuration for commands.'
   config-from-file:
-    description: 'JSON configuration from a file for the action.'
+    description: 'JSON configuration from a file for commands.'
 runs:
   using: 'node12'
   main: 'dist/index.js'
