@@ -9,7 +9,7 @@
     "command": "delete",
     "permission": "write",
     "issue_type": "both",
-    "allow-edits": true
+    "allow_edits": true
   },
   {
     "command": "do-something-remotely",
@@ -30,7 +30,7 @@
     "command": "analyze",
     "permission": "admin",
     "issue_type": "pull-request",
-    "allow-edits": true,
+    "allow_edits": true,
     "event_type_suffix": "-cmd"
   }
 ]
