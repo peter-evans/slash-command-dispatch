@@ -1,11 +1,11 @@
 # Slash Command Dispatch
 [![GitHub Marketplace](https://img.shields.io/badge/Marketplace-Slash%20Command%20Dispatch-blue.svg?colorA=24292e&colorB=0366d6&style=flat&longCache=true&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAM6wAADOsB5dZE0gAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAERSURBVCiRhZG/SsMxFEZPfsVJ61jbxaF0cRQRcRJ9hlYn30IHN/+9iquDCOIsblIrOjqKgy5aKoJQj4O3EEtbPwhJbr6Te28CmdSKeqzeqr0YbfVIrTBKakvtOl5dtTkK+v4HfA9PEyBFCY9AGVgCBLaBp1jPAyfAJ/AAdIEG0dNAiyP7+K1qIfMdonZic6+WJoBJvQlvuwDqcXadUuqPA1NKAlexbRTAIMvMOCjTbMwl1LtI/6KWJ5Q6rT6Ht1MA58AX8Apcqqt5r2qhrgAXQC3CZ6i1+KMd9TRu3MvA3aH/fFPnBodb6oe6HM8+lYHrGdRXW8M9bMZtPXUji69lmf5Cmamq7quNLFZXD9Rq7v0Bpc1o/tp0fisAAAAASUVORK5CYII=)](https://github.com/marketplace/actions/slash-command-dispatch)
 
-A GitHub action that facilitates "ChatOps" by creating repository dispatch events for slash commands.
+A GitHub action that facilitates ["ChatOps"](https://www.pagerduty.com/blog/what-is-chatops/) by creating repository dispatch events for slash commands.
 
 ### How does it work?
 
-The action runs in `on: issue_comment` workflows and checks comments for slash commands.
+The action runs in `issue_comment` event workflows and checks comments for slash commands.
 When a valid command is found it creates a repository dispatch event that includes a payload containing full details of the command and its context.
 
 ### Why repository dispatch?
@@ -15,14 +15,14 @@ In repositories with a lot of activity, the workflow queue will get backed up ve
 
 Dispatching commands to be processed elsewhere keeps the workflow queue moving quickly. It essentially allows you to run multiple workflow queues in parallel.
 
-### Advantages of slash-command-dispatch
+### Key features
 
 - Easy configuration of "ChatOps" slash commands
-- Separating the queue of `issue_comment` events from the queue of commands to process keeps it fast moving
+- Enables separating the queue of `issue_comment` events from the queue of commands to process to keep it fast moving
 - Users receive faster feedback that commands have been seen and are waiting to be processed
-- The ability to handle processing workloads in multiple repositories in parallel
+- The ability to handle processing commands in multiple repositories in parallel
 - Long running workloads can be processed in a repository workflow queue of their own
-- Even if commands are processed in the same repository, separation of comment parsing and command processing logic allows easier management of "ChatOps" use cases
+- Even if commands are dispatched and processed in the same repository, separation of comment parsing and command processing makes workflows more maintainable, and with less duplication
 
 ### Demo
 
