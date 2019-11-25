@@ -195,7 +195,7 @@ You can inspect the payload with the following step.
 
 Using [create-or-update-comment](https://github.com/peter-evans/create-or-update-comment) action there are a number of ways you can respond to the comment once the command has completed.
 
-The simplest response is to add a :hooray: reaction to the comment.
+The simplest response is to add a :tada: reaction to the comment.
 
 ```yml
       - name: Add reaction
