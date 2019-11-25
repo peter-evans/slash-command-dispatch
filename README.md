@@ -28,7 +28,7 @@ Dispatching commands to be processed elsewhere keeps the workflow queue moving q
 
 
 
-## Usage
+## Dispatching commands
 
 ### Basic configuration
 
@@ -50,31 +50,19 @@ jobs:
 
 ### Action inputs
 
-| Name | Description | Default |
-| --- | --- | --- |
-| `token` | (**required**) A `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). | |
-| `reaction-token` | `GITHUB_TOKEN` or a `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). | |
-| `reactions` | Add reactions. :eyes: = seen, :rocket: = dispatched | `true` |
-| `commands` | (**required**) A comma separated list of commands to dispatch. | |
-| `permission` | The repository permission level required by the user to dispatch commands. (`none`, `read`, `write`, `admin`) | `write` |
-| `issue-type` | The issue type required for commands. (`issue`, `pull-request`, `both`) | `both` |
-| `allow-edits` | Allow edited comments to trigger command dispatches. | `false` |
-| `repository` | The full name of the repository to send the dispatch events. | Current repository |
-| `event-type-suffix` | The repository dispatch event type suffix for the commands. | `-command` |
-| `config` | JSON configuration for commands. | |
-| `config-from-file` | JSON configuration from a file for commands. | |
-
-### Handling dispatched commands
-
-Repository dispatch events have a `type` to distinguish between events. The `type` set by the action is a combination of the slash command and `event-type-suffix`. The `event-type-suffix` input defaults to `-command`.
-
-For example, if your slash command is `integration-test`, the event type will be `integration-test-command`.
-
-```yml
-on:
-  repository_dispatch:
-    types: [integration-test-command]
-```
+| Input | JSON Property | Description | Default |
+| --- | --- | --- | --- |
+| `token` | | (**required**) A `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). | |
+| `reaction-token` | | `GITHUB_TOKEN` or a `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). | |
+| `reactions` | | Add reactions. :eyes: = seen, :rocket: = dispatched | `true` |
+| `commands` | `command` | (**required**) A comma separated list of commands to dispatch. | |
+| `permission` | `permission` | The repository permission level required by the user to dispatch commands. (`none`, `read`, `write`, `admin`) | `write` |
+| `issue-type` | `issue_type` | The issue type required for commands. (`issue`, `pull-request`, `both`) | `both` |
+| `allow-edits` | `allow_edits` | Allow edited comments to trigger command dispatches. | `false` |
+| `repository` | `repository` | The full name of the repository to send the dispatch events. | Current repository |
+| `event-type-suffix` | `event_type_suffix` | The repository dispatch event type suffix for the commands. | `-command` |
+| `config` | | JSON configuration for commands. See [Advanced configuration](#advanced-configuration) | |
+| `config-from-file` | | JSON configuration from a file for commands. See [Advanced configuration](#advanced-configuration) | |
 
 ### What is the reaction-token?
 
@@ -154,6 +142,45 @@ jobs:
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
           config-from-file: .github/slash-command-dispatch.json
+```
+
+## Handling dispatched commands
+
+### Event types
+
+Repository dispatch events have a `type` to distinguish between events. The `type` set by the action is a combination of the slash command and `event-type-suffix`. The `event-type-suffix` input defaults to `-command`.
+
+For example, if your slash command is `integration-test`, the event type will be `integration-test-command`.
+
+```yml
+on:
+  repository_dispatch:
+    types: [integration-test-command]
+```
+
+### Accessing command arguments
+
+```yml
+      - name: Output command and arguments
+        run: |
+          echo ${{ github.event.client_payload.slash_command.command }}
+          echo ${{ github.event.client_payload.slash_command.args }}
+          echo ${{ github.event.client_payload.slash_command.arg1 }}
+          echo ${{ github.event.client_payload.slash_command.arg2 }}
+          echo ${{ github.event.client_payload.slash_command.arg3 }}
+          # etc.
+```
+
+### Reacting to the comment on completion
+
+```yml
+      - name: Add reaction
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          reaction-type: hooray
 ```
 
 ## License
