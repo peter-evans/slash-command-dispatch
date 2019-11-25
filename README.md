@@ -50,6 +50,9 @@ jobs:
 
 ### Action inputs
 
+For basic configuration, use the inputs in the leftmost column.
+Use the JSON properties for [Advanced configuration](#advanced-configuration).
+
 | Input | JSON Property | Description | Default |
 | --- | --- | --- | --- |
 | `token` | | (**required**) A `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). | |
