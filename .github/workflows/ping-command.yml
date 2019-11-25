@@ -1,7 +1,7 @@
 name: Ping Command
 on:
   repository_dispatch:
-    types: [ping-command]
+    types: [ping-local-command]
 jobs:
   helloWorld:
     runs-on: ubuntu-latest

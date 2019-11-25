@@ -1,7 +1,7 @@
 name: Hello World Command
 on:
   repository_dispatch:
-    types: [hello-world-command]
+    types: [hello-world-local-command]
 jobs:
   helloWorld:
     runs-on: ubuntu-latest
