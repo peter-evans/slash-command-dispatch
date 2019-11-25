@@ -18,9 +18,9 @@ Dispatching commands to be processed elsewhere keeps the workflow queue moving q
 ### Key features
 
 - Easy configuration of "ChatOps" slash commands
-- Enables separating the queue of `issue_comment` events from the queue of commands to process to keep it fast moving
+- Enables separating the queue of `issue_comment` events from the queue of dispatched commands to keep it fast moving
 - Users receive faster feedback that commands have been seen and are waiting to be processed
-- The ability to handle processing commands in multiple repositories in parallel
+- The ability to handle processing commands in multiple repositories in parallel (repository == process queue!)
 - Long running workloads can be processed in a repository workflow queue of their own
 - Even if commands are dispatched and processed in the same repository, separation of comment parsing and command processing makes workflows more maintainable, and with less duplication
 
