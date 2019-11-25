@@ -87,7 +87,7 @@ Using JSON configuration allows the options for each command to be specified ind
 
 Note that it's recommended to write the JSON configuration directly in the workflow rather than use a file. Using the `config-from-file` input will be slightly slower due to requiring the repository to be checked out with `actions/checkout` so the file can be accessed.
 
-Here is an example workflow. Take care to use the correct property names. The JSON property names differ from the action inputs by using underscores in place of hyphens.
+Here is an example workflow. Take care to use the correct JSON property names.
 
 ```yml
 name: Slash Command Dispatch
@@ -127,7 +127,7 @@ jobs:
             ]
 ```
 
-An example using the `config-from-file` input to set JSON configuration.
+The following workflow is an example using the `config-from-file` input to set JSON configuration.
 Note that `actions/checkout` is required to access the file.
 
 ```yml
@@ -161,7 +161,13 @@ on:
     types: [integration-test-command]
 ```
 
-### Accessing command arguments
+### Accessing command contexts
+
+Commands are dispatched with a payload containing a number of contexts.
+
+The slash command context can be accessed as follows.
+`args` is a space separated string of all the supplied arguments.
+Each argument is also supplied in a numbered property, i.e. `arg1`, `arg2`, `arg3`, etc. 
 
 ```yml
       - name: Output command and arguments
@@ -172,6 +178,17 @@ on:
           echo ${{ github.event.client_payload.slash_command.arg2 }}
           echo ${{ github.event.client_payload.slash_command.arg3 }}
           # etc.
+```
+
+The payload contains the complete `github` context of the `issue_comment` event at path `github.event.client_payload.github`.
+Additionally, if the comment was made in a pull request, the action calls the [GitHub API to fetch the pull request detail](https://developer.github.com/v3/pulls/#get-a-single-pull-request) and attach it to the payload at path `github.event.client_payload.pull_request`.
+
+You can inspect the payload with the following step.
+```yml
+      - name: Dump the client payload context
+        env:
+          PAYLOAD_CONTEXT: ${{ toJson(github.event.client_payload) }}
+        run: echo "$PAYLOAD_CONTEXT"
 ```
 
 ### Reacting to the comment on completion
