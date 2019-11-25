@@ -23,7 +23,7 @@ jobs:
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
           reaction-token: ${{ secrets.GITHUB_TOKEN }}
-          commands: hello-world, ping
+          commands: hello-world-local, ping-local
           permission: none
           issue-type: issue
 
@@ -36,13 +36,13 @@ jobs:
           config: >
             [
               {
-                "command": "hello-world-remote",
+                "command": "hello-world",
                 "permission": "none",
                 "issue_type": "issue",
                 "repository": "peter-evans/slash-command-dispatch-processor"
               },
               {
-                "command": "ping-remote",
+                "command": "ping",
                 "permission": "none",
                 "issue_type": "issue",
                 "repository": "peter-evans/slash-command-dispatch-processor"
