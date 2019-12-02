@@ -6,30 +6,8 @@ jobs:
   helloWorld:
     runs-on: ubuntu-latest
     steps:
-      # Checkout is necessary here due to referencing a local action.
-      # It's also necessary when using the 'config-from-file' option.
-      # Otherwise, avoid using checkout to keep this workflow fast.
-      - uses: actions/checkout@v1
-
-      # For debugging purposes. Remove this in production.
-      - name: Dump GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
-
-      # For debugging purposes. Remove this in production.
-      - name: Output Command
-        run: |
-          echo ${{ github.event.client_payload.slash_command.command }}
-          echo ${{ github.event.client_payload.slash_command.args }}
-          echo ${{ github.event.client_payload.slash_command.arg1 }}
-          echo ${{ github.event.client_payload.slash_command.arg2 }}
-          echo ${{ github.event.client_payload.slash_command.arg3 }}
-          # etc.
-
       - name: Update comment
-        #uses: peter-evans/create-or-update-comment@v1
-        uses: ./.github/create-or-update-comment
+        uses: peter-evans/create-or-update-comment@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
