@@ -1,4 +1,4 @@
-name: 'Slash Commmand Dispatch'
+name: 'Slash Command Dispatch'
 description: 'Facilitates "ChatOps" by creating repository dispatch events for slash commands'
 inputs:
   token:
