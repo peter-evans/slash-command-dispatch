@@ -30,7 +30,7 @@ The best way to understand how this works is to try it out for yourself.
 Check out the following demos.
 
 - [ChatOps Demo in Issues](https://github.com/peter-evans/slash-command-dispatch/issues/3)
-- [ChatOps Demo in Pull Requests](https://github.com/peter-evans/slash-command-dispatch/pull/6)
+- [ChatOps Demo in Pull Requests](https://github.com/peter-evans/slash-command-dispatch/pull/8)
 
 ## Dispatching commands
 
