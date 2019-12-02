@@ -39,7 +39,7 @@ jobs:
               },
               {
                 "command": "hello-world",
-                "permission": "write",
+                "permission": "none",
                 "issue_type": "pull-request",
                 "repository": "peter-evans/slash-command-dispatch-processor",
                 "event_type_suffix": "-pr-command"
