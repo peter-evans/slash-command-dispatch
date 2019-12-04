@@ -31,7 +31,7 @@ Check out the following demos.
 
 - [ChatOps Demo in Issues](https://github.com/peter-evans/slash-command-dispatch/issues/3)
 - [ChatOps Demo in Pull Requests](https://github.com/peter-evans/slash-command-dispatch/pull/8)
-- [Slash command code formatting - Python](https://github.com/peter-evans/slash-command-dispatch/pull/10)
+- [Slash command code formatting - Python](https://github.com/peter-evans/slash-command-dispatch/pull/11)
 
 ## Dispatching commands
 
