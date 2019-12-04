@@ -51,6 +51,12 @@ jobs:
                 "repository": "peter-evans/slash-command-dispatch-processor"
               },
               {
+                "command": "reset-demo",
+                "permission": "none",
+                "issue_type": "pull-request",
+                "repository": "peter-evans/slash-command-dispatch-processor"
+              },
+              {
                 "command": "ping",
                 "permission": "none",
                 "issue_type": "issue",
