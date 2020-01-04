@@ -9,7 +9,7 @@ inputs:
   reactions:
     description: 'Add reactions to comments containing commands.'
   commands:
-    description: 'A comma separated list of commands to dispatch.'
+    description: 'A comma separated list of commands.'
     required: true
   permission:
     description: 'The repository permission level required by the user to dispatch commands.'

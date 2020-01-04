@@ -48,6 +48,8 @@ jobs:
           commands: rebase, integration-test, create-ticket
 ```
 
+This action also features [advanced configuration](docs/advanced-configuration.md) that allows each command to be configured individually if necessary. Use the standard configuration above unless you require advanced features.
+
 ### Action inputs
 
 | Input | Description | Default |
@@ -55,7 +57,7 @@ jobs:
 | `token` | (**required**) A `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). | |
 | `reaction-token` | `GITHUB_TOKEN` or a `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). | |
 | `reactions` | Add reactions. :eyes: = seen, :rocket: = dispatched | `true` |
-| `commands` | (**required**) Input: A comma separated list of commands to dispatch. JSON property: A single command. | |
+| `commands` | (**required**) A comma separated list of commands. | |
 | `permission` | The repository permission level required by the user to dispatch commands. (`none`, `read`, `write`, `admin`) | `write` |
 | `issue-type` | The issue type required for commands. (`issue`, `pull-request`, `both`) | `both` |
 | `allow-edits` | Allow edited comments to trigger command dispatches. | `false` |
@@ -64,8 +66,6 @@ jobs:
 | `named-args` | Parse named arguments and add them to the command payload. | `false` |
 | `config` | | JSON configuration for commands. See [Advanced configuration](docs/advanced-configuration.md) | |
 | `config-from-file` | | JSON configuration from a file for commands. See [Advanced configuration](docs/advanced-configuration.md) | |
-
-This action also features [advanced configuration](docs/advanced-configuration.md) that allows each command to be configured individually if necessary.
 
 ### What is the reaction-token?
 
@@ -121,16 +121,16 @@ If the `named-args` input is set to `true`, any arguments that are prefixed in t
 For example, the slash command `/deploy branch=master env=prod some other args` will be set in the JSON payload as follows.
 
 ```json
-{
-  "command": "deploy",
-  "args": "branch=master env=prod some other args",
-  "unnamed_args": "some other args",
-  "branch": "master",
-  "env": "prod",
-  "arg1": "some",
-  "arg2": "other",
-  "arg3": "args"
-}
+    "slash_command": {
+        "command": "deploy",
+        "args": "branch=master env=prod some other args",
+        "unnamed_args": "some other args",
+        "branch": "master",
+        "env": "prod",
+        "arg1": "some",
+        "arg2": "other",
+        "arg3": "args"
+    }
 ```
 
 These named arguments can be accessed in a workflow as follows.

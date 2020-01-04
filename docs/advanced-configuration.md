@@ -93,7 +93,7 @@ Advanced configuration requires a combination of yaml based inputs and JSON conf
 | `token` | | (**required**) A `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). | |
 | `reaction-token` | | `GITHUB_TOKEN` or a `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). | |
 | `reactions` | | Add reactions. :eyes: = seen, :rocket: = dispatched | `true` |
-| | `command` | (**required**) Input: A comma separated list of commands to dispatch. JSON property: A single command. | |
+| | `command` | (**required**) The slash command. | |
 | | `permission` | The repository permission level required by the user to dispatch commands. (`none`, `read`, `write`, `admin`) | `write` |
 | | `issue_type` | The issue type required for commands. (`issue`, `pull-request`, `both`) | `both` |
 | | `allow_edits` | Allow edited comments to trigger command dispatches. | `false` |
