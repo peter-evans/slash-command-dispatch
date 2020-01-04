@@ -13,16 +13,16 @@ When a valid command is found it creates a repository dispatch event that includ
 "ChatOps" with slash commands can work in a basic way by parsing the commands during `issue_comment` events and immediately processing the command.
 In repositories with a lot of activity, the workflow queue will get backed up very quickly if it is trying to handle new comments for commands *and* process the commands themselves.
 
-Dispatching commands to be processed elsewhere keeps the workflow queue moving quickly. It essentially allows you to run multiple workflow queues in parallel.
+Dispatching commands to be processed elsewhere keeps the workflow queue moving quickly. It essentially enables parallel processing of workflows.
 
 ### Key features
 
-- Easy configuration of "ChatOps" slash commands
 - Enables separating the queue of `issue_comment` events from the queue of dispatched commands to keep it fast moving
 - Users receive faster feedback that commands have been seen and are waiting to be processed
 - The ability to handle processing commands in multiple repositories in parallel
-- Long running workloads can be processed in a repository workflow queue of their own
-- Even if commands are dispatched and processed in the same repository, separation of comment parsing and command processing makes workflows more maintainable, and with less duplication
+- Long running workloads can be separated to a repository workflow queue of their own
+
+Even if commands are dispatched and processed in the same repository, separation of comment parsing and command processing makes workflows more maintainable, and with less duplication.
 
 ### Demo and examples
 
@@ -37,7 +37,9 @@ See [examples](examples.md) for command patterns and example workflows.
 
 ## Dispatching commands
 
-### Basic configuration
+### Dispatch configuration
+
+This workflow should be configured in the repository where commands will be dispatched from.
 
 ```yml
 name: Slash Command Dispatch
@@ -57,23 +59,22 @@ jobs:
 
 ### Action inputs
 
-For basic configuration, use the inputs in the leftmost column.
-Use the JSON properties for [Advanced configuration](#advanced-configuration).
+| Input | Description | Default |
+| --- | --- | --- |
+| `token` | (**required**) A `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). | |
+| `reaction-token` | `GITHUB_TOKEN` or a `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). | |
+| `reactions` | Add reactions. :eyes: = seen, :rocket: = dispatched | `true` |
+| `commands` | (**required**) Input: A comma separated list of commands to dispatch. JSON property: A single command. | |
+| `permission` | The repository permission level required by the user to dispatch commands. (`none`, `read`, `write`, `admin`) | `write` |
+| `issue-type` | The issue type required for commands. (`issue`, `pull-request`, `both`) | `both` |
+| `allow-edits` | Allow edited comments to trigger command dispatches. | `false` |
+| `repository` | The full name of the repository to send the dispatch events. | Current repository |
+| `event-type-suffix` | The repository dispatch event type suffix for the commands. | `-command` |
+| `named-args` | Parse named arguments and add them to the command payload. | `false` |
+| `config` | | JSON configuration for commands. See [Advanced configuration](docs/advanced-configuration.md) | |
+| `config-from-file` | | JSON configuration from a file for commands. See [Advanced configuration](docs/advanced-configuration.md) | |
 
-| Input | JSON Property | Description | Default |
-| --- | --- | --- | --- |
-| `token` | | (**required**) A `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). | |
-| `reaction-token` | | `GITHUB_TOKEN` or a `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). | |
-| `reactions` | | Add reactions. :eyes: = seen, :rocket: = dispatched | `true` |
-| `commands` | `command` | (**required**) Input: A comma separated list of commands to dispatch. JSON property: A single command. | |
-| `permission` | `permission` | The repository permission level required by the user to dispatch commands. (`none`, `read`, `write`, `admin`) | `write` |
-| `issue-type` | `issue_type` | The issue type required for commands. (`issue`, `pull-request`, `both`) | `both` |
-| `allow-edits` | `allow_edits` | Allow edited comments to trigger command dispatches. | `false` |
-| `repository` | `repository` | The full name of the repository to send the dispatch events. | Current repository |
-| `event-type-suffix` | `event_type_suffix` | The repository dispatch event type suffix for the commands. | `-command` |
-| `named-args` | `named_args` | Parse named arguments and add them to the command payload. | `false` |
-| `config` | | JSON configuration for commands. See [Advanced configuration](#advanced-configuration) | |
-| `config-from-file` | | JSON configuration from a file for commands. See [Advanced configuration](#advanced-configuration) | |
+This action also features [advanced configuration](docs/advanced-configuration.md) that allows each command to be configured individually if necessary.
 
 ### What is the reaction-token?
 
@@ -87,73 +88,6 @@ This means that reactions to comments will appear to be made by the user account
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
           reaction-token: ${{ secrets.GITHUB_TOKEN }}
           commands: rebase, integration-test, create-ticket
-```
-
-### Advanced configuration
-
-Using JSON configuration allows the options for each command to be specified individually.
-
-Note that it's recommended to write the JSON configuration directly in the workflow rather than use a file. Using the `config-from-file` input will be slightly slower due to requiring the repository to be checked out with `actions/checkout` so the file can be accessed.
-
-Here is an example workflow. Take care to use the correct JSON property names.
-
-```yml
-name: Slash Command Dispatch
-on:
-  issue_comment:
-    types: [created]
-jobs:
-  slashCommandDispatch:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Slash Command Dispatch
-        uses: peter-evans/slash-command-dispatch@v1
-        with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
-          reaction-token: ${{ secrets.GITHUB_TOKEN }}
-          config: >
-            [
-              {
-                "command": "rebase",
-                "permission": "admin",
-                "issue_type": "pull-request",
-                "repository": "peter-evans/slash-command-dispatch-processor"
-              },
-              {
-                "command": "integration-test",
-                "permission": "write",
-                "issue_type": "both",
-                "repository": "peter-evans/slash-command-dispatch-processor",
-                "named_args": true
-              },
-              {
-                "command": "create-ticket",
-                "permission": "write",
-                "issue_type": "issue",
-                "allow_edits": true,
-                "event_type_suffix": "-cmd"
-              }
-            ]
-```
-
-The following workflow is an example using the `config-from-file` input to set JSON configuration.
-Note that `actions/checkout` is required to access the file.
-
-```yml
-name: Slash Command Dispatch
-on:
-  issue_comment:
-    types: [created]
-jobs:
-  slashCommandDispatch:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Slash Command Dispatch
-        uses: peter-evans/slash-command-dispatch@v1
-        with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
-          config-from-file: .github/slash-command-dispatch.json
 ```
 
 ## Handling dispatched commands
@@ -191,7 +125,7 @@ Each argument is also supplied in a numbered property, i.e. `arg1`, `arg2`, `arg
           # etc.
 ```
 
-If the `named-args` input (or `named_args` JSON property) is set to `true`, any arguments that are prefixed in the format `name=argument` will be parsed and added to the payload.
+If the `named-args` input is set to `true`, any arguments that are prefixed in the format `name=argument` will be parsed and added to the payload.
 
 For example, the slash command `/deploy branch=master env=prod some other args` will be set in the JSON payload as follows.
 
