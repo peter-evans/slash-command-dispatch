@@ -67,6 +67,13 @@ jobs:
                 "permission": "none",
                 "issue_type": "issue",
                 "repository": "peter-evans/slash-command-dispatch-processor"
+              },
+              {
+                "command": "hello-world-test",
+                "permission": "none",
+                "issue_type": "pull-request",
+                "repository": "peter-evans/slash-command-dispatch-processor",
+                "event_type_suffix": "-pr-test-command"
               }
             ]
 
