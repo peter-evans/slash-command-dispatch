@@ -144,7 +144,7 @@ jobs:
   slashCommandDispatch:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Slash Command Dispatch
         uses: peter-evans/slash-command-dispatch@v1
         with:
