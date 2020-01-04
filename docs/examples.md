@@ -3,6 +3,7 @@
 - [Use case: Execute command using a specific repository branch](#execute-command-using-a-specific-repository-branch)
   - [pytest](#pytest)
 - [Use case: Execute command to modify a pull request branch](#execute-command-to-modify-a-pull-request-branch)
+  - [black](#black)
 
 ## Use case: Execute command using a specific repository branch
 
@@ -59,7 +60,7 @@ jobs:
 
 ### pytest
 
-This is a real example that uses this pattern to execute the Python test tool `pytest` against a specific branch. 
+This is a real example that uses this pattern to execute the Python test tool [pytest](https://github.com/pytest-dev/pytest/) against a specific branch. 
 
 ```
 /pytest branch=develop -v -s
@@ -167,7 +168,7 @@ jobs:
 
 ### black
 
-This is a real example that uses this pattern to format Python code using [black](https://github.com/psf/black).
+This is a real example that uses this pattern to format Python code using [Black](https://github.com/psf/black).
 
 ```
 /black
@@ -187,7 +188,7 @@ jobs:
       # Checkout the pull request branch
       - uses: actions/checkout@v2
         with:
-          token: ${{ secrets.ACTIONS_BOT_TOKEN }}
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
           repository: ${{ github.event.client_payload.pull_request.head.repo.full_name }}
           ref: ${{ github.event.client_payload.pull_request.head.ref }}
 
@@ -216,7 +217,7 @@ jobs:
       - name: Add reaction
         uses: peter-evans/create-or-update-comment@v1
         with:
-          token: ${{ secrets.ACTIONS_BOT_TOKEN }}
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
           reaction-type: hooray

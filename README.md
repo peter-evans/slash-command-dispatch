@@ -30,7 +30,7 @@ See [examples](docs/examples.md) for command patterns and example workflows.
 
 ### Configuration
 
-The following workflow should be configured in the repository where commands will be dispatched from. This example will respond to comments containing the slash commands `/rebase`, `/integration-test` and `/create-ticket`.
+The following workflow should be configured in the repository where commands will be dispatched from. This example will respond to comments containing the slash commands `/deploy`, `/integration-test` and `/create-ticket`.
 
 ```yml
 name: Slash Command Dispatch
@@ -45,7 +45,7 @@ jobs:
         uses: peter-evans/slash-command-dispatch@v1
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
-          commands: rebase, integration-test, create-ticket
+          commands: deploy, integration-test, create-ticket
 ```
 
 This action also features [advanced configuration](docs/advanced-configuration.md) that allows each command to be configured individually if necessary. Use the standard configuration shown above unless you require advanced features.
@@ -78,7 +78,7 @@ This means that reactions to comments will appear to be made by the user account
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
           reaction-token: ${{ secrets.GITHUB_TOKEN }}
-          commands: rebase, integration-test, create-ticket
+          commands: deploy, integration-test, create-ticket
 ```
 
 ## Handling dispatched commands
