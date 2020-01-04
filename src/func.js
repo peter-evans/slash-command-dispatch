@@ -10,7 +10,8 @@ const commandDefaults = Object.freeze({
   issue_type: "both",
   allow_edits: false,
   repository: process.env.GITHUB_REPOSITORY,
-  event_type_suffix: "-command"
+  event_type_suffix: "-command",
+  named_args: false
 });
 
 function toBool(input, defaultVal) {
@@ -34,6 +35,7 @@ function getInputs() {
     allowEdits: core.getInput("allow-edits"),
     repository: core.getInput("repository"),
     eventTypeSuffix: core.getInput("event-type-suffix"),
+    namedArgs: core.getInput("named-args"),
     config: core.getInput("config"),
     configFromFile: core.getInput("config-from-file")
   };
@@ -77,6 +79,7 @@ function getCommandsConfigFromInputs(inputs) {
     cmd.event_type_suffix = inputs.eventTypeSuffix
       ? inputs.eventTypeSuffix
       : cmd.event_type_suffix;
+    cmd.named_args = toBool(inputs.namedArgs, cmd.named_args);
     config.push(cmd);
   }
   return config;
@@ -98,6 +101,7 @@ function getCommandsConfigFromJson(json) {
     cmd.event_type_suffix = jc.event_type_suffix
       ? jc.event_type_suffix
       : cmd.event_type_suffix;
+    cmd.named_args = toBool(jc.named_args, cmd.named_args);
     config.push(cmd);
   }
   return config;
