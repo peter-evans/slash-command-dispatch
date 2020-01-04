@@ -1,8 +1,8 @@
 # Examples
 
-- [Use case: Execute command using a specific repository branch](#execute-command-using-a-specific-repository-branch)
+- [Use case: Execute command using a specific repository branch](#use-case-execute-command-using-a-specific-repository-branch)
   - [pytest](#pytest)
-- [Use case: Execute command to modify a pull request branch](#execute-command-to-modify-a-pull-request-branch)
+- [Use case: Execute command to modify a pull request branch](#use-case-execute-command-to-modify-a-pull-request-branch)
   - [black](#black)
 
 ## Use case: Execute command using a specific repository branch
