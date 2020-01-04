@@ -24,11 +24,11 @@ Check out the following demos.
 - [ChatOps Demo in Pull Requests](https://github.com/peter-evans/slash-command-dispatch/pull/8)
 - [Slash command code formatting - Python](https://github.com/peter-evans/slash-command-dispatch/pull/11)
 
-See [examples](examples.md) for command patterns and example workflows.
+See [examples](docs/examples.md) for command patterns and example workflows.
 
 ## Dispatching commands
 
-### Dispatch configuration
+### Configuration
 
 This workflow should be configured in the repository where commands will be dispatched from.
 
