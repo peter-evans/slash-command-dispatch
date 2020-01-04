@@ -24,7 +24,7 @@ Dispatching commands to be processed elsewhere keeps the workflow queue moving q
 - Long running workloads can be processed in a repository workflow queue of their own
 - Even if commands are dispatched and processed in the same repository, separation of comment parsing and command processing makes workflows more maintainable, and with less duplication
 
-### Demo
+### Demo and examples
 
 The best way to understand how this works is to try it out for yourself.
 Check out the following demos.
@@ -32,6 +32,8 @@ Check out the following demos.
 - [ChatOps Demo in Issues](https://github.com/peter-evans/slash-command-dispatch/issues/3)
 - [ChatOps Demo in Pull Requests](https://github.com/peter-evans/slash-command-dispatch/pull/8)
 - [Slash command code formatting - Python](https://github.com/peter-evans/slash-command-dispatch/pull/11)
+
+See [examples](examples.md) for command patterns and example workflows.
 
 ## Dispatching commands
 
