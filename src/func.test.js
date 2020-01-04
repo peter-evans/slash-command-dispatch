@@ -164,3 +164,33 @@ test("slash command payload", async () => {
   };
   expect(getSlashCommandPayload(commandWords)).toEqual(payload);
 });
+
+test("slash command payload with named args", async () => {
+  commandWords = ["test", "branch=master", "arg1", "env=prod", "arg2"];
+  namedArgs = true;
+  payload = {
+    command: "test",
+    args: "branch=master arg1 env=prod arg2",
+    unnamed_args: "arg1 arg2",
+    branch: "master",
+    env: "prod",
+    arg1: "arg1",
+    arg2: "arg2"
+  };
+  expect(getSlashCommandPayload(commandWords, namedArgs)).toEqual(payload);
+});
+
+test("slash command payload with malformed named args", async () => {
+  commandWords = ["test", "branch=", "arg1", "e-nv=prod", "arg2"];
+  namedArgs = true;
+  payload = {
+    command: "test",
+    args: "branch= arg1 e-nv=prod arg2",
+    unnamed_args: "branch= arg1 e-nv=prod arg2",
+    arg1: "branch=",
+    arg2: "arg1",
+    arg3: "e-nv=prod",
+    arg4: "arg2"
+  };
+  expect(getSlashCommandPayload(commandWords, namedArgs)).toEqual(payload);
+});

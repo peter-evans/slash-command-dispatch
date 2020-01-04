@@ -3,6 +3,7 @@ var fs = require("fs");
 const core = require("@actions/core");
 
 const MAX_ARGS = 50;
+const namedArgPattern = /^(?<name>[a-zA-Z0-9_]+)=(?<value>[^\s]+)$/;
 
 const commandDefaults = Object.freeze({
   permission: "write",
@@ -155,7 +156,7 @@ async function addReaction(octokit, repo, commentId, reaction) {
   }
 }
 
-function getSlashCommandPayload(commentWords) {
+function getSlashCommandPayload(commentWords, namedArgs) {
   var payload = {
     command: commentWords[0],
     args: ""
@@ -163,8 +164,22 @@ function getSlashCommandPayload(commentWords) {
   if (commentWords.length > 1) {
     const argWords = commentWords.slice(1, MAX_ARGS + 1);
     payload.args = argWords.join(" ");
-    for (var i = 0; i < argWords.length; i++) {
-      payload[`arg${i + 1}`] = argWords[i];
+    // Parse named and unnamed args
+    var unnamedCount = 1;
+    var unnamedArgs = [];
+    for (var argWord of argWords) {
+      if (namedArgs && namedArgPattern.test(argWord)) {
+        const { groups: { name, value } } = namedArgPattern.exec(argWord);
+        payload[`${name}`] = value;
+      } else {
+        unnamedArgs.push(argWord)
+        payload[`arg${unnamedCount}`] = argWord;
+        unnamedCount += 1;
+      }
+    }
+    // Add a string of only the unnamed args
+    if (namedArgs && unnamedArgs.length > 0) {
+      payload["unnamed_args"] = unnamedArgs.join(" ");
     }
   }
   return payload;
