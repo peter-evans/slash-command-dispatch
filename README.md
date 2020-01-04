@@ -30,7 +30,7 @@ See [examples](docs/examples.md) for command patterns and example workflows.
 
 ### Configuration
 
-This workflow should be configured in the repository where commands will be dispatched from.
+The following workflow should be configured in the repository where commands will be dispatched from. This example will respond to comments containing the slash commands `/rebase`, `/integration-test` and `/create-ticket`.
 
 ```yml
 name: Slash Command Dispatch
@@ -48,7 +48,7 @@ jobs:
           commands: rebase, integration-test, create-ticket
 ```
 
-This action also features [advanced configuration](docs/advanced-configuration.md) that allows each command to be configured individually if necessary. Use the standard configuration above unless you require advanced features.
+This action also features [advanced configuration](docs/advanced-configuration.md) that allows each command to be configured individually if necessary. Use the standard configuration shown above unless you require advanced features.
 
 ### Action inputs
 
