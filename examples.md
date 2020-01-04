@@ -1,6 +1,6 @@
 # Examples
 
-This document details some command patterns and examples.
+This document details command patterns and examples.
 
 - [Use case: Execute command using a specific repository branch](#execute-command-using-a-specific-repository-branch)
 - [Use case: Execute command to modify a pull request branch](#execute-command-to-modify-a-pull-request-branch)
@@ -82,7 +82,7 @@ jobs:
       # Commit changes to the PR branch
       - name: Commit changes to the PR branch
         run: |
-          # TODO Make changes to commit here
+          # Make changes to commit here
           #
           git config --global user.name 'actions-bot'
           git config --global user.email '58130806+actions-bot@users.noreply.github.com'
