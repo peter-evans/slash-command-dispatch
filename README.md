@@ -71,6 +71,7 @@ Use the JSON properties for [Advanced configuration](#advanced-configuration).
 | `allow-edits` | `allow_edits` | Allow edited comments to trigger command dispatches. | `false` |
 | `repository` | `repository` | The full name of the repository to send the dispatch events. | Current repository |
 | `event-type-suffix` | `event_type_suffix` | The repository dispatch event type suffix for the commands. | `-command` |
+| `named-args` | `named_args` | Parse named arguments and add them to the command payload. | `false` |
 | `config` | | JSON configuration for commands. See [Advanced configuration](#advanced-configuration) | |
 | `config-from-file` | | JSON configuration from a file for commands. See [Advanced configuration](#advanced-configuration) | |
 
@@ -122,7 +123,8 @@ jobs:
                 "command": "integration-test",
                 "permission": "write",
                 "issue_type": "both",
-                "repository": "peter-evans/slash-command-dispatch-processor"
+                "repository": "peter-evans/slash-command-dispatch-processor",
+                "named_args": true
               },
               {
                 "command": "create-ticket",
@@ -168,9 +170,11 @@ on:
     types: [integration-test-command]
 ```
 
-### Accessing command contexts
+### Accessing contexts
 
 Commands are dispatched with a payload containing a number of contexts.
+
+#### `slash_command` context
 
 The slash command context can be accessed as follows.
 `args` is a space separated string of all the supplied arguments.
@@ -186,6 +190,36 @@ Each argument is also supplied in a numbered property, i.e. `arg1`, `arg2`, `arg
           echo ${{ github.event.client_payload.slash_command.arg3 }}
           # etc.
 ```
+
+If the `named-args` input (or `named_args` JSON property) is set to `true`, any arguments that are prefixed in the format `name=argument` will be parsed and added to the payload.
+
+For example, the slash command `/deploy branch=master env=prod some other args` will be set in the JSON payload as follows.
+
+```json
+{
+  "command": "deploy",
+  "args": "branch=master env=prod some other args",
+  "unnamed_args": "some other args",
+  "branch": "master",
+  "env": "prod",
+  "arg1": "some",
+  "arg2": "other",
+  "arg3": "args"
+}
+```
+
+These named args can be accessed in a workflow as follows.
+
+```yml
+      - name: Output command and named arguments
+        run: |
+          echo ${{ github.event.client_payload.slash_command.command }}
+          echo ${{ github.event.client_payload.slash_command.branch }}
+          echo ${{ github.event.client_payload.slash_command.env }}
+          echo ${{ github.event.client_payload.slash_command.unnamed_args }}
+```
+
+#### `github` and `pull_request` contexts
 
 The payload contains the complete `github` context of the `issue_comment` event at path `github.event.client_payload.github`.
 Additionally, if the comment was made in a pull request, the action calls the [GitHub API to fetch the pull request detail](https://developer.github.com/v3/pulls/#get-a-single-pull-request) and attach it to the payload at path `github.event.client_payload.pull_request`.
