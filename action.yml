@@ -9,7 +9,7 @@ inputs:
   reactions:
     description: 'Add reactions to comments containing commands.'
   commands:
-    description: 'A comma separated list of commands to dispatch.'
+    description: 'A comma separated list of commands.'
     required: true
   permission:
     description: 'The repository permission level required by the user to dispatch commands.'
@@ -21,6 +21,8 @@ inputs:
     description: 'The full name of the repository to send the dispatch events.'
   event-type-suffix:
     description: 'The repository dispatch event type suffix for the commands.'
+  named-args:
+    description: 'Parse named arguments and add them to the command payload.'
   config:
     description: 'JSON configuration for commands.'
   config-from-file:

@@ -4665,13 +4665,15 @@ var fs = __webpack_require__(747);
 const core = __webpack_require__(470);
 
 const MAX_ARGS = 50;
+const namedArgPattern = /^(?<name>[a-zA-Z0-9_]+)=(?<value>[^\s]+)$/;
 
 const commandDefaults = Object.freeze({
   permission: "write",
   issue_type: "both",
   allow_edits: false,
   repository: process.env.GITHUB_REPOSITORY,
-  event_type_suffix: "-command"
+  event_type_suffix: "-command",
+  named_args: false
 });
 
 function toBool(input, defaultVal) {
@@ -4695,6 +4697,7 @@ function getInputs() {
     allowEdits: core.getInput("allow-edits"),
     repository: core.getInput("repository"),
     eventTypeSuffix: core.getInput("event-type-suffix"),
+    namedArgs: core.getInput("named-args"),
     config: core.getInput("config"),
     configFromFile: core.getInput("config-from-file")
   };
@@ -4738,6 +4741,7 @@ function getCommandsConfigFromInputs(inputs) {
     cmd.event_type_suffix = inputs.eventTypeSuffix
       ? inputs.eventTypeSuffix
       : cmd.event_type_suffix;
+    cmd.named_args = toBool(inputs.namedArgs, cmd.named_args);
     config.push(cmd);
   }
   return config;
@@ -4759,6 +4763,7 @@ function getCommandsConfigFromJson(json) {
     cmd.event_type_suffix = jc.event_type_suffix
       ? jc.event_type_suffix
       : cmd.event_type_suffix;
+    cmd.named_args = toBool(jc.named_args, cmd.named_args);
     config.push(cmd);
   }
   return config;
@@ -4817,7 +4822,7 @@ async function addReaction(octokit, repo, commentId, reaction) {
   }
 }
 
-function getSlashCommandPayload(commentWords) {
+function getSlashCommandPayload(commentWords, namedArgs) {
   var payload = {
     command: commentWords[0],
     args: ""
@@ -4825,8 +4830,22 @@ function getSlashCommandPayload(commentWords) {
   if (commentWords.length > 1) {
     const argWords = commentWords.slice(1, MAX_ARGS + 1);
     payload.args = argWords.join(" ");
-    for (var i = 0; i < argWords.length; i++) {
-      payload[`arg${i + 1}`] = argWords[i];
+    // Parse named and unnamed args
+    var unnamedCount = 1;
+    var unnamedArgs = [];
+    for (var argWord of argWords) {
+      if (namedArgs && namedArgPattern.test(argWord)) {
+        const { groups: { name, value } } = namedArgPattern.exec(argWord);
+        payload[`${name}`] = value;
+      } else {
+        unnamedArgs.push(argWord)
+        payload[`arg${unnamedCount}`] = argWord;
+        unnamedCount += 1;
+      }
+    }
+    // Add a string of only the unnamed args
+    if (namedArgs && unnamedArgs.length > 0) {
+      payload["unnamed_args"] = unnamedArgs.join(" ");
     }
   }
   return payload;
@@ -8049,10 +8068,8 @@ async function run() {
     core.info(`Command '${commentWords[0]}' to be dispatched.`);
 
     // Define payload
-    const slashCommandPayload = getSlashCommandPayload(commentWords);
-    core.debug(`Slash command payload: ${inspect(slashCommandPayload)}`);
     var clientPayload = {
-      slash_command: slashCommandPayload,
+      slash_command: {},
       github: github.context
     };
 
@@ -8067,6 +8084,15 @@ async function run() {
 
     // Dispatch for each matching configuration
     for (const cmd of configMatches) {
+      // Generate slash command payload
+      clientPayload.slash_command = getSlashCommandPayload(
+        commentWords,
+        cmd.named_args
+      );
+      core.debug(
+        `Slash command payload: ${inspect(clientPayload.slash_command)}`
+      );
+      // Dispatch the command
       const dispatchRepo = cmd.repository.split("/");
       const eventType = cmd.command + cmd.event_type_suffix;
       await octokit.repos.createDispatchEvent({

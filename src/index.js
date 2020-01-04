@@ -136,10 +136,8 @@ async function run() {
     core.info(`Command '${commentWords[0]}' to be dispatched.`);
 
     // Define payload
-    const slashCommandPayload = getSlashCommandPayload(commentWords);
-    core.debug(`Slash command payload: ${inspect(slashCommandPayload)}`);
     var clientPayload = {
-      slash_command: slashCommandPayload,
+      slash_command: {},
       github: github.context
     };
 
@@ -154,6 +152,15 @@ async function run() {
 
     // Dispatch for each matching configuration
     for (const cmd of configMatches) {
+      // Generate slash command payload
+      clientPayload.slash_command = getSlashCommandPayload(
+        commentWords,
+        cmd.named_args
+      );
+      core.debug(
+        `Slash command payload: ${inspect(clientPayload.slash_command)}`
+      );
+      // Dispatch the command
       const dispatchRepo = cmd.repository.split("/");
       const eventType = cmd.command + cmd.event_type_suffix;
       await octokit.repos.createDispatchEvent({
