@@ -15,15 +15,6 @@ In repositories with a lot of activity, the workflow queue will get backed up ve
 
 Dispatching commands to be processed elsewhere keeps the workflow queue moving quickly. It essentially enables parallel processing of workflows.
 
-### Key features
-
-- Enables separating the queue of `issue_comment` events from the queue of dispatched commands to keep it fast moving
-- Users receive faster feedback that commands have been seen and are waiting to be processed
-- The ability to handle processing commands in multiple repositories in parallel
-- Long running workloads can be separated to a repository workflow queue of their own
-
-Even if commands are dispatched and processed in the same repository, separation of comment parsing and command processing makes workflows more maintainable, and with less duplication.
-
 ### Demo and examples
 
 The best way to understand how this works is to try it out for yourself.
