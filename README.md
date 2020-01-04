@@ -208,7 +208,7 @@ For example, the slash command `/deploy branch=master env=prod some other args` 
 }
 ```
 
-These named args can be accessed in a workflow as follows.
+These named arguments can be accessed in a workflow as follows.
 
 ```yml
       - name: Output command and named arguments
