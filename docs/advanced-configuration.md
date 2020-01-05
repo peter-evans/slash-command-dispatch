@@ -94,11 +94,11 @@ Advanced configuration requires a combination of yaml based inputs and JSON conf
 | `reaction-token` | | `GITHUB_TOKEN` or a `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). | |
 | `reactions` | | Add reactions. :eyes: = seen, :rocket: = dispatched | `true` |
 | | `command` | (**required**) The slash command. | |
-| | `permission` | The repository permission level required by the user to dispatch commands. (`none`, `read`, `write`, `admin`) | `write` |
-| | `issue_type` | The issue type required for commands. (`issue`, `pull-request`, `both`) | `both` |
+| | `permission` | The repository permission level required by the user to dispatch the command. (`none`, `read`, `write`, `admin`) | `write` |
+| | `issue_type` | The issue type required for the command. (`issue`, `pull-request`, `both`) | `both` |
 | | `allow_edits` | Allow edited comments to trigger command dispatches. | `false` |
 | | `repository` | The full name of the repository to send the dispatch events. | Current repository |
-| | `event_type_suffix` | The repository dispatch event type suffix for the commands. | `-command` |
+| | `event_type_suffix` | The repository dispatch event type suffix for the command. | `-command` |
 | | `named_args` | Parse named arguments and add them to the command payload. | `false` |
-| `config` | | JSON configuration for commands. See [Advanced configuration](#advanced-configuration) | |
-| `config-from-file` | | JSON configuration from a file for commands. See [Advanced configuration](#advanced-configuration) | |
+| `config` | | JSON configuration for commands. | |
+| `config-from-file` | | JSON configuration from a file for commands. | |
