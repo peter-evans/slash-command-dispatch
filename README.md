@@ -19,8 +19,7 @@ Dispatching commands to be processed elsewhere keeps the workflow queue moving q
 
 ## Demos
 
-The best way to understand how this works is to try it out for yourself.
-Check out the following demos.
+See it in action with the following live demos.
 
 - [ChatOps Demo in Issues](https://github.com/peter-evans/slash-command-dispatch/issues/3)
 - [ChatOps Demo in Pull Requests](https://github.com/peter-evans/slash-command-dispatch/pull/8)
