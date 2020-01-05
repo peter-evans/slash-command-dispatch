@@ -81,6 +81,6 @@ Command dispatch setup is complete! Now let's test our `/example` command.
 
 Once the command completes you should see all three reactions on your comment.
 
-![Example Command](assets/example-command.png)
+![Example Command](../assets/example-command.png)
 
 Now you can start to tweak the command and make it do something useful!
