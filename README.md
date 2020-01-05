@@ -28,12 +28,12 @@ Check out the following demos.
 
 - [Getting started](docs/getting-started.md)
 - [Examples](docs/examples.md)
-- [Standard configuration](#configuration)
+- [Standard configuration](#standard-configuration)
 - [Advanced configuration](docs/advanced-configuration.md)
 
 ## Dispatching commands
 
-### Configuration
+### Standard configuration
 
 The following workflow should be configured in the repository where commands will be dispatched from. This example will respond to comments containing the slash commands `/deploy`, `/integration-test` and `/create-ticket`.
 
