@@ -11,7 +11,7 @@ When a valid command is found it creates a repository dispatch event that includ
 ### Why repository dispatch?
 
 "ChatOps" with slash commands can work in a basic way by parsing the commands during `issue_comment` events and immediately processing the command.
-In repositories with a lot of activity, the workflow queue will get backed up very quickly if it is trying to handle new comments for commands *and* process the commands themselves.
+In repositories with a lot of activity, the workflow queue will get backed up very quickly trying to handle new `issue_comment` events *and* process the commands themselves.
 
 Dispatching commands to be processed elsewhere keeps the workflow queue moving quickly. It essentially enables parallel processing of workflows.
 
