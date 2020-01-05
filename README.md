@@ -15,6 +15,8 @@ In repositories with a lot of activity, the workflow queue will get backed up ve
 
 Dispatching commands to be processed elsewhere keeps the workflow queue moving quickly. It essentially enables parallel processing of workflows.
 
+<div align="center"><img src="assets/slash-command-dispatch.png" width="550"></div>
+
 ## Demos
 
 The best way to understand how this works is to try it out for yourself.
