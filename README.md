@@ -15,7 +15,7 @@ In repositories with a lot of activity, the workflow queue will get backed up ve
 
 Dispatching commands to be processed elsewhere keeps the workflow queue moving quickly. It essentially enables parallel processing of workflows.
 
-### Demo and examples
+## Demos
 
 The best way to understand how this works is to try it out for yourself.
 Check out the following demos.
@@ -24,7 +24,12 @@ Check out the following demos.
 - [ChatOps Demo in Pull Requests](https://github.com/peter-evans/slash-command-dispatch/pull/8)
 - [Slash command code formatting - Python](https://github.com/peter-evans/slash-command-dispatch/pull/11)
 
-See [examples](docs/examples.md) for command patterns and example workflows.
+## Documentation
+
+- [Getting started](docs/getting-started.md)
+- [Examples](docs/examples.md)
+- [Standard configuration](#configuration)
+- [Advanced configuration](docs/advanced-configuration.md)
 
 ## Dispatching commands
 

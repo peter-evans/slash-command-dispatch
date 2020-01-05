@@ -44,7 +44,7 @@ Command processing setup is complete! Now we need to setup command dispatch for 
 
    In the repository, create the following workflow at `.github/workflows/slash-command-dispatch.yml`.
 
-   **Note**: Change `your-github-username/slash-command-processor` to reference your command process repository created in the [previous section](#command-processing-setup).
+   **Note**: Change `your-github-username/slash-command-processor` to reference your command processor repository created in the [previous section](#command-processing-setup).
 
     ```yml
     name: Slash Command Dispatch
