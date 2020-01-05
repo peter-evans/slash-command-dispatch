@@ -32,6 +32,12 @@ jobs:
           config: >
             [
               {
+                "command": "example",
+                "permission": "none",
+                "issue_type": "issue",
+                "repository": "peter-evans/slash-command-dispatch-processor"
+              },
+              {
                 "command": "hello-world",
                 "permission": "none",
                 "issue_type": "issue",
@@ -43,6 +49,12 @@ jobs:
                 "issue_type": "pull-request",
                 "repository": "peter-evans/slash-command-dispatch-processor",
                 "event_type_suffix": "-pr-command"
+              },
+              {
+                "command": "ping",
+                "permission": "none",
+                "issue_type": "issue",
+                "repository": "peter-evans/slash-command-dispatch-processor"
               },
               {
                 "command": "autopep8",
@@ -60,12 +72,6 @@ jobs:
                 "command": "reset-demo",
                 "permission": "none",
                 "issue_type": "pull-request",
-                "repository": "peter-evans/slash-command-dispatch-processor"
-              },
-              {
-                "command": "ping",
-                "permission": "none",
-                "issue_type": "issue",
                 "repository": "peter-evans/slash-command-dispatch-processor"
               }
             ]
