@@ -1,8 +1,10 @@
-import math, sys
+import math
+import sys
 
 
 def example1():
-    ####This is a long comment. This should be wrapped to fit within 72 characters.
+    # This is a long comment. This should be wrapped to fit within 72
+    # characters.
     some_tuple = (1, 2, 3, "a")
     some_variable = {
         "long": "Long code lines should be wrapped within 79 characters.",
@@ -23,7 +25,7 @@ def example1():
 
 
 def example2():
-    return {"has_key() is deprecated": True}.has_key({"f": 2}.has_key(""))
+    return ("" in {"f": 2}) in {"has_key() is deprecated": True}
 
 
 class Example3(object):
