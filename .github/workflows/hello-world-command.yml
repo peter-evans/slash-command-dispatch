@@ -13,6 +13,10 @@ jobs:
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
           reaction-type: hooray
 
+      - name: Create URL to the run output
+        id: vars
+        run: echo ::set-output name=run-url::https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
+
       - name: Create comment
         uses: peter-evans/create-or-update-comment@v1
         with:
@@ -20,3 +24,7 @@ jobs:
           issue-number: ${{ github.event.client_payload.github.payload.issue.number }}
           body: |
             Hello @${{ github.event.client_payload.github.actor }}!
+
+            [Click here to see the command run output][1]
+
+            [1]: ${{ steps.vars.outputs.run-url }}
