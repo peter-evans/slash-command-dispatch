@@ -5,7 +5,7 @@ A GitHub action that facilitates ["ChatOps"](https://www.pagerduty.com/blog/what
 
 ### How does it work?
 
-The action runs in `issue_comment` event workflows and checks comments for slash commands.
+The action runs in `issue_comment` event workflows and checks the first line of comments for slash commands.
 When a valid command is found it creates a repository dispatch event that includes a payload containing full details of the command and its context.
 
 ### Why repository dispatch?
