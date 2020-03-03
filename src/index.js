@@ -44,23 +44,24 @@ async function run() {
     core.debug(`Comment body: ${commentBody}`);
     core.debug(`Comment id: ${commentId}`);
 
-    // Check if the comment is a slash command
-    if (commentBody.charAt(0) != "/" || commentBody.length < 2) {
-      core.info("Comment is not a valid slash command.");
+    // Check if the first line of the comment is a slash command
+    const firstLine = commentBody.split(/\r?\n/)[0];
+    if (firstLine.length < 2 || firstLine.charAt(0) != "/") {
+      console.debug("The first line of the comment is not a valid slash command.");
       return;
     }
 
-    // Split the comment into "words"
-    const commentWords = commentBody.slice(1).split(" ");
-    core.debug(`Comment words: ${inspect(commentWords)}`);
+    // Split the first line into "words"
+    const commandWords = firstLine.slice(1).split(" ");
+    core.debug(`Command words: ${inspect(commandWords)}`);
 
     // Check if the command is registered for dispatch
     var configMatches = config.filter(function(cmd) {
-      return cmd.command == commentWords[0];
+      return cmd.command == commandWords[0];
     });
     core.debug(`Config matches on 'command': ${inspect(configMatches)}`);
     if (configMatches.length == 0) {
-      core.info(`Command '${commentWords[0]}' is not registered for dispatch.`);
+      core.info(`Command '${commandWords[0]}' is not registered for dispatch.`);
       return;
     }
 
@@ -77,7 +78,7 @@ async function run() {
     if (configMatches.length == 0) {
       const issueType = isPullRequest ? "pull request" : "issue";
       core.info(
-        `Command '${commentWords[0]}' is not configured for the issue type '${issueType}'.`
+        `Command '${commandWords[0]}' is not configured for the issue type '${issueType}'.`
       );
       return;
     }
@@ -90,7 +91,7 @@ async function run() {
       core.debug(`Config matches on 'allow_edits': ${inspect(configMatches)}`);
       if (configMatches.length == 0) {
         core.info(
-          `Command '${commentWords[0]}' is not configured to allow edits.`
+          `Command '${commandWords[0]}' is not configured to allow edits.`
         );
         return;
       }
@@ -127,13 +128,13 @@ async function run() {
     core.debug(`Config matches on 'permission': ${inspect(configMatches)}`);
     if (configMatches.length == 0) {
       core.info(
-        `Command '${commentWords[0]}' is not configured for the user's permission level '${actorPermission}'.`
+        `Command '${commandWords[0]}' is not configured for the user's permission level '${actorPermission}'.`
       );
       return;
     }
 
     // Determined that the command should be dispatched
-    core.info(`Command '${commentWords[0]}' to be dispatched.`);
+    core.info(`Command '${commandWords[0]}' to be dispatched.`);
 
     // Define payload
     var clientPayload = {
@@ -154,7 +155,7 @@ async function run() {
     for (const cmd of configMatches) {
       // Generate slash command payload
       clientPayload.slash_command = getSlashCommandPayload(
-        commentWords,
+        commandWords,
         cmd.named_args
       );
       core.debug(

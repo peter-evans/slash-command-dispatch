@@ -160,13 +160,13 @@ async function addReaction(octokit, repo, commentId, reaction) {
   }
 }
 
-function getSlashCommandPayload(commentWords, namedArgs) {
+function getSlashCommandPayload(commandWords, namedArgs) {
   var payload = {
-    command: commentWords[0],
+    command: commandWords[0],
     args: ""
   };
-  if (commentWords.length > 1) {
-    const argWords = commentWords.slice(1, MAX_ARGS + 1);
+  if (commandWords.length > 1) {
+    const argWords = commandWords.slice(1, MAX_ARGS + 1);
     payload.args = argWords.join(" ");
     // Parse named and unnamed args
     var unnamedCount = 1;
