@@ -45,7 +45,7 @@ async function run() {
     core.debug(`Comment id: ${commentId}`);
 
     // Check if the first line of the comment is a slash command
-    const firstLine = commentBody.split(/\r?\n/)[0];
+    const firstLine = commentBody.split(/\r?\n/)[0].trim();
     if (firstLine.length < 2 || firstLine.charAt(0) != "/") {
       console.debug("The first line of the comment is not a valid slash command.");
       return;

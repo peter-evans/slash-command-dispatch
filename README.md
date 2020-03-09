@@ -91,7 +91,7 @@ This means that reactions to comments will appear to be made by the user account
 
 Slash commands must be placed in the first line of the comment to be interpreted as a command.
 
-- The first character must be a `/`
+- The command must start with a `/`
 - The slash command extends to the last non-whitespace character on the first line
 - Anything after the first line is ignored and can be freely used for comments
 
