@@ -54,6 +54,8 @@ jobs:
           commands: deploy, integration-test, build-docs
 ```
 
+Note that not specifying the `repository` input will mean that `repository_dispatch` events are created in the *current* repository by default. It's perfectly fine to use the current repository and not dispatch events to a seperate "processor" repository.
+
 This action also features [advanced configuration](docs/advanced-configuration.md) that allows each command to be configured individually if necessary. Use the standard configuration shown above unless you require advanced features.
 
 ### Action inputs
