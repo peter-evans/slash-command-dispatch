@@ -32,6 +32,19 @@ jobs:
           config: >
             [
               {
+                "command": "help",
+                "permission": "none",
+                "issue_type": "issue",
+                "repository": "peter-evans/slash-command-dispatch-processor"
+              },
+              {
+                "command": "help",
+                "permission": "none",
+                "issue_type": "pull-request",
+                "repository": "peter-evans/slash-command-dispatch-processor",
+                "event_type_suffix": "-pr-command"
+              },
+              {
                 "command": "example",
                 "permission": "none",
                 "issue_type": "issue",
