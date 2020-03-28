@@ -4,6 +4,7 @@
   - [pytest](#pytest)
 - [Use case: Execute command to modify a pull request branch](#use-case-execute-command-to-modify-a-pull-request-branch)
   - [black](#black)
+- [Help command](#help-command)
 
 ## Use case: Execute command using a specific repository branch
 
@@ -220,5 +221,34 @@ jobs:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          reaction-type: hooray
+```
+
+## Help command
+
+The following is an example command workflow to return details of available commands when a user issues the `/help` command.
+
+```yml
+name: help-command
+on:
+  repository_dispatch:
+    types: [help-command]
+jobs:
+  help:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update comment
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          token: ${{ secrets.ACTIONS_BOT_TOKEN }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            > Command | Description
+            > --- | ---
+            > /hello-world | Receive a greeting from the world
+            > /ping [\<args\> ...] | Echos back a list of arguments
+            > /hello-world-local | Receive a greeting from the world (local execution)
+            > /ping-local [\<args\> ...] | Echos back a list of arguments (local execution)
           reaction-type: hooray
 ```
