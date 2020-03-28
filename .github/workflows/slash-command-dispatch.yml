@@ -57,12 +57,6 @@ jobs:
                 "repository": "peter-evans/slash-command-dispatch-processor"
               },
               {
-                "command": "autopep8",
-                "permission": "none",
-                "issue_type": "pull-request",
-                "repository": "peter-evans/slash-command-dispatch-processor"
-              },
-              {
                 "command": "black",
                 "permission": "none",
                 "issue_type": "pull-request",
