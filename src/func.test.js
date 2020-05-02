@@ -124,7 +124,7 @@ test("invalid permission level in config", async () => {
   const config = [
     {
       command: "test",
-      permission: "super-admin",
+      permission: "test-case-invalid-permission",
       issue_type: "both",
       repository: "peter-evans/slash-command-dispatch",
       event_type_suffix: "-command"
@@ -138,7 +138,7 @@ test("invalid issue type in config", async () => {
     {
       command: "test",
       permission: "write",
-      issue_type: "pr",
+      issue_type: "test-case-invalid-issue-type",
       repository: "peter-evans/slash-command-dispatch",
       event_type_suffix: "-command"
     }
