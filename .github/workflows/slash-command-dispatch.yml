@@ -32,6 +32,12 @@ jobs:
           config: >
             [
               {
+                "command": "rebase",
+                "permission": "admin",
+                "repository": "peter-evans/slash-command-dispatch-processor",
+                "issue_type": "pull-request"
+              },
+              {
                 "command": "help",
                 "permission": "none",
                 "issue_type": "issue",
@@ -84,6 +90,7 @@ jobs:
             ]
 
       # Advanced JSON configuration from file
+      # (These commands do not do anything and are just a reference example)
       - name: Slash Command Dispatch (JSON file)
         uses: ./
         with:

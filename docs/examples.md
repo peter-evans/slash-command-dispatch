@@ -3,6 +3,7 @@
 - [Use case: Execute command using a specific repository branch](#use-case-execute-command-using-a-specific-repository-branch)
   - [pytest](#pytest)
 - [Use case: Execute command to modify a pull request branch](#use-case-execute-command-to-modify-a-pull-request-branch)
+  - [rebase](#rebase)
   - [black](#black)
 - [Help command](#help-command)
 
@@ -167,9 +168,71 @@ jobs:
           reaction-type: hooray
 ```
 
+### rebase
+
+This rebase command is a working example and demonstrates a using slash command to modify a pull request.
+
+```
+/rebase
+```
+
+In the following command workflow, note how the pull request `rebaseable` context property is checked to see whether or not GitHub has determined a safe rebase is possible.
+
+```yml
+name: rebase-command
+on:
+  repository_dispatch:
+    types: [rebase-command]
+jobs:
+  rebase:
+    if: github.event.client_payload.pull_request.rebaseable == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout pull request
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          repository: ${{ github.event.client_payload.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.client_payload.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: Rebase
+        run: |
+          git config --global user.name '${{ github.event.client_payload.github.actor }}'
+          git config --global user.email '${{ github.event.client_payload.github.actor }}@users.noreply.github.com'
+          git remote add base https://x-access-token:${{ secrets.REPO_ACCESS_TOKEN }}@github.com/${{ github.event.client_payload.pull_request.base.repo.full_name }}.git
+          git fetch base ${{ github.event.client_payload.pull_request.base.ref }}
+          git rebase base/${{ github.event.client_payload.pull_request.base.ref }}
+          git push --force-with-lease
+
+      - name: Update comment
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            >Pull request successfully rebased
+          reaction-type: hooray
+
+  notRebaseable:
+    if: github.event.client_payload.pull_request.rebaseable != true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update comment
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            >Pull request is not rebaseable
+          reaction-type: hooray
+```
+
 ### black
 
-This is a real example that uses this pattern to format Python code using [Black](https://github.com/psf/black).
+In this real example, a pull request is modified by formatting Python code using [Black](https://github.com/psf/black).
 
 ```
 /black
