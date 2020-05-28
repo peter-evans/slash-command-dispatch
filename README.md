@@ -63,8 +63,8 @@ This action also features [advanced configuration](docs/advanced-configuration.m
 
 | Input | Description | Default |
 | --- | --- | --- |
-| `token` | (**required**) A `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). Note: `GITHUB_TOKEN` *does not* work here. | |
-| `reaction-token` | `GITHUB_TOKEN` or a `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). | Value of input `token` |
+| `token` | (**required**) A `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). Note: `GITHUB_TOKEN` *does not* work here. See [token](#token) for further details. | |
+| `reaction-token` | `GITHUB_TOKEN` or a `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). See [reaction-token](#reaction-token) for further details. | Value of input `token` |
 | `reactions` | Add reactions. :eyes: = seen, :rocket: = dispatched | `true` |
 | `commands` | (**required**) A comma separated list of commands. | |
 | `permission` | The repository permission level required by the user to dispatch commands. (`none`, `read`, `write`, `admin`) | `write` |
@@ -76,7 +76,13 @@ This action also features [advanced configuration](docs/advanced-configuration.m
 | `config` | | JSON configuration for commands. See [Advanced configuration](docs/advanced-configuration.md) | |
 | `config-from-file` | | JSON configuration from a file for commands. See [Advanced configuration](docs/advanced-configuration.md) | |
 
-### What is the reaction-token?
+#### `token`
+
+This action creates [`repository_dispatch`](https://developer.github.com/v3/repos/#create-a-repository-dispatch-event) events.
+The default `GITHUB_TOKEN` does not have scopes to do this so a `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line) is required.
+If you will be dispatching commands to public repositories *only* then you can use the more limited `public_repo` scope.
+
+#### `reaction-token`
 
 If you don't specify a token for `reaction-token` it will use the [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line) supplied via `token`.
 This means that reactions to comments will appear to be made by the user account associated with the PAT. If you prefer to have the @github-actions bot user react to comments you can set `reaction-token` to `GITHUB_TOKEN`.
@@ -90,7 +96,7 @@ This means that reactions to comments will appear to be made by the user account
           commands: deploy, integration-test, build-docs
 ```
 
-### How are comments parsed for slash commands?
+### How comments are parsed for slash commands
 
 Slash commands must be placed in the first line of the comment to be interpreted as a command.
 
