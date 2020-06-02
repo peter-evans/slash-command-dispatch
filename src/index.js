@@ -99,9 +99,7 @@ async function run() {
 
     // Set octokit clients
     const octokit = new github.GitHub(inputs.token);
-    const reactionOctokit = inputs.reactionToken
-      ? new github.GitHub(inputs.reactionToken)
-      : new github.GitHub(inputs.token);
+    const reactionOctokit = new github.GitHub(inputs.reactionToken)
 
     // At this point we know the command is registered
     // Add the "eyes" reaction to the comment

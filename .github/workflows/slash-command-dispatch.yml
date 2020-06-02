@@ -18,7 +18,6 @@ jobs:
         uses: ./
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
-          reaction-token: ${{ secrets.GITHUB_TOKEN }}
           commands: hello-world-local, ping-local
           permission: none
           issue-type: issue
@@ -28,7 +27,6 @@ jobs:
         uses: ./
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
-          reaction-token: ${{ secrets.GITHUB_TOKEN }}
           config: >
             [
               {
@@ -95,6 +93,5 @@ jobs:
         uses: ./
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
-          reaction-token: ${{ secrets.GITHUB_TOKEN }}
           reactions: false
           config-from-file: .github/slash-command-dispatch.json
