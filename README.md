@@ -64,7 +64,7 @@ This action also features [advanced configuration](docs/advanced-configuration.m
 | Input | Description | Default |
 | --- | --- | --- |
 | `token` | (**required**) A `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). Note: `GITHUB_TOKEN` *does not* work here. See [token](#token) for further details. | |
-| `reaction-token` | `GITHUB_TOKEN` or a `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). See [reaction-token](#reaction-token) for further details. | Value of input `token` |
+| `reaction-token` | `GITHUB_TOKEN` or a `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). See [reaction-token](#reaction-token) for further details. | `GITHUB_TOKEN` |
 | `reactions` | Add reactions. :eyes: = seen, :rocket: = dispatched | `true` |
 | `commands` | (**required**) A comma separated list of commands. | |
 | `permission` | The repository permission level required by the user to dispatch commands. (`none`, `read`, `write`, `admin`) | `write` |
@@ -84,15 +84,16 @@ If you will be dispatching commands to public repositories *only* then you can u
 
 #### `reaction-token`
 
-If you don't specify a token for `reaction-token` it will use the [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line) supplied via `token`.
-This means that reactions to comments will appear to be made by the user account associated with the PAT. If you prefer to have the @github-actions bot user react to comments you can set `reaction-token` to `GITHUB_TOKEN`.
+If you don't specify a token for `reaction-token` it will use the default `GITHUB_TOKEN`.
+Reactions to comments will then be made by the @github-actions bot user.
+You can use a [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line) if you would prefer reactions to be made by the user account associated with the PAT. 
 
 ```yml
       - name: Slash Command Dispatch
         uses: peter-evans/slash-command-dispatch@v1
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
-          reaction-token: ${{ secrets.GITHUB_TOKEN }}
+          reaction-token: ${{ secrets.REPO_ACCESS_TOKEN }}
           commands: deploy, integration-test, build-docs
 ```
 
