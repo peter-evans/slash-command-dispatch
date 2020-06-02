@@ -12,8 +12,8 @@ Follow this guide to get started with a working `/example` command.
     ```yml
     name: example-command
     on:
-    repository_dispatch:
-      types: [example-command]
+      repository_dispatch:
+        types: [example-command]
     jobs:
       example:
         runs-on: ubuntu-latest
@@ -49,8 +49,8 @@ Command processing setup is complete! Now we need to setup command dispatch for 
     ```yml
     name: Slash Command Dispatch
     on:
-    issue_comment:
-      types: [created]
+      issue_comment:
+        types: [created]
     jobs:
       slashCommandDispatch:
         runs-on: ubuntu-latest
