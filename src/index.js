@@ -152,7 +152,7 @@ async function run() {
     // Dispatch for each matching configuration
     for (const cmd of configMatches) {
       // Generate slash command payload
-      clientPayload.slash_command = getSlashCommandPayload(
+      clientPayload = getSlashCommandPayload(
         commandWords,
         cmd.named_args
       );
