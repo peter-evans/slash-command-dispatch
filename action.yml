@@ -9,21 +9,28 @@ inputs:
     default: ${{ github.token }}
   reactions:
     description: 'Add reactions to comments containing commands.'
+    default: true
   commands:
     description: 'A comma separated list of commands.'
     required: true
   permission:
     description: 'The repository permission level required by the user to dispatch commands.'
+    default: write
   issue-type:
     description: 'The issue type required for commands.'
+    default: both
   allow-edits:
     description: 'Allow edited comments to trigger command dispatches.'
+    default: false
   repository:
     description: 'The full name of the repository to send the dispatch events.'
+    default: ${{ github.repository }}
   event-type-suffix:
     description: 'The repository dispatch event type suffix for the commands.'
+    default: -command
   named-args:
     description: 'Parse named arguments and add them to the command payload.'
+    default: false
   config:
     description: 'JSON configuration for commands.'
   config-from-file:
