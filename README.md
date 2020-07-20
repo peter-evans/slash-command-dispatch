@@ -32,6 +32,7 @@ See it in action with the following live demos.
 - [Examples](docs/examples.md)
 - [Standard configuration](#standard-configuration)
 - [Advanced configuration](docs/advanced-configuration.md)
+- [Updating to v2](docs/updating.md)
 
 ## Dispatching commands
 
@@ -49,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Slash Command Dispatch
-        uses: peter-evans/slash-command-dispatch@v1
+        uses: peter-evans/slash-command-dispatch@v2
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
           commands: deploy, integration-test, build-docs
@@ -90,7 +91,7 @@ You can use a [PAT](https://help.github.com/en/github/authenticating-to-github/c
 
 ```yml
       - name: Slash Command Dispatch
-        uses: peter-evans/slash-command-dispatch@v1
+        uses: peter-evans/slash-command-dispatch@v2
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
           reaction-token: ${{ secrets.REPO_ACCESS_TOKEN }}
@@ -172,7 +173,7 @@ These named arguments can be accessed in a workflow as follows.
 
 #### `github` and `pull_request` contexts
 
-The payload contains the complete `github` context of the `issue_comment` event at path `github.event.client_payload.github`.
+The payload contains the `github` context of the `issue_comment` event at path `github.event.client_payload.github`.
 Additionally, if the comment was made in a pull request, the action calls the [GitHub API to fetch the pull request detail](https://developer.github.com/v3/pulls/#get-a-single-pull-request) and attach it to the payload at path `github.event.client_payload.pull_request`.
 
 You can inspect the payload with the following step.
@@ -182,6 +183,8 @@ You can inspect the payload with the following step.
           PAYLOAD_CONTEXT: ${{ toJson(github.event.client_payload) }}
         run: echo "$PAYLOAD_CONTEXT"
 ```
+
+Note that the `client_payload.github.payload.issue.body` and `client_payload.pull_request.body` context properties will be truncated if they exceed 1000 characters.
 
 ### Responding to the comment on command completion
 

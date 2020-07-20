@@ -56,7 +56,7 @@ Command processing setup is complete! Now we need to setup command dispatch for 
         runs-on: ubuntu-latest
         steps:
           - name: Slash Command Dispatch
-            uses: peter-evans/slash-command-dispatch@v1
+            uses: peter-evans/slash-command-dispatch@v2
             with:
               token: ${{ secrets.REPO_ACCESS_TOKEN }}
               commands: example

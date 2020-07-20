@@ -145,6 +145,16 @@ async function run(): Promise<void> {
       slash_command: {},
       github: github.context
     }
+    // Truncate the body to keep the size of the payload under the max
+    if (
+      clientPayload.github.payload.issue &&
+      clientPayload.github.payload.issue.body
+    ) {
+      clientPayload.github.payload.issue.body = clientPayload.github.payload.issue.body.slice(
+        0,
+        1000
+      )
+    }
 
     // Get the pull request context for the dispatch payload
     if (isPullRequest) {
@@ -152,6 +162,8 @@ async function run(): Promise<void> {
         ...github.context.repo,
         pull_number: github.context.payload.issue.number
       })
+      // Truncate the body to keep the size of the payload under the max
+      pullRequest.body = pullRequest.body.slice(0, 1000)
       clientPayload['pull_request'] = pullRequest
     }
 

@@ -20,7 +20,7 @@ describe('command-helper tests', () => {
       permission: 'write',
       issueType: 'both',
       allowEdits: false,
-      // Should be process.env.GITHUB_REPOSITORY, but '' for tests
+      // Should be the value of github.repository, but '' for tests
       repository: '',
       eventTypeSuffix: '-command',
       namedArgs: false,
