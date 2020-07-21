@@ -11,7 +11,7 @@ inputs:
     description: 'Add reactions to comments containing commands.'
     default: true
   commands:
-    description: 'A comma separated list of commands.'
+    description: 'A comma or newline separated list of commands.'
     required: true
   permission:
     description: 'The repository permission level required by the user to dispatch commands.'

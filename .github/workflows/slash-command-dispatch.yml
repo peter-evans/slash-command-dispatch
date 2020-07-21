@@ -18,7 +18,9 @@ jobs:
         uses: ./
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
-          commands: hello-world-local, ping-local
+          commands: |
+            hello-world-local
+            ping-local
           permission: none
           issue-type: issue
 

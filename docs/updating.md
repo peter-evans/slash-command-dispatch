@@ -6,4 +6,11 @@
 
 ### New features
 
-- 
+- The `commands` input can now be newline separated, or comma separated.
+  e.g.
+  ```yml
+          commands: |
+            deploy
+            integration-test
+            build-docs
+  ```

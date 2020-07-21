@@ -2,6 +2,7 @@ import * as core from '@actions/core'
 import * as fs from 'fs'
 import {inspect} from 'util'
 import {Octokit} from './octokit-client'
+import * as utils from './utils'
 
 const NAMED_ARG_PATTERN = /^(?<name>[a-zA-Z0-9_]+)=(?<value>[^\s]+)$/
 
@@ -11,7 +12,7 @@ export interface Inputs {
   token: string
   reactionToken: string
   reactions: boolean
-  commands: string
+  commands: string[]
   permission: string
   issueType: string
   allowEdits: boolean
@@ -73,7 +74,7 @@ export function getInputs(): Inputs {
     token: core.getInput('token'),
     reactionToken: core.getInput('reaction-token'),
     reactions: core.getInput('reactions') === 'true',
-    commands: core.getInput('commands'),
+    commands: utils.getInputAsArray('commands'),
     permission: core.getInput('permission'),
     issueType: core.getInput('issue-type'),
     allowEdits: core.getInput('allow-edits') === 'true',
@@ -101,13 +102,11 @@ export function getCommandsConfig(inputs: Inputs): Command[] {
 }
 
 export function getCommandsConfigFromInputs(inputs: Inputs): Command[] {
-  // Get commands
-  const commands = inputs.commands.replace(/\s+/g, '').split(',')
-  core.debug(`Commands: ${inspect(commands)}`)
+  core.debug(`Commands: ${inspect(inputs.commands)}`)
 
   // Build config
   const config: Command[] = []
-  for (const c of commands) {
+  for (const c of inputs.commands) {
     const cmd: Command = {
       command: c,
       permission: inputs.permission,

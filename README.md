@@ -53,7 +53,10 @@ jobs:
         uses: peter-evans/slash-command-dispatch@v2
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
-          commands: deploy, integration-test, build-docs
+          commands: |
+            deploy
+            integration-test
+            build-docs
 ```
 
 Note that not specifying the `repository` input will mean that `repository_dispatch` events are created in the *current* repository by default. It's perfectly fine to use the current repository and not dispatch events to a seperate "processor" repository.
@@ -67,7 +70,7 @@ This action also features [advanced configuration](docs/advanced-configuration.m
 | `token` | (**required**) A `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). Note: `GITHUB_TOKEN` *does not* work here. See [token](#token) for further details. | |
 | `reaction-token` | `GITHUB_TOKEN` or a `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). See [reaction-token](#reaction-token) for further details. | `GITHUB_TOKEN` |
 | `reactions` | Add reactions. :eyes: = seen, :rocket: = dispatched | `true` |
-| `commands` | (**required**) A comma separated list of commands. | |
+| `commands` | (**required**) A comma or newline separated list of commands. | |
 | `permission` | The repository permission level required by the user to dispatch commands. (`none`, `read`, `write`, `admin`) | `write` |
 | `issue-type` | The issue type required for commands. (`issue`, `pull-request`, `both`) | `both` |
 | `allow-edits` | Allow edited comments to trigger command dispatches. | `false` |
@@ -94,7 +97,10 @@ You can use a [PAT](https://help.github.com/en/github/authenticating-to-github/c
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
           reaction-token: ${{ secrets.REPO_ACCESS_TOKEN }}
-          commands: deploy, integration-test, build-docs
+          commands: |
+            deploy
+            integration-test
+            build-docs
 ```
 
 ### How comments are parsed for slash commands

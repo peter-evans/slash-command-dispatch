@@ -11,7 +11,10 @@ For example, the following basic configuration means that all commands must have
         uses: peter-evans/slash-command-dispatch@v2
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
-          commands: deploy, integration-test, build-docs
+          commands: |
+            deploy
+            integration-test
+            build-docs
           permission: admin
 ```
 

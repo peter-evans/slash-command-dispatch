@@ -947,6 +947,7 @@ exports.getSlashCommandPayload = exports.addReaction = exports.getActorPermissio
 const core = __importStar(__webpack_require__(470));
 const fs = __importStar(__webpack_require__(747));
 const util_1 = __webpack_require__(669);
+const utils = __importStar(__webpack_require__(611));
 const NAMED_ARG_PATTERN = /^(?<name>[a-zA-Z0-9_]+)=(?<value>[^\s]+)$/;
 exports.MAX_ARGS = 50;
 exports.commandDefaults = Object.freeze({
@@ -974,7 +975,7 @@ function getInputs() {
         token: core.getInput('token'),
         reactionToken: core.getInput('reaction-token'),
         reactions: core.getInput('reactions') === 'true',
-        commands: core.getInput('commands'),
+        commands: utils.getInputAsArray('commands'),
         permission: core.getInput('permission'),
         issueType: core.getInput('issue-type'),
         allowEdits: core.getInput('allow-edits') === 'true',
@@ -1004,12 +1005,10 @@ function getCommandsConfig(inputs) {
 }
 exports.getCommandsConfig = getCommandsConfig;
 function getCommandsConfigFromInputs(inputs) {
-    // Get commands
-    const commands = inputs.commands.replace(/\s+/g, '').split(',');
-    core.debug(`Commands: ${util_1.inspect(commands)}`);
+    core.debug(`Commands: ${util_1.inspect(inputs.commands)}`);
     // Build config
     const config = [];
-    for (const c of commands) {
+    for (const c of inputs.commands) {
         const cmd = {
             command: c,
             permission: inputs.permission,
@@ -4515,6 +4514,48 @@ exports.HttpClient = HttpClient;
 /***/ (function(module) {
 
 module.exports = require("http");
+
+/***/ }),
+
+/***/ 611:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getStringAsArray = exports.getInputAsArray = void 0;
+const core = __importStar(__webpack_require__(470));
+function getInputAsArray(name, options) {
+    return getStringAsArray(core.getInput(name, options));
+}
+exports.getInputAsArray = getInputAsArray;
+function getStringAsArray(str) {
+    return str
+        .split(/[\n,]+/)
+        .map(s => s.trim())
+        .filter(x => x !== '');
+}
+exports.getStringAsArray = getStringAsArray;
+
 
 /***/ }),
 

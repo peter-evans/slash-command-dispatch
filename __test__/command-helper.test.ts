@@ -12,11 +12,12 @@ import {
 
 describe('command-helper tests', () => {
   test('building config with required inputs only', async () => {
+    const commands = ['list', 'of', 'slash', 'commands']
     const inputs: Inputs = {
       token: '',
       reactionToken: '',
       reactions: true,
-      commands: 'list, of, slash, commands',
+      commands: commands,
       permission: 'write',
       issueType: 'both',
       allowEdits: false,
@@ -26,7 +27,6 @@ describe('command-helper tests', () => {
       config: '',
       configFromFile: ''
     }
-    const commands = inputs.commands.replace(/\s+/g, '').split(',')
     const config = getCommandsConfigFromInputs(inputs)
     expect(config.length).toEqual(4)
     for (var i = 0; i < config.length; i++) {
@@ -42,11 +42,12 @@ describe('command-helper tests', () => {
   })
 
   test('building config with optional inputs', async () => {
+    const commands = ['list', 'of', 'slash', 'commands']
     const inputs: Inputs = {
       token: '',
       reactionToken: '',
       reactions: true,
-      commands: 'list, of, slash, commands',
+      commands: commands,
       permission: 'admin',
       issueType: 'pull-request',
       allowEdits: true,
@@ -55,7 +56,6 @@ describe('command-helper tests', () => {
       config: '',
       configFromFile: ''
     }
-    const commands = inputs.commands.replace(/\s+/g, '').split(',')
     const config = getCommandsConfigFromInputs(inputs)
     expect(config.length).toEqual(4)
     for (var i = 0; i < config.length; i++) {
