@@ -24,6 +24,7 @@ describe('command-helper tests', () => {
       // Should be the value of github.repository, but '' for tests
       repository: '',
       eventTypeSuffix: '-command',
+      staticArgs: [],
       config: '',
       configFromFile: ''
     }
@@ -38,6 +39,7 @@ describe('command-helper tests', () => {
       expect(config[i].event_type_suffix).toEqual(
         commandDefaults.event_type_suffix
       )
+      expect(config[i].static_args).toEqual(commandDefaults.static_args)
     }
   })
 
@@ -53,6 +55,7 @@ describe('command-helper tests', () => {
       allowEdits: true,
       repository: 'owner/repo',
       eventTypeSuffix: '-cmd',
+      staticArgs: ['production', 'region=us-east-1'],
       config: '',
       configFromFile: ''
     }
@@ -65,6 +68,7 @@ describe('command-helper tests', () => {
       expect(config[i].allow_edits).toEqual(inputs.allowEdits)
       expect(config[i].repository).toEqual(inputs.repository)
       expect(config[i].event_type_suffix).toEqual(inputs.eventTypeSuffix)
+      expect(config[i].static_args).toEqual(inputs.staticArgs)
     }
   })
 
@@ -89,6 +93,7 @@ describe('command-helper tests', () => {
       expect(config[i].event_type_suffix).toEqual(
         commandDefaults.event_type_suffix
       )
+      expect(config[i].static_args).toEqual(commandDefaults.static_args)
     }
   })
 
@@ -104,7 +109,11 @@ describe('command-helper tests', () => {
       },
       {
         "command": "test-all-the-things",
-        "permission": "read"
+        "permission": "read",
+        "static_args": [
+          "production",
+          "region=us-east-1"
+        ]
       }
     ]`
     const commands = ['do-stuff', 'test-all-the-things']
@@ -119,6 +128,7 @@ describe('command-helper tests', () => {
     expect(config[1].command).toEqual(commands[1])
     expect(config[1].permission).toEqual('read')
     expect(config[1].issue_type).toEqual(commandDefaults.issue_type)
+    expect(config[1].static_args).toEqual(['production', 'region=us-east-1'])
   })
 
   test('valid config', async () => {
@@ -129,7 +139,8 @@ describe('command-helper tests', () => {
         issue_type: 'both',
         allow_edits: false,
         repository: 'peter-evans/slash-command-dispatch',
-        event_type_suffix: '-command'
+        event_type_suffix: '-command',
+        static_args: []
       }
     ]
     expect(configIsValid(config)).toBeTruthy()
@@ -143,7 +154,8 @@ describe('command-helper tests', () => {
         issue_type: 'both',
         allow_edits: false,
         repository: 'peter-evans/slash-command-dispatch',
-        event_type_suffix: '-command'
+        event_type_suffix: '-command',
+        static_args: []
       }
     ]
     expect(configIsValid(config)).toBeFalsy()
@@ -157,7 +169,8 @@ describe('command-helper tests', () => {
         issue_type: 'test-case-invalid-issue-type',
         allow_edits: false,
         repository: 'peter-evans/slash-command-dispatch',
-        event_type_suffix: '-command'
+        event_type_suffix: '-command',
+        static_args: []
       }
     ]
     expect(configIsValid(config)).toBeFalsy()
@@ -178,6 +191,7 @@ describe('command-helper tests', () => {
 
   test('slash command payload', async () => {
     const commandWords = ['test', 'arg1', 'arg2', 'arg3']
+    const staticArgs = []
     const payload: SlashCommandPayload = {
       command: 'test',
       args: {
@@ -191,11 +205,12 @@ describe('command-helper tests', () => {
         named: {}
       }
     }
-    expect(getSlashCommandPayload(commandWords)).toEqual(payload)
+    expect(getSlashCommandPayload(commandWords, staticArgs)).toEqual(payload)
   })
 
   test('slash command payload with named args', async () => {
     const commandWords = ['test', 'branch=master', 'arg1', 'env=prod', 'arg2']
+    const staticArgs = []
     const payload: SlashCommandPayload = {
       command: 'test',
       args: {
@@ -211,11 +226,34 @@ describe('command-helper tests', () => {
         }
       }
     }
-    expect(getSlashCommandPayload(commandWords)).toEqual(payload)
+    expect(getSlashCommandPayload(commandWords, staticArgs)).toEqual(payload)
+  })
+
+  test('slash command payload with named args and static args', async () => {
+    const commandWords = ['test', 'branch=master', 'arg1', 'arg2']
+    const staticArgs = ['production', 'region=us-east-1']
+    const payload: SlashCommandPayload = {
+      command: 'test',
+      args: {
+        all: 'production region=us-east-1 branch=master arg1 arg2',
+        unnamed: {
+          all: 'production arg1 arg2',
+          arg1: 'production',
+          arg2: 'arg1',
+          arg3: 'arg2'
+        },
+        named: {
+          region: 'us-east-1',
+          branch: 'master'
+        }
+      }
+    }
+    expect(getSlashCommandPayload(commandWords, staticArgs)).toEqual(payload)
   })
 
   test('slash command payload with malformed named args', async () => {
     const commandWords = ['test', 'branch=', 'arg1', 'e-nv=prod', 'arg2']
+    const staticArgs = []
     const payload: SlashCommandPayload = {
       command: 'test',
       args: {
@@ -230,6 +268,6 @@ describe('command-helper tests', () => {
         named: {}
       }
     }
-    expect(getSlashCommandPayload(commandWords)).toEqual(payload)
+    expect(getSlashCommandPayload(commandWords, staticArgs)).toEqual(payload)
   })
 })

@@ -636,7 +636,7 @@ function run() {
             // Dispatch for each matching configuration
             for (const cmd of configMatches) {
                 // Generate slash command payload
-                clientPayload.slash_command = command_helper_1.getSlashCommandPayload(commandWords);
+                clientPayload.slash_command = command_helper_1.getSlashCommandPayload(commandWords, cmd.static_args);
                 core.debug(`Slash command payload: ${util_1.inspect(clientPayload.slash_command)}`);
                 // Dispatch the command
                 const dispatchRepo = cmd.repository.split('/');
@@ -955,7 +955,8 @@ exports.commandDefaults = Object.freeze({
     issue_type: 'both',
     allow_edits: false,
     repository: process.env.GITHUB_REPOSITORY || '',
-    event_type_suffix: '-command'
+    event_type_suffix: '-command',
+    static_args: []
 });
 function toBool(input, defaultVal) {
     if (typeof input === 'boolean') {
@@ -981,6 +982,7 @@ function getInputs() {
         allowEdits: core.getInput('allow-edits') === 'true',
         repository: core.getInput('repository'),
         eventTypeSuffix: core.getInput('event-type-suffix'),
+        staticArgs: utils.getInputAsArray('static-args'),
         config: core.getInput('config'),
         configFromFile: core.getInput('config-from-file')
     };
@@ -1015,7 +1017,8 @@ function getCommandsConfigFromInputs(inputs) {
             issue_type: inputs.issueType,
             allow_edits: inputs.allowEdits,
             repository: inputs.repository,
-            event_type_suffix: inputs.eventTypeSuffix
+            event_type_suffix: inputs.eventTypeSuffix,
+            static_args: inputs.staticArgs
         };
         config.push(cmd);
     }
@@ -1035,7 +1038,8 @@ function getCommandsConfigFromJson(json) {
             repository: jc.repository ? jc.repository : exports.commandDefaults.repository,
             event_type_suffix: jc.event_type_suffix
                 ? jc.event_type_suffix
-                : exports.commandDefaults.event_type_suffix
+                : exports.commandDefaults.event_type_suffix,
+            static_args: jc.static_args ? jc.static_args : exports.commandDefaults.static_args
         };
         config.push(cmd);
     }
@@ -1087,7 +1091,7 @@ function addReaction(octokit, repo, commentId, reaction) {
     });
 }
 exports.addReaction = addReaction;
-function getSlashCommandPayload(commandWords) {
+function getSlashCommandPayload(commandWords, staticArgs) {
     const payload = {
         command: commandWords[0],
         args: {
@@ -1098,8 +1102,11 @@ function getSlashCommandPayload(commandWords) {
             named: {}
         }
     };
-    if (commandWords.length > 1) {
-        const argWords = commandWords.slice(1, exports.MAX_ARGS + 1);
+    // Get arguments if they exist
+    const argWords = commandWords.length > 1 ? commandWords.slice(1, exports.MAX_ARGS + 1) : [];
+    // Add static arguments if they exist
+    argWords.unshift(...staticArgs);
+    if (argWords.length > 0) {
         payload.args.all = argWords.join(' ');
         // Parse named and unnamed args
         let unnamedCount = 1;

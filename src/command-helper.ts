@@ -18,6 +18,7 @@ export interface Inputs {
   allowEdits: boolean
   repository: string
   eventTypeSuffix: string
+  staticArgs: string[]
   config: string
   configFromFile: string
 }
@@ -29,6 +30,7 @@ export interface Command {
   allow_edits: boolean
   repository: string
   event_type_suffix: string
+  static_args: string[]
 }
 
 interface Repo {
@@ -55,7 +57,8 @@ export const commandDefaults = Object.freeze({
   issue_type: 'both',
   allow_edits: false,
   repository: process.env.GITHUB_REPOSITORY || '',
-  event_type_suffix: '-command'
+  event_type_suffix: '-command',
+  static_args: []
 })
 
 export function toBool(input: string, defaultVal: boolean): boolean {
@@ -80,6 +83,7 @@ export function getInputs(): Inputs {
     allowEdits: core.getInput('allow-edits') === 'true',
     repository: core.getInput('repository'),
     eventTypeSuffix: core.getInput('event-type-suffix'),
+    staticArgs: utils.getInputAsArray('static-args'),
     config: core.getInput('config'),
     configFromFile: core.getInput('config-from-file')
   }
@@ -113,7 +117,8 @@ export function getCommandsConfigFromInputs(inputs: Inputs): Command[] {
       issue_type: inputs.issueType,
       allow_edits: inputs.allowEdits,
       repository: inputs.repository,
-      event_type_suffix: inputs.eventTypeSuffix
+      event_type_suffix: inputs.eventTypeSuffix,
+      static_args: inputs.staticArgs
     }
     config.push(cmd)
   }
@@ -134,7 +139,8 @@ export function getCommandsConfigFromJson(json: string): Command[] {
       repository: jc.repository ? jc.repository : commandDefaults.repository,
       event_type_suffix: jc.event_type_suffix
         ? jc.event_type_suffix
-        : commandDefaults.event_type_suffix
+        : commandDefaults.event_type_suffix,
+      static_args: jc.static_args ? jc.static_args : commandDefaults.static_args
     }
     config.push(cmd)
   }
@@ -213,7 +219,8 @@ export async function addReaction(
 }
 
 export function getSlashCommandPayload(
-  commandWords: string[]
+  commandWords: string[],
+  staticArgs: string[]
 ): SlashCommandPayload {
   const payload: SlashCommandPayload = {
     command: commandWords[0],
@@ -225,8 +232,12 @@ export function getSlashCommandPayload(
       named: {}
     }
   }
-  if (commandWords.length > 1) {
-    const argWords = commandWords.slice(1, MAX_ARGS + 1)
+  // Get arguments if they exist
+  const argWords =
+    commandWords.length > 1 ? commandWords.slice(1, MAX_ARGS + 1) : []
+  // Add static arguments if they exist
+  argWords.unshift(...staticArgs)
+  if (argWords.length > 0) {
     payload.args.all = argWords.join(' ')
     // Parse named and unnamed args
     let unnamedCount = 1

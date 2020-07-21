@@ -28,6 +28,8 @@ inputs:
   event-type-suffix:
     description: 'The repository dispatch event type suffix for the commands.'
     default: -command
+  static-args:
+    description: 'A comma or newline separated list of arguments that will be dispatched with every command.'
   config:
     description: 'JSON configuration for commands.'
   config-from-file:

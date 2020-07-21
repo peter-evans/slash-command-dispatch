@@ -76,6 +76,7 @@ This action also features [advanced configuration](docs/advanced-configuration.m
 | `allow-edits` | Allow edited comments to trigger command dispatches. | `false` |
 | `repository` | The full name of the repository to send the dispatch events. | Current repository |
 | `event-type-suffix` | The repository dispatch event type suffix for the commands. | `-command` |
+| `static-args` | A comma or newline separated list of arguments that will be dispatched with every command. | |
 | `config` | | JSON configuration for commands. See [Advanced configuration](docs/advanced-configuration.md) | |
 | `config-from-file` | | JSON configuration from a file for commands. See [Advanced configuration](docs/advanced-configuration.md) | |
 
@@ -133,24 +134,38 @@ Commands are dispatched with a payload containing a number of contexts.
 
 #### `slash_command` context
 
-The slash command context contains the command and any arguments supplied with it.
+The slash command context contains the command and any arguments that were supplied by the user.
+It will also contain any static arguments, if configured.
 
-For example, the slash command `/deploy branch=master env=prod some other args` will be converted to a JSON payload as follows.
+To demonstrate, take the following configuration as an example.
+```yml
+      - uses: peter-evans/slash-command-dispatch@v2
+        with:
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          commands: |
+            deploy
+          static-args: |
+            production
+            region=us-east-1
+```
+
+For the above example configuration, the slash command `/deploy branch=master some other args` will be converted to a JSON payload as follows.
 
 ```json
     "slash_command": {
         "command": "deploy",
         "args": {
-            "all": "branch=master env=prod some other args",
+            "all": "production region=us-east-1 branch=master some other args",
             "unnamed": {
-                "all": "some other args",
-                "arg1": "some",
-                "arg2": "other",
-                "arg3": "args"
+                "all": "production some other args",
+                "arg1": "production",
+                "arg2": "some",
+                "arg3": "other",
+                "arg4": "args"
             },
             "named": {
-                "branch": "master",
-                "env": "prod"
+                "region": "us-east-1",
+                "branch": "master"
             },
         }
     }
@@ -167,8 +182,9 @@ The properties in the `slash_command` context from the above example can be used
           echo ${{ github.event.client_payload.slash_command.args.unnamed.arg1 }}
           echo ${{ github.event.client_payload.slash_command.args.unnamed.arg2 }}
           echo ${{ github.event.client_payload.slash_command.args.unnamed.arg3 }}
+          echo ${{ github.event.client_payload.slash_command.args.unnamed.arg4 }}
+          echo ${{ github.event.client_payload.slash_command.args.named.region }}
           echo ${{ github.event.client_payload.slash_command.args.named.branch }}
-          echo ${{ github.event.client_payload.slash_command.args.named.env }}
           # etc.
 ```
 

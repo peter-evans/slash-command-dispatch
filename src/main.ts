@@ -170,7 +170,10 @@ async function run(): Promise<void> {
     // Dispatch for each matching configuration
     for (const cmd of configMatches) {
       // Generate slash command payload
-      clientPayload.slash_command = getSlashCommandPayload(commandWords)
+      clientPayload.slash_command = getSlashCommandPayload(
+        commandWords,
+        cmd.static_args
+      )
       core.debug(
         `Slash command payload: ${inspect(clientPayload.slash_command)}`
       )

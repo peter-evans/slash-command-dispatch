@@ -9,7 +9,11 @@
     "command": "delete",
     "permission": "write",
     "issue_type": "both",
-    "allow_edits": true
+    "allow_edits": true,
+    "static_args": [
+      "some-unnamed-arg",
+      "foo=bar"
+    ]
   },
   {
     "command": "do-something-remotely",
