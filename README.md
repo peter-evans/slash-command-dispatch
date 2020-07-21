@@ -73,7 +73,6 @@ This action also features [advanced configuration](docs/advanced-configuration.m
 | `allow-edits` | Allow edited comments to trigger command dispatches. | `false` |
 | `repository` | The full name of the repository to send the dispatch events. | Current repository |
 | `event-type-suffix` | The repository dispatch event type suffix for the commands. | `-command` |
-| `named-args` | Parse named arguments and add them to the command payload. | `false` |
 | `config` | | JSON configuration for commands. See [Advanced configuration](docs/advanced-configuration.md) | |
 | `config-from-file` | | JSON configuration from a file for commands. See [Advanced configuration](docs/advanced-configuration.md) | |
 
@@ -128,47 +127,43 @@ Commands are dispatched with a payload containing a number of contexts.
 
 #### `slash_command` context
 
-The slash command context can be accessed as follows.
-`args` is a space separated string of all the supplied arguments.
-Each argument is also supplied in a numbered property, i.e. `arg1`, `arg2`, `arg3`, etc. 
+The slash command context contains the command and any arguments supplied with it.
+
+For example, the slash command `/deploy branch=master env=prod some other args` will be converted to a JSON payload as follows.
+
+```json
+    "slash_command": {
+        "command": "deploy",
+        "args": {
+            "all": "branch=master env=prod some other args",
+            "unnamed": {
+                "all": "some other args",
+                "arg1": "some",
+                "arg2": "other",
+                "arg3": "args"
+            },
+            "named": {
+                "branch": "master",
+                "env": "prod"
+            },
+        }
+    }
+```
+
+The properties in the `slash_command` context from the above example can be used in a workflow as follows.
 
 ```yml
       - name: Output command and arguments
         run: |
           echo ${{ github.event.client_payload.slash_command.command }}
-          echo ${{ github.event.client_payload.slash_command.args }}
-          echo ${{ github.event.client_payload.slash_command.arg1 }}
-          echo ${{ github.event.client_payload.slash_command.arg2 }}
-          echo ${{ github.event.client_payload.slash_command.arg3 }}
+          echo ${{ github.event.client_payload.slash_command.args.all }}
+          echo ${{ github.event.client_payload.slash_command.args.unnamed.all }}
+          echo ${{ github.event.client_payload.slash_command.args.unnamed.arg1 }}
+          echo ${{ github.event.client_payload.slash_command.args.unnamed.arg2 }}
+          echo ${{ github.event.client_payload.slash_command.args.unnamed.arg3 }}
+          echo ${{ github.event.client_payload.slash_command.args.named.branch }}
+          echo ${{ github.event.client_payload.slash_command.args.named.env }}
           # etc.
-```
-
-If the `named-args` input is set to `true`, any arguments that are prefixed in the format `name=argument` will be parsed and added to the payload.
-
-For example, the slash command `/deploy branch=master env=prod some other args` will be set in the JSON payload as follows.
-
-```json
-    "slash_command": {
-        "command": "deploy",
-        "args": "branch=master env=prod some other args",
-        "unnamed_args": "some other args",
-        "branch": "master",
-        "env": "prod",
-        "arg1": "some",
-        "arg2": "other",
-        "arg3": "args"
-    }
-```
-
-These named arguments can be accessed in a workflow as follows.
-
-```yml
-      - name: Output command and named arguments
-        run: |
-          echo ${{ github.event.client_payload.slash_command.command }}
-          echo ${{ github.event.client_payload.slash_command.branch }}
-          echo ${{ github.event.client_payload.slash_command.env }}
-          echo ${{ github.event.client_payload.slash_command.unnamed_args }}
 ```
 
 #### `github` and `pull_request` contexts

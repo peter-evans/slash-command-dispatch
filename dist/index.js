@@ -636,7 +636,7 @@ function run() {
             // Dispatch for each matching configuration
             for (const cmd of configMatches) {
                 // Generate slash command payload
-                clientPayload.slash_command = command_helper_1.getSlashCommandPayload(commandWords, cmd.named_args);
+                clientPayload.slash_command = command_helper_1.getSlashCommandPayload(commandWords);
                 core.debug(`Slash command payload: ${util_1.inspect(clientPayload.slash_command)}`);
                 // Dispatch the command
                 const dispatchRepo = cmd.repository.split('/');
@@ -954,8 +954,7 @@ exports.commandDefaults = Object.freeze({
     issue_type: 'both',
     allow_edits: false,
     repository: process.env.GITHUB_REPOSITORY || '',
-    event_type_suffix: '-command',
-    named_args: false
+    event_type_suffix: '-command'
 });
 function toBool(input, defaultVal) {
     if (typeof input === 'boolean') {
@@ -981,7 +980,6 @@ function getInputs() {
         allowEdits: core.getInput('allow-edits') === 'true',
         repository: core.getInput('repository'),
         eventTypeSuffix: core.getInput('event-type-suffix'),
-        namedArgs: core.getInput('named-args') === 'true',
         config: core.getInput('config'),
         configFromFile: core.getInput('config-from-file')
     };
@@ -1018,8 +1016,7 @@ function getCommandsConfigFromInputs(inputs) {
             issue_type: inputs.issueType,
             allow_edits: inputs.allowEdits,
             repository: inputs.repository,
-            event_type_suffix: inputs.eventTypeSuffix,
-            named_args: inputs.namedArgs
+            event_type_suffix: inputs.eventTypeSuffix
         };
         config.push(cmd);
     }
@@ -1039,8 +1036,7 @@ function getCommandsConfigFromJson(json) {
             repository: jc.repository ? jc.repository : exports.commandDefaults.repository,
             event_type_suffix: jc.event_type_suffix
                 ? jc.event_type_suffix
-                : exports.commandDefaults.event_type_suffix,
-            named_args: toBool(jc.named_args, exports.commandDefaults.named_args)
+                : exports.commandDefaults.event_type_suffix
         };
         config.push(cmd);
     }
@@ -1092,33 +1088,40 @@ function addReaction(octokit, repo, commentId, reaction) {
     });
 }
 exports.addReaction = addReaction;
-function getSlashCommandPayload(commandWords, namedArgs) {
+function getSlashCommandPayload(commandWords) {
     const payload = {
         command: commandWords[0],
-        args: ''
+        args: {
+            all: '',
+            unnamed: {
+                all: ''
+            },
+            named: {}
+        }
     };
     if (commandWords.length > 1) {
         const argWords = commandWords.slice(1, exports.MAX_ARGS + 1);
-        payload.args = argWords.join(' ');
+        payload.args.all = argWords.join(' ');
         // Parse named and unnamed args
         let unnamedCount = 1;
         const unnamedArgs = [];
         for (const argWord of argWords) {
-            if (namedArgs && NAMED_ARG_PATTERN.test(argWord)) {
+            if (NAMED_ARG_PATTERN.test(argWord)) {
                 const result = NAMED_ARG_PATTERN.exec(argWord);
                 if (result && result.groups) {
-                    payload[`${result.groups['name']}`] = result.groups['value'];
+                    payload.args.named[`${result.groups['name']}`] =
+                        result.groups['value'];
                 }
             }
             else {
                 unnamedArgs.push(argWord);
-                payload[`arg${unnamedCount}`] = argWord;
+                payload.args.unnamed[`arg${unnamedCount}`] = argWord;
                 unnamedCount += 1;
             }
         }
         // Add a string of only the unnamed args
-        if (namedArgs && unnamedArgs.length > 0) {
-            payload['unnamed_args'] = unnamedArgs.join(' ');
+        if (unnamedArgs.length > 0) {
+            payload.args.unnamed.all = unnamedArgs.join(' ');
         }
     }
     return payload;

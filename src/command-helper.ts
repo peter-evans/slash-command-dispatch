@@ -17,7 +17,6 @@ export interface Inputs {
   allowEdits: boolean
   repository: string
   eventTypeSuffix: string
-  namedArgs: boolean
   config: string
   configFromFile: string
 }
@@ -29,7 +28,6 @@ export interface Command {
   allow_edits: boolean
   repository: string
   event_type_suffix: string
-  named_args: boolean
 }
 
 interface Repo {
@@ -39,8 +37,16 @@ interface Repo {
 
 export interface SlashCommandPayload {
   command: string
-  args: string
-  [k: string]: string
+  args: {
+    all: string
+    unnamed: {
+      all: string
+      [k: string]: string
+    }
+    named: {
+      [k: string]: string
+    }
+  }
 }
 
 export const commandDefaults = Object.freeze({
@@ -48,8 +54,7 @@ export const commandDefaults = Object.freeze({
   issue_type: 'both',
   allow_edits: false,
   repository: process.env.GITHUB_REPOSITORY || '',
-  event_type_suffix: '-command',
-  named_args: false
+  event_type_suffix: '-command'
 })
 
 export function toBool(input: string, defaultVal: boolean): boolean {
@@ -74,7 +79,6 @@ export function getInputs(): Inputs {
     allowEdits: core.getInput('allow-edits') === 'true',
     repository: core.getInput('repository'),
     eventTypeSuffix: core.getInput('event-type-suffix'),
-    namedArgs: core.getInput('named-args') === 'true',
     config: core.getInput('config'),
     configFromFile: core.getInput('config-from-file')
   }
@@ -110,8 +114,7 @@ export function getCommandsConfigFromInputs(inputs: Inputs): Command[] {
       issue_type: inputs.issueType,
       allow_edits: inputs.allowEdits,
       repository: inputs.repository,
-      event_type_suffix: inputs.eventTypeSuffix,
-      named_args: inputs.namedArgs
+      event_type_suffix: inputs.eventTypeSuffix
     }
     config.push(cmd)
   }
@@ -132,8 +135,7 @@ export function getCommandsConfigFromJson(json: string): Command[] {
       repository: jc.repository ? jc.repository : commandDefaults.repository,
       event_type_suffix: jc.event_type_suffix
         ? jc.event_type_suffix
-        : commandDefaults.event_type_suffix,
-      named_args: toBool(jc.named_args, commandDefaults.named_args)
+        : commandDefaults.event_type_suffix
     }
     config.push(cmd)
   }
@@ -212,34 +214,40 @@ export async function addReaction(
 }
 
 export function getSlashCommandPayload(
-  commandWords: string[],
-  namedArgs: boolean
+  commandWords: string[]
 ): SlashCommandPayload {
   const payload: SlashCommandPayload = {
     command: commandWords[0],
-    args: ''
+    args: {
+      all: '',
+      unnamed: {
+        all: ''
+      },
+      named: {}
+    }
   }
   if (commandWords.length > 1) {
     const argWords = commandWords.slice(1, MAX_ARGS + 1)
-    payload.args = argWords.join(' ')
+    payload.args.all = argWords.join(' ')
     // Parse named and unnamed args
     let unnamedCount = 1
     const unnamedArgs: string[] = []
     for (const argWord of argWords) {
-      if (namedArgs && NAMED_ARG_PATTERN.test(argWord)) {
+      if (NAMED_ARG_PATTERN.test(argWord)) {
         const result = NAMED_ARG_PATTERN.exec(argWord)
         if (result && result.groups) {
-          payload[`${result.groups['name']}`] = result.groups['value']
+          payload.args.named[`${result.groups['name']}`] =
+            result.groups['value']
         }
       } else {
         unnamedArgs.push(argWord)
-        payload[`arg${unnamedCount}`] = argWord
+        payload.args.unnamed[`arg${unnamedCount}`] = argWord
         unnamedCount += 1
       }
     }
     // Add a string of only the unnamed args
-    if (namedArgs && unnamedArgs.length > 0) {
-      payload['unnamed_args'] = unnamedArgs.join(' ')
+    if (unnamedArgs.length > 0) {
+      payload.args.unnamed.all = unnamedArgs.join(' ')
     }
   }
   return payload

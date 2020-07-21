@@ -11,5 +11,5 @@ jobs:
         with:
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
           body: |
-            >pong ${{ github.event.client_payload.slash_command.args }}
+            >pong ${{ github.event.client_payload.slash_command.args.all }}
           reaction-type: hooray

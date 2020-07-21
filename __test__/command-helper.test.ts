@@ -23,7 +23,6 @@ describe('command-helper tests', () => {
       // Should be the value of github.repository, but '' for tests
       repository: '',
       eventTypeSuffix: '-command',
-      namedArgs: false,
       config: '',
       configFromFile: ''
     }
@@ -39,7 +38,6 @@ describe('command-helper tests', () => {
       expect(config[i].event_type_suffix).toEqual(
         commandDefaults.event_type_suffix
       )
-      expect(config[i].named_args).toEqual(commandDefaults.named_args)
     }
   })
 
@@ -54,7 +52,6 @@ describe('command-helper tests', () => {
       allowEdits: true,
       repository: 'owner/repo',
       eventTypeSuffix: '-cmd',
-      namedArgs: true,
       config: '',
       configFromFile: ''
     }
@@ -68,7 +65,6 @@ describe('command-helper tests', () => {
       expect(config[i].allow_edits).toEqual(inputs.allowEdits)
       expect(config[i].repository).toEqual(inputs.repository)
       expect(config[i].event_type_suffix).toEqual(inputs.eventTypeSuffix)
-      expect(config[i].named_args).toEqual(inputs.namedArgs)
     }
   })
 
@@ -93,7 +89,6 @@ describe('command-helper tests', () => {
       expect(config[i].event_type_suffix).toEqual(
         commandDefaults.event_type_suffix
       )
-      expect(config[i].named_args).toEqual(commandDefaults.named_args)
     }
   })
 
@@ -105,8 +100,7 @@ describe('command-helper tests', () => {
         "issue_type": "pull-request",
         "allow_edits": true,
         "repository": "owner/repo",
-        "event_type_suffix": "-cmd",
-        "named_args": true
+        "event_type_suffix": "-cmd"
       },
       {
         "command": "test-all-the-things",
@@ -122,7 +116,6 @@ describe('command-helper tests', () => {
     expect(config[0].allow_edits).toBeTruthy()
     expect(config[0].repository).toEqual('owner/repo')
     expect(config[0].event_type_suffix).toEqual('-cmd')
-    expect(config[0].named_args).toBeTruthy()
     expect(config[1].command).toEqual(commands[1])
     expect(config[1].permission).toEqual('read')
     expect(config[1].issue_type).toEqual(commandDefaults.issue_type)
@@ -136,8 +129,7 @@ describe('command-helper tests', () => {
         issue_type: 'both',
         allow_edits: false,
         repository: 'peter-evans/slash-command-dispatch',
-        event_type_suffix: '-command',
-        named_args: false
+        event_type_suffix: '-command'
       }
     ]
     expect(configIsValid(config)).toBeTruthy()
@@ -151,8 +143,7 @@ describe('command-helper tests', () => {
         issue_type: 'both',
         allow_edits: false,
         repository: 'peter-evans/slash-command-dispatch',
-        event_type_suffix: '-command',
-        named_args: false
+        event_type_suffix: '-command'
       }
     ]
     expect(configIsValid(config)).toBeFalsy()
@@ -166,8 +157,7 @@ describe('command-helper tests', () => {
         issue_type: 'test-case-invalid-issue-type',
         allow_edits: false,
         repository: 'peter-evans/slash-command-dispatch',
-        event_type_suffix: '-command',
-        named_args: false
+        event_type_suffix: '-command'
       }
     ]
     expect(configIsValid(config)).toBeFalsy()
@@ -188,44 +178,58 @@ describe('command-helper tests', () => {
 
   test('slash command payload', async () => {
     const commandWords = ['test', 'arg1', 'arg2', 'arg3']
-    const namedArgs = false
     const payload: SlashCommandPayload = {
       command: 'test',
-      args: 'arg1 arg2 arg3',
-      arg1: 'arg1',
-      arg2: 'arg2',
-      arg3: 'arg3'
+      args: {
+        all: 'arg1 arg2 arg3',
+        unnamed: {
+          all: 'arg1 arg2 arg3',
+          arg1: 'arg1',
+          arg2: 'arg2',
+          arg3: 'arg3'
+        },
+        named: {}
+      }
     }
-    expect(getSlashCommandPayload(commandWords, namedArgs)).toEqual(payload)
+    expect(getSlashCommandPayload(commandWords)).toEqual(payload)
   })
 
   test('slash command payload with named args', async () => {
     const commandWords = ['test', 'branch=master', 'arg1', 'env=prod', 'arg2']
-    const namedArgs = true
     const payload: SlashCommandPayload = {
       command: 'test',
-      args: 'branch=master arg1 env=prod arg2',
-      unnamed_args: 'arg1 arg2',
-      branch: 'master',
-      env: 'prod',
-      arg1: 'arg1',
-      arg2: 'arg2'
+      args: {
+        all: 'branch=master arg1 env=prod arg2',
+        unnamed: {
+          all: 'arg1 arg2',
+          arg1: 'arg1',
+          arg2: 'arg2'
+        },
+        named: {
+          branch: 'master',
+          env: 'prod'
+        }
+      }
     }
-    expect(getSlashCommandPayload(commandWords, namedArgs)).toEqual(payload)
+    expect(getSlashCommandPayload(commandWords)).toEqual(payload)
   })
 
   test('slash command payload with malformed named args', async () => {
     const commandWords = ['test', 'branch=', 'arg1', 'e-nv=prod', 'arg2']
-    const namedArgs = true
     const payload: SlashCommandPayload = {
       command: 'test',
-      args: 'branch= arg1 e-nv=prod arg2',
-      unnamed_args: 'branch= arg1 e-nv=prod arg2',
-      arg1: 'branch=',
-      arg2: 'arg1',
-      arg3: 'e-nv=prod',
-      arg4: 'arg2'
+      args: {
+        all: 'branch= arg1 e-nv=prod arg2',
+        unnamed: {
+          all: 'branch= arg1 e-nv=prod arg2',
+          arg1: 'branch=',
+          arg2: 'arg1',
+          arg3: 'e-nv=prod',
+          arg4: 'arg2'
+        },
+        named: {}
+      }
     }
-    expect(getSlashCommandPayload(commandWords, namedArgs)).toEqual(payload)
+    expect(getSlashCommandPayload(commandWords)).toEqual(payload)
   })
 })

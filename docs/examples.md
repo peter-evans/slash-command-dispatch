@@ -15,8 +15,6 @@ This is pattern for a slash command where a named argument specifies the branch 
 /do-something branch=develop
 ```
 
-In the dispatch configuration for this command pattern, `named-args` should be set to `true`.
-
 In the following command workflow, `REPO_ACCESS_TOKEN` is a `repo` scoped [Personal Access Token](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line).
 
 ```yml
@@ -32,7 +30,7 @@ jobs:
       - name: Get the target branch name
         id: vars
         run: |
-          branch=${{ github.event.client_payload.slash_command.branch }}
+          branch=${{ github.event.client_payload.slash_command.args.named.branch }}
           if [[ -z "$branch" ]]; then branch="master"; fi
           echo ::set-output name=branch::$branch
 
@@ -68,7 +66,7 @@ This is a real example that uses this pattern to execute the Python test tool [p
 /pytest branch=develop -v -s
 ```
 
-In the following command workflow, note how the remaining `unnamed_args` are passed to the `pytest` tool.
+In the following command workflow, note how the unnamed arguments are passed to the `pytest` tool with the property `args.unnamed.all`.
 
 ```yml
 name: pytest
@@ -83,7 +81,7 @@ jobs:
       - name: Get the target branch name
         id: vars
         run: |
-          branch=${{ github.event.client_payload.slash_command.branch }}
+          branch=${{ github.event.client_payload.slash_command.args.named.branch }}
           if [[ -z "$branch" ]]; then branch="master"; fi
           echo ::set-output name=branch::$branch
 
@@ -109,7 +107,7 @@ jobs:
 
       # Execute pytest
       - name: Execute pytest
-        run: pytest ${{ github.event.client_payload.slash_command.unnamed_args }}
+        run: pytest ${{ github.event.client_payload.slash_command.args.unnamed.all }}
 
       # Add reaction to the comment
       - name: Add reaction

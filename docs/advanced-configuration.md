@@ -50,8 +50,7 @@ jobs:
                 "command": "integration-test",
                 "permission": "write",
                 "issue_type": "both",
-                "repository": "peter-evans/slash-command-dispatch-processor",
-                "named_args": true
+                "repository": "peter-evans/slash-command-dispatch-processor"
               },
               {
                 "command": "create-ticket",
@@ -98,6 +97,5 @@ Advanced configuration requires a combination of yaml based inputs and JSON conf
 | | `allow_edits` | Allow edited comments to trigger command dispatches. | `false` |
 | | `repository` | The full name of the repository to send the dispatch events. | Current repository |
 | | `event_type_suffix` | The repository dispatch event type suffix for the command. | `-command` |
-| | `named_args` | Parse named arguments and add them to the command payload. | `false` |
 | `config` | | JSON configuration for commands. | |
 | `config-from-file` | | JSON configuration from a file for commands. | |

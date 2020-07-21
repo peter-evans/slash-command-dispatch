@@ -3,8 +3,7 @@
     "command": "create",
     "permission": "write",
     "issue_type": "issue",
-    "event_type_suffix": "-cmd",
-    "named_args": true
+    "event_type_suffix": "-cmd"
   },
   {
     "command": "delete",

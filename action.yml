@@ -28,9 +28,6 @@ inputs:
   event-type-suffix:
     description: 'The repository dispatch event type suffix for the commands.'
     default: -command
-  named-args:
-    description: 'Parse named arguments and add them to the command payload.'
-    default: false
   config:
     description: 'JSON configuration for commands.'
   config-from-file:
