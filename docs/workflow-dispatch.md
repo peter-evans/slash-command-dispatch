@@ -52,14 +52,14 @@ Using basic configuration:
 ```yml
           static-args: |
             repository=${{ github.repository }}
-            comment-id=${{ github.event.issue.comment-id }}
+            comment-id=${{ github.event.comment.id }}
 ```
 
 Using advanced configuration:
 ```json
           "static_args": [
             "repository=${{ github.repository }}",
-            "comment-id=${{ github.event.issue.comment-id }}"
+            "comment-id=${{ github.event.comment.id }}"
           ]
 ```
 
