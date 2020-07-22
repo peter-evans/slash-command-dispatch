@@ -647,11 +647,9 @@ function run() {
         catch (error) {
             core.debug(util_1.inspect(error));
             const message = error.message;
-            if (message == 'Unexpected inputs provided') {
-                core.warning(message);
-            }
-            else if (message.startsWith('Required input') &&
-                message.endsWith('not provided')) {
+            if (message == 'Unexpected inputs provided' ||
+                (message.startsWith('Required input') && message.endsWith('not provided'))) {
+                core.setOutput('error-message', message);
                 core.warning(message);
             }
             else {
