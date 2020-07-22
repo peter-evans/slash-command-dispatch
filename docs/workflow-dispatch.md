@@ -91,14 +91,14 @@ The simplest response is to add a :tada: reaction to the comment.
           reaction-type: hooray
 ```
 
-### Action warnings
+### Validation errors
 
 When creating the [workflow_dispatch](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch) event, the GitHub API will return validation errors. In the following cases the action will issue a warning (visible in the Actions log), and set the action output `error-message`.
 
-- `Required input '...' not provided`: A required input for the workflow was not supplied as a named argument.
-- `Unexpected inputs provided`: Named arguments were supplied that are not defined as workflow inputs.
+- `Required input '...' not provided` - A required input for the workflow was not supplied as a named argument.
+- `Unexpected inputs provided` - Named arguments were supplied that are not defined as workflow inputs.
 
-The `error-message` output can be used to provide feedback to the user as follows. Note that the step needs an `id` to access the outputs.
+The `error-message` output can be used to provide feedback to the user as follows. Note that the action step needs an `id` to access the outputs.
 
 ```yml
       - name: Slash Command Dispatch

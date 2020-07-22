@@ -37,6 +37,9 @@ inputs:
     description: 'JSON configuration for commands.'
   config-from-file:
     description: 'JSON configuration from a file for commands.'
+outputs:
+  error-message:
+    description: 'Validation errors when using `workflow` dispatch.'
 runs:
   using: 'node12'
   main: 'dist/index.js'
