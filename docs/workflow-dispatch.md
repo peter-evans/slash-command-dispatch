@@ -91,7 +91,7 @@ The simplest response is to add a :tada: reaction to the comment.
           reaction-type: hooray
 ```
 
-### Validation errors
+## Validation errors
 
 When creating the [workflow_dispatch](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch) event, the GitHub API will return validation errors. In the following cases the action will issue a warning (visible in the Actions log), and set the action output `error-message`.
 
