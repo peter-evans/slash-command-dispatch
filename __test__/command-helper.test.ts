@@ -21,8 +21,7 @@ describe('command-helper tests', () => {
       permission: 'write',
       issueType: 'both',
       allowEdits: false,
-      // Should be the value of github.repository, but '' for tests
-      repository: '',
+      repository: 'peter-evans/slash-command-dispatch',
       eventTypeSuffix: '-command',
       staticArgs: [],
       dispatchType: 'repository',
