@@ -64,7 +64,8 @@ jobs:
                 "permission": "write",
                 "issue_type": "issue",
                 "allow_edits": true,
-                "event_type_suffix": "-cmd"
+                "event_type_suffix": "-cmd",
+                "dispatch_type": "workflow"
               }
             ]
 ```
@@ -105,5 +106,6 @@ Advanced configuration requires a combination of yaml based inputs and JSON conf
 | | `repository` | The full name of the repository to send the dispatch events. | Current repository |
 | | `event_type_suffix` | The repository dispatch event type suffix for the command. | `-command` |
 | | `static_args` | A string array of arguments that will be dispatched with the command. | `[]` |
+| | `dispatch_type` | The dispatch type; `repository` or `workflow`. | `repository` |
 | `config` | | JSON configuration for commands. | |
 | `config-from-file` | | JSON configuration from a file for commands. | |

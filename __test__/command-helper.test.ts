@@ -25,6 +25,7 @@ describe('command-helper tests', () => {
       repository: '',
       eventTypeSuffix: '-command',
       staticArgs: [],
+      dispatchType: 'repository',
       config: '',
       configFromFile: ''
     }
@@ -40,6 +41,7 @@ describe('command-helper tests', () => {
         commandDefaults.event_type_suffix
       )
       expect(config[i].static_args).toEqual(commandDefaults.static_args)
+      expect(config[i].dispatch_type).toEqual(commandDefaults.dispatch_type)
     }
   })
 
@@ -56,6 +58,7 @@ describe('command-helper tests', () => {
       repository: 'owner/repo',
       eventTypeSuffix: '-cmd',
       staticArgs: ['production', 'region=us-east-1'],
+      dispatchType: 'workflow',
       config: '',
       configFromFile: ''
     }
@@ -69,6 +72,7 @@ describe('command-helper tests', () => {
       expect(config[i].repository).toEqual(inputs.repository)
       expect(config[i].event_type_suffix).toEqual(inputs.eventTypeSuffix)
       expect(config[i].static_args).toEqual(inputs.staticArgs)
+      expect(config[i].dispatch_type).toEqual(inputs.dispatchType)
     }
   })
 
@@ -93,7 +97,8 @@ describe('command-helper tests', () => {
       expect(config[i].event_type_suffix).toEqual(
         commandDefaults.event_type_suffix
       )
-      expect(config[i].static_args).toEqual(commandDefaults.static_args)
+      expect(config[i].static_args).toEqual(commandDefaults.static_args),
+        expect(config[i].dispatch_type).toEqual(commandDefaults.dispatch_type)
     }
   })
 
@@ -113,7 +118,8 @@ describe('command-helper tests', () => {
         "static_args": [
           "production",
           "region=us-east-1"
-        ]
+        ],
+        "dispatch_type": "workflow"
       }
     ]`
     const commands = ['do-stuff', 'test-all-the-things']
@@ -125,10 +131,13 @@ describe('command-helper tests', () => {
     expect(config[0].allow_edits).toBeTruthy()
     expect(config[0].repository).toEqual('owner/repo')
     expect(config[0].event_type_suffix).toEqual('-cmd')
+    expect(config[0].static_args).toEqual([])
+    expect(config[0].dispatch_type).toEqual('repository')
     expect(config[1].command).toEqual(commands[1])
     expect(config[1].permission).toEqual('read')
     expect(config[1].issue_type).toEqual(commandDefaults.issue_type)
     expect(config[1].static_args).toEqual(['production', 'region=us-east-1'])
+    expect(config[1].dispatch_type).toEqual('workflow')
   })
 
   test('valid config', async () => {
@@ -140,7 +149,8 @@ describe('command-helper tests', () => {
         allow_edits: false,
         repository: 'peter-evans/slash-command-dispatch',
         event_type_suffix: '-command',
-        static_args: []
+        static_args: [],
+        dispatch_type: 'repository'
       }
     ]
     expect(configIsValid(config)).toBeTruthy()
@@ -155,7 +165,8 @@ describe('command-helper tests', () => {
         allow_edits: false,
         repository: 'peter-evans/slash-command-dispatch',
         event_type_suffix: '-command',
-        static_args: []
+        static_args: [],
+        dispatch_type: 'repository'
       }
     ]
     expect(configIsValid(config)).toBeFalsy()
@@ -170,7 +181,24 @@ describe('command-helper tests', () => {
         allow_edits: false,
         repository: 'peter-evans/slash-command-dispatch',
         event_type_suffix: '-command',
-        static_args: []
+        static_args: [],
+        dispatch_type: 'repository'
+      }
+    ]
+    expect(configIsValid(config)).toBeFalsy()
+  })
+
+  test('invalid dispatch type in config', async () => {
+    const config: Command[] = [
+      {
+        command: 'test',
+        permission: 'write',
+        issue_type: 'test-case-invalid-issue-type',
+        allow_edits: false,
+        repository: 'peter-evans/slash-command-dispatch',
+        event_type_suffix: '-command',
+        static_args: [],
+        dispatch_type: 'test-case-invalid-dispatch-type'
       }
     ]
     expect(configIsValid(config)).toBeFalsy()

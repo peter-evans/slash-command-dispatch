@@ -2,14 +2,15 @@
 [![CI](https://github.com/peter-evans/slash-command-dispatch/workflows/CI/badge.svg)](https://github.com/peter-evans/slash-command-dispatch/actions?query=workflow%3ACI)
 [![GitHub Marketplace](https://img.shields.io/badge/Marketplace-Slash%20Command%20Dispatch-blue.svg?colorA=24292e&colorB=0366d6&style=flat&longCache=true&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAM6wAADOsB5dZE0gAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAERSURBVCiRhZG/SsMxFEZPfsVJ61jbxaF0cRQRcRJ9hlYn30IHN/+9iquDCOIsblIrOjqKgy5aKoJQj4O3EEtbPwhJbr6Te28CmdSKeqzeqr0YbfVIrTBKakvtOl5dtTkK+v4HfA9PEyBFCY9AGVgCBLaBp1jPAyfAJ/AAdIEG0dNAiyP7+K1qIfMdonZic6+WJoBJvQlvuwDqcXadUuqPA1NKAlexbRTAIMvMOCjTbMwl1LtI/6KWJ5Q6rT6Ht1MA58AX8Apcqqt5r2qhrgAXQC3CZ6i1+KMd9TRu3MvA3aH/fFPnBodb6oe6HM8+lYHrGdRXW8M9bMZtPXUji69lmf5Cmamq7quNLFZXD9Rq7v0Bpc1o/tp0fisAAAAASUVORK5CYII=)](https://github.com/marketplace/actions/slash-command-dispatch)
 
-A GitHub action that facilitates ["ChatOps"](https://www.pagerduty.com/blog/what-is-chatops/) by creating repository dispatch events for slash commands.
+A GitHub action that facilitates ["ChatOps"](https://www.pagerduty.com/blog/what-is-chatops/) by creating dispatch events for slash commands.
 
 ### How does it work?
 
 The action runs in `issue_comment` event workflows and checks the first line of comments for slash commands.
-When a valid command is found it creates a repository dispatch event that includes a payload containing full details of the command and its context.
+When a valid command is found it creates a [repository dispatch](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#repository_dispatch) event that includes a payload containing full details of the command and its context.
+It also supports creating [workflow dispatch](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch) events with defined input parameters.
 
-### Why repository dispatch?
+### Why create dispatch events?
 
 "ChatOps" with slash commands can work in a basic way by parsing the commands during `issue_comment` events and immediately processing the command.
 In repositories with a lot of activity, the workflow queue will get backed up very quickly trying to handle new `issue_comment` events *and* process the commands themselves.
@@ -32,6 +33,7 @@ See it in action with the following live demos.
 - [Examples](docs/examples.md)
 - [Standard configuration](#standard-configuration)
 - [Advanced configuration](docs/advanced-configuration.md)
+- [Workflow dispatch](docs/workflow-dispatch.md)
 - [Updating to v2](docs/updating.md)
 
 ## Dispatching commands
@@ -59,7 +61,7 @@ jobs:
             build-docs
 ```
 
-Note that not specifying the `repository` input will mean that `repository_dispatch` events are created in the *current* repository by default. It's perfectly fine to use the current repository and not dispatch events to a seperate "processor" repository.
+Note that not specifying the `repository` input will mean that dispatch events are created in the *current* repository by default. It's perfectly fine to use the current repository and not dispatch events to a seperate "processor" repository.
 
 This action also features [advanced configuration](docs/advanced-configuration.md) that allows each command to be configured individually if necessary. Use the standard configuration shown above unless you require advanced features.
 
@@ -77,13 +79,14 @@ This action also features [advanced configuration](docs/advanced-configuration.m
 | `repository` | The full name of the repository to send the dispatch events. | Current repository |
 | `event-type-suffix` | The repository dispatch event type suffix for the commands. | `-command` |
 | `static-args` | A comma or newline separated list of arguments that will be dispatched with every command. | |
+| `dispatch-type` | The dispatch type; `repository` or `workflow`. See [dispatch-type](#dispatch-type) for further details. | `repository` |
 | `config` | | JSON configuration for commands. See [Advanced configuration](docs/advanced-configuration.md) | |
 | `config-from-file` | | JSON configuration from a file for commands. See [Advanced configuration](docs/advanced-configuration.md) | |
 
 #### `token`
 
-This action creates [`repository_dispatch`](https://developer.github.com/v3/repos/#create-a-repository-dispatch-event) events.
-The default `GITHUB_TOKEN` does not have scopes to do this so a `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line) is required.
+This action creates [`repository_dispatch`](https://developer.github.com/v3/repos/#create-a-repository-dispatch-event) and [workflow_dispatch](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch) events.
+The default `GITHUB_TOKEN` does not have scopes to create these events, so a `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line) is required.
 If you will be dispatching commands to public repositories *only* then you can use the more limited `public_repo` scope.
 
 #### `reaction-token`
@@ -104,6 +107,13 @@ You can use a [PAT](https://help.github.com/en/github/authenticating-to-github/c
             build-docs
 ```
 
+#### `dispatch-type`
+
+By default, the action creates [`repository_dispatch`](https://developer.github.com/v3/repos/#create-a-repository-dispatch-event) events.
+Setting `dispatch-type` to `workflow` will instead create [workflow_dispatch](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch) events.
+
+There are significant differences in the action's behaviour when using `workflow` dispatch. See [workflow dispatch](docs/workflow-dispatch.md) for usage details.
+
 ### How comments are parsed for slash commands
 
 Slash commands must be placed in the first line of the comment to be interpreted as a command.
@@ -115,6 +125,9 @@ Slash commands must be placed in the first line of the comment to be interpreted
 ![Comment Parsing](docs/assets/comment-parsing.png)
 
 ## Handling dispatched commands
+
+The following documentation applies to the `dispatch-type` default, `repository`, which creates [`repository_dispatch`](https://developer.github.com/v3/repos/#create-a-repository-dispatch-event) events.
+For `workflow` dispatch documentation, see [workflow dispatch](docs/workflow-dispatch.md).
 
 ### Event types
 

@@ -6,11 +6,9 @@ import {
   getCommandsConfig,
   configIsValid,
   actorHasPermission,
-  getActorPermission,
-  addReaction,
   getSlashCommandPayload
 } from './command-helper'
-import {Octokit} from './octokit-client'
+import {GitHubHelper, ClientPayload} from './github-helper'
 
 async function run(): Promise<void> {
   try {
@@ -108,18 +106,21 @@ async function run(): Promise<void> {
       }
     }
 
-    // Set octokit clients
-    const octokit = new Octokit({auth: `${inputs.token}`})
-    const reactionOctokit = new Octokit({auth: `${inputs.reactionToken}`})
+    // Create github clients
+    const githubHelper = new GitHubHelper(inputs.token)
+    const githubHelperReaction = new GitHubHelper(inputs.reactionToken)
 
     // At this point we know the command is registered
     // Add the "eyes" reaction to the comment
     if (inputs.reactions)
-      await addReaction(reactionOctokit, github.context.repo, commentId, 'eyes')
+      await githubHelperReaction.tryAddReaction(
+        github.context.repo,
+        commentId,
+        'eyes'
+      )
 
     // Get the actor permission
-    const actorPermission = await getActorPermission(
-      octokit,
+    const actorPermission = await githubHelper.getActorPermission(
       github.context.repo,
       github.context.actor
     )
@@ -141,8 +142,7 @@ async function run(): Promise<void> {
     core.info(`Command '${commandWords[0]}' to be dispatched.`)
 
     // Define payload
-    const clientPayload = {
-      slash_command: {},
+    const clientPayload: ClientPayload = {
       github: github.context
     }
     // Truncate the body to keep the size of the payload under the max
@@ -158,10 +158,10 @@ async function run(): Promise<void> {
 
     // Get the pull request context for the dispatch payload
     if (isPullRequest) {
-      const {data: pullRequest} = await octokit.pulls.get({
-        ...github.context.repo,
-        pull_number: github.context.payload.issue.number
-      })
+      const pullRequest = await githubHelper.getPull(
+        github.context.repo,
+        github.context.payload.issue.number
+      )
       // Truncate the body to keep the size of the payload under the max
       pullRequest.body = pullRequest.body.slice(0, 1000)
       clientPayload['pull_request'] = pullRequest
@@ -178,24 +178,12 @@ async function run(): Promise<void> {
         `Slash command payload: ${inspect(clientPayload.slash_command)}`
       )
       // Dispatch the command
-      const dispatchRepo = cmd.repository.split('/')
-      const eventType = cmd.command + cmd.event_type_suffix
-      await octokit.repos.createDispatchEvent({
-        owner: dispatchRepo[0],
-        repo: dispatchRepo[1],
-        event_type: eventType,
-        client_payload: clientPayload
-      })
-      core.info(
-        `Command '${cmd.command}' dispatched to '${cmd.repository}' ` +
-          `with event type '${eventType}'.`
-      )
+      await githubHelper.createDispatch(cmd, clientPayload)
     }
 
     // Add the "rocket" reaction to the comment
     if (inputs.reactions)
-      await addReaction(
-        reactionOctokit,
+      await githubHelperReaction.tryAddReaction(
         github.context.repo,
         commentId,
         'rocket'

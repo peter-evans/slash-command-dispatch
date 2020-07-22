@@ -2,7 +2,7 @@
   "name": "slash-command-dispatch",
   "version": "2.0.0",
   "private": true,
-  "description": "Create repository dispatch events for slash commands",
+  "description": "Facilitates 'ChatOps' by creating dispatch events for slash commands",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc && ncc build",
@@ -31,7 +31,8 @@
     "@actions/github": "4.0.0",
     "@octokit/core": "3.1.1",
     "@octokit/plugin-paginate-rest": "2.2.3",
-    "@octokit/plugin-rest-endpoint-methods": "4.1.0"
+    "@octokit/plugin-rest-endpoint-methods": "4.1.0",
+    "@octokit/types": "5.1.0"
   },
   "devDependencies": {
     "@types/jest": "26.0.5",

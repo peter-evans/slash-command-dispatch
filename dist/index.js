@@ -520,7 +520,7 @@ const core = __importStar(__webpack_require__(470));
 const github = __importStar(__webpack_require__(469));
 const util_1 = __webpack_require__(669);
 const command_helper_1 = __webpack_require__(372);
-const octokit_client_1 = __webpack_require__(921);
+const github_helper_1 = __webpack_require__(718);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -595,15 +595,15 @@ function run() {
                     return;
                 }
             }
-            // Set octokit clients
-            const octokit = new octokit_client_1.Octokit({ auth: `${inputs.token}` });
-            const reactionOctokit = new octokit_client_1.Octokit({ auth: `${inputs.reactionToken}` });
+            // Create github clients
+            const githubHelper = new github_helper_1.GitHubHelper(inputs.token);
+            const githubHelperReaction = new github_helper_1.GitHubHelper(inputs.reactionToken);
             // At this point we know the command is registered
             // Add the "eyes" reaction to the comment
             if (inputs.reactions)
-                yield command_helper_1.addReaction(reactionOctokit, github.context.repo, commentId, 'eyes');
+                yield githubHelperReaction.tryAddReaction(github.context.repo, commentId, 'eyes');
             // Get the actor permission
-            const actorPermission = yield command_helper_1.getActorPermission(octokit, github.context.repo, github.context.actor);
+            const actorPermission = yield githubHelper.getActorPermission(github.context.repo, github.context.actor);
             core.debug(`Actor permission: ${actorPermission}`);
             // Filter matching commands by the user's permission level
             configMatches = configMatches.filter(function (cmd) {
@@ -618,7 +618,6 @@ function run() {
             core.info(`Command '${commandWords[0]}' to be dispatched.`);
             // Define payload
             const clientPayload = {
-                slash_command: {},
                 github: github.context
             };
             // Truncate the body to keep the size of the payload under the max
@@ -628,7 +627,7 @@ function run() {
             }
             // Get the pull request context for the dispatch payload
             if (isPullRequest) {
-                const { data: pullRequest } = yield octokit.pulls.get(Object.assign(Object.assign({}, github.context.repo), { pull_number: github.context.payload.issue.number }));
+                const pullRequest = yield githubHelper.getPull(github.context.repo, github.context.payload.issue.number);
                 // Truncate the body to keep the size of the payload under the max
                 pullRequest.body = pullRequest.body.slice(0, 1000);
                 clientPayload['pull_request'] = pullRequest;
@@ -639,20 +638,11 @@ function run() {
                 clientPayload.slash_command = command_helper_1.getSlashCommandPayload(commandWords, cmd.static_args);
                 core.debug(`Slash command payload: ${util_1.inspect(clientPayload.slash_command)}`);
                 // Dispatch the command
-                const dispatchRepo = cmd.repository.split('/');
-                const eventType = cmd.command + cmd.event_type_suffix;
-                yield octokit.repos.createDispatchEvent({
-                    owner: dispatchRepo[0],
-                    repo: dispatchRepo[1],
-                    event_type: eventType,
-                    client_payload: clientPayload
-                });
-                core.info(`Command '${cmd.command}' dispatched to '${cmd.repository}' ` +
-                    `with event type '${eventType}'.`);
+                yield githubHelper.createDispatch(cmd, clientPayload);
             }
             // Add the "rocket" reaction to the comment
             if (inputs.reactions)
-                yield command_helper_1.addReaction(reactionOctokit, github.context.repo, commentId, 'rocket');
+                yield githubHelperReaction.tryAddReaction(github.context.repo, commentId, 'rocket');
         }
         catch (error) {
             core.debug(util_1.inspect(error));
@@ -933,17 +923,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getSlashCommandPayload = exports.addReaction = exports.getActorPermission = exports.actorHasPermission = exports.configIsValid = exports.getCommandsConfigFromJson = exports.getCommandsConfigFromInputs = exports.getCommandsConfig = exports.getInputs = exports.toBool = exports.commandDefaults = exports.MAX_ARGS = void 0;
+exports.getSlashCommandPayload = exports.actorHasPermission = exports.configIsValid = exports.getCommandsConfigFromJson = exports.getCommandsConfigFromInputs = exports.getCommandsConfig = exports.getInputs = exports.toBool = exports.commandDefaults = exports.MAX_ARGS = void 0;
 const core = __importStar(__webpack_require__(470));
 const fs = __importStar(__webpack_require__(747));
 const util_1 = __webpack_require__(669);
@@ -956,7 +937,8 @@ exports.commandDefaults = Object.freeze({
     allow_edits: false,
     repository: process.env.GITHUB_REPOSITORY || '',
     event_type_suffix: '-command',
-    static_args: []
+    static_args: [],
+    dispatch_type: 'repository'
 });
 function toBool(input, defaultVal) {
     if (typeof input === 'boolean') {
@@ -983,6 +965,7 @@ function getInputs() {
         repository: core.getInput('repository'),
         eventTypeSuffix: core.getInput('event-type-suffix'),
         staticArgs: utils.getInputAsArray('static-args'),
+        dispatchType: core.getInput('dispatch-type'),
         config: core.getInput('config'),
         configFromFile: core.getInput('config-from-file')
     };
@@ -1018,7 +1001,8 @@ function getCommandsConfigFromInputs(inputs) {
             allow_edits: inputs.allowEdits,
             repository: inputs.repository,
             event_type_suffix: inputs.eventTypeSuffix,
-            static_args: inputs.staticArgs
+            static_args: inputs.staticArgs,
+            dispatch_type: inputs.dispatchType
         };
         config.push(cmd);
     }
@@ -1039,7 +1023,12 @@ function getCommandsConfigFromJson(json) {
             event_type_suffix: jc.event_type_suffix
                 ? jc.event_type_suffix
                 : exports.commandDefaults.event_type_suffix,
-            static_args: jc.static_args ? jc.static_args : exports.commandDefaults.static_args
+            static_args: jc.static_args
+                ? jc.static_args
+                : exports.commandDefaults.static_args,
+            dispatch_type: jc.dispatch_type
+                ? jc.dispatch_type
+                : exports.commandDefaults.dispatch_type
         };
         config.push(cmd);
     }
@@ -1054,6 +1043,10 @@ function configIsValid(config) {
         }
         if (!['issue', 'pull-request', 'both'].includes(command.issue_type)) {
             core.setFailed(`'${command.issue_type}' is not a valid 'issue-type'.`);
+            return false;
+        }
+        if (!['repository', 'workflow'].includes(command.dispatch_type)) {
+            core.setFailed(`'${command.dispatch_type}' is not a valid 'dispatch-type'.`);
             return false;
         }
     }
@@ -1072,25 +1065,6 @@ function actorHasPermission(actorPermission, commandPermission) {
     return (permissionLevels[actorPermission] >= permissionLevels[commandPermission]);
 }
 exports.actorHasPermission = actorHasPermission;
-function getActorPermission(octokit, repo, actor) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const { data: { permission } } = yield octokit.repos.getCollaboratorPermissionLevel(Object.assign(Object.assign({}, repo), { username: actor }));
-        return permission;
-    });
-}
-exports.getActorPermission = getActorPermission;
-function addReaction(octokit, repo, commentId, reaction) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            yield octokit.reactions.createForIssueComment(Object.assign(Object.assign({}, repo), { comment_id: commentId, content: reaction }));
-        }
-        catch (error) {
-            core.debug(util_1.inspect(error));
-            core.warning(`Failed to set reaction on comment ID ${commentId}.`);
-        }
-    });
-}
-exports.addReaction = addReaction;
 function getSlashCommandPayload(commandWords, staticArgs) {
     const payload = {
         command: commandWords[0],
@@ -4674,6 +4648,133 @@ function isPlainObject(o) {
 }
 
 module.exports = isPlainObject;
+
+
+/***/ }),
+
+/***/ 718:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.GitHubHelper = void 0;
+const core = __importStar(__webpack_require__(470));
+const octokit_client_1 = __webpack_require__(921);
+class GitHubHelper {
+    constructor(token) {
+        const options = {};
+        if (token) {
+            options.auth = `${token}`;
+        }
+        this.octokit = new octokit_client_1.Octokit(options);
+    }
+    parseRepository(repository) {
+        const [owner, repo] = repository.split('/');
+        return {
+            owner: owner,
+            repo: repo
+        };
+    }
+    getActorPermission(repo, actor) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { data: { permission } } = yield this.octokit.repos.getCollaboratorPermissionLevel(Object.assign(Object.assign({}, repo), { username: actor }));
+            return permission;
+        });
+    }
+    tryAddReaction(repo, commentId, reaction) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                yield this.octokit.reactions.createForIssueComment(Object.assign(Object.assign({}, repo), { comment_id: commentId, content: reaction }));
+            }
+            catch (error) {
+                core.debug(error);
+                core.warning(`Failed to set reaction on comment ID ${commentId}.`);
+            }
+        });
+    }
+    getPull(repo, pullNumber) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { data: pullRequest } = yield this.octokit.pulls.get(Object.assign(Object.assign({}, repo), { pull_number: pullNumber }));
+            return pullRequest;
+        });
+    }
+    createDispatch(cmd, clientPayload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (cmd.dispatch_type == 'repository') {
+                yield this.createRepositoryDispatch(cmd, clientPayload);
+            }
+            else {
+                yield this.createWorkflowDispatch(cmd, clientPayload);
+            }
+        });
+    }
+    createRepositoryDispatch(cmd, clientPayload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const eventType = `${cmd.command}${cmd.event_type_suffix}`;
+            yield this.octokit.repos.createDispatchEvent(Object.assign(Object.assign({}, this.parseRepository(cmd.repository)), { event_type: `${cmd.command}${cmd.event_type_suffix}`, client_payload: clientPayload }));
+            core.info(`Command '${cmd.command}' dispatched to '${cmd.repository}' ` +
+                `with event type '${eventType}'.`);
+        });
+    }
+    createWorkflowDispatch(cmd, clientPayload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const workflow = `${cmd.command}${cmd.event_type_suffix}.yml`;
+            const slashCommand = clientPayload.slash_command;
+            const ref = slashCommand.args.named.ref
+                ? slashCommand.args.named.ref
+                : yield this.getDefaultBranch(cmd.repository);
+            // Take max 10 named arguments, excluding 'ref'.
+            const inputs = {};
+            let count = 0;
+            for (const key in slashCommand.args.named) {
+                if (key != 'ref') {
+                    inputs[key] = slashCommand.args.named[key];
+                    count++;
+                }
+                if (count == 10)
+                    break;
+            }
+            yield this.octokit.request('POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches', Object.assign(Object.assign({}, this.parseRepository(cmd.repository)), { workflow_id: workflow, ref: ref, inputs: inputs }));
+            core.info(`Command '${cmd.command}' dispatched to workflow '${workflow}' in '${cmd.repository}'`);
+        });
+    }
+    getDefaultBranch(repository) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { data: repo } = yield this.octokit.repos.get(Object.assign({}, this.parseRepository(repository)));
+            return repo.default_branch;
+        });
+    }
+}
+exports.GitHubHelper = GitHubHelper;
 
 
 /***/ }),

@@ -5,3 +5,5 @@ export {RestEndpointMethodTypes} from '@octokit/plugin-rest-endpoint-methods'
 export {OctokitOptions} from '@octokit/core/dist-types/types'
 
 export const Octokit = Core.plugin(paginateRest, restEndpointMethods)
+
+export {PullsGetResponseData} from '@octokit/types'

@@ -16,6 +16,12 @@
     ]
   },
   {
+    "command": "update",
+    "permission": "write",
+    "issue_type": "issue",
+    "dispatch_type": "workflow"
+  },
+  {
     "command": "do-something-remotely",
     "permission": "write",
     "issue_type": "both",

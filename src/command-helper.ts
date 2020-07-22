@@ -1,7 +1,6 @@
 import * as core from '@actions/core'
 import * as fs from 'fs'
 import {inspect} from 'util'
-import {Octokit} from './octokit-client'
 import * as utils from './utils'
 
 const NAMED_ARG_PATTERN = /^(?<name>[a-zA-Z0-9_]+)=(?<value>[^\s]+)$/
@@ -19,6 +18,7 @@ export interface Inputs {
   repository: string
   eventTypeSuffix: string
   staticArgs: string[]
+  dispatchType: string
   config: string
   configFromFile: string
 }
@@ -31,11 +31,7 @@ export interface Command {
   repository: string
   event_type_suffix: string
   static_args: string[]
-}
-
-interface Repo {
-  owner: string
-  repo: string
+  dispatch_type: string
 }
 
 export interface SlashCommandPayload {
@@ -58,7 +54,8 @@ export const commandDefaults = Object.freeze({
   allow_edits: false,
   repository: process.env.GITHUB_REPOSITORY || '',
   event_type_suffix: '-command',
-  static_args: []
+  static_args: [],
+  dispatch_type: 'repository'
 })
 
 export function toBool(input: string, defaultVal: boolean): boolean {
@@ -84,6 +81,7 @@ export function getInputs(): Inputs {
     repository: core.getInput('repository'),
     eventTypeSuffix: core.getInput('event-type-suffix'),
     staticArgs: utils.getInputAsArray('static-args'),
+    dispatchType: core.getInput('dispatch-type'),
     config: core.getInput('config'),
     configFromFile: core.getInput('config-from-file')
   }
@@ -118,7 +116,8 @@ export function getCommandsConfigFromInputs(inputs: Inputs): Command[] {
       allow_edits: inputs.allowEdits,
       repository: inputs.repository,
       event_type_suffix: inputs.eventTypeSuffix,
-      static_args: inputs.staticArgs
+      static_args: inputs.staticArgs,
+      dispatch_type: inputs.dispatchType
     }
     config.push(cmd)
   }
@@ -140,7 +139,12 @@ export function getCommandsConfigFromJson(json: string): Command[] {
       event_type_suffix: jc.event_type_suffix
         ? jc.event_type_suffix
         : commandDefaults.event_type_suffix,
-      static_args: jc.static_args ? jc.static_args : commandDefaults.static_args
+      static_args: jc.static_args
+        ? jc.static_args
+        : commandDefaults.static_args,
+      dispatch_type: jc.dispatch_type
+        ? jc.dispatch_type
+        : commandDefaults.dispatch_type
     }
     config.push(cmd)
   }
@@ -155,6 +159,12 @@ export function configIsValid(config: Command[]): boolean {
     }
     if (!['issue', 'pull-request', 'both'].includes(command.issue_type)) {
       core.setFailed(`'${command.issue_type}' is not a valid 'issue-type'.`)
+      return false
+    }
+    if (!['repository', 'workflow'].includes(command.dispatch_type)) {
+      core.setFailed(
+        `'${command.dispatch_type}' is not a valid 'dispatch-type'.`
+      )
       return false
     }
   }
@@ -176,46 +186,6 @@ export function actorHasPermission(
   return (
     permissionLevels[actorPermission] >= permissionLevels[commandPermission]
   )
-}
-
-export async function getActorPermission(
-  octokit: InstanceType<typeof Octokit>,
-  repo: Repo,
-  actor: string
-): Promise<string> {
-  const {
-    data: {permission}
-  } = await octokit.repos.getCollaboratorPermissionLevel({
-    ...repo,
-    username: actor
-  })
-  return permission
-}
-
-export async function addReaction(
-  octokit: InstanceType<typeof Octokit>,
-  repo: Repo,
-  commentId: number,
-  reaction:
-    | '+1'
-    | '-1'
-    | 'laugh'
-    | 'confused'
-    | 'heart'
-    | 'hooray'
-    | 'rocket'
-    | 'eyes'
-): Promise<void> {
-  try {
-    await octokit.reactions.createForIssueComment({
-      ...repo,
-      comment_id: commentId,
-      content: reaction
-    })
-  } catch (error) {
-    core.debug(inspect(error))
-    core.warning(`Failed to set reaction on comment ID ${commentId}.`)
-  }
 }
 
 export function getSlashCommandPayload(

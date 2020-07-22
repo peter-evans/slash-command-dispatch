@@ -1,5 +1,5 @@
 name: 'Slash Command Dispatch'
-description: 'Facilitates "ChatOps" by creating repository dispatch events for slash commands'
+description: 'Facilitates "ChatOps" by creating dispatch events for slash commands'
 inputs:
   token:
     description: 'A repo scoped GitHub Personal Access Token.'
@@ -30,6 +30,9 @@ inputs:
     default: -command
   static-args:
     description: 'A comma or newline separated list of arguments that will be dispatched with every command.'
+  dispatch-type:
+    description: 'The dispatch type; `repository` or `workflow`.'
+    default: repository
   config:
     description: 'JSON configuration for commands.'
   config-from-file:
