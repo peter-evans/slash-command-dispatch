@@ -90,3 +90,35 @@ The simplest response is to add a :tada: reaction to the comment.
           comment-id: ${{ github.event.inputs.comment-id }}
           reaction-type: hooray
 ```
+
+### Action warnings
+
+When creating the [workflow_dispatch](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch) event, the GitHub API will return validation errors. In the following cases the action will issue a warning (visible in the Actions log), and set the action output `error-message`.
+
+- `Required input '...' not provided`: A required input for the workflow was not supplied as a named argument.
+- `Unexpected inputs provided`: Named arguments were supplied that are not defined as workflow inputs.
+
+The `error-message` output can be used to provide feedback to the user as follows. Note that the step needs an `id` to access the outputs.
+
+```yml
+      - name: Slash Command Dispatch
+        id: scd
+        uses: peter-evans/slash-command-dispatch@v2
+        with:
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          commands: |
+            deploy
+            integration-test
+            build-docs
+          dispatch-type: workflow
+
+      - name: Edit comment with error message
+        if: steps.scd.outputs.error-message
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          comment-id: ${{ github.event.comment.id }}
+          body: |
+            > ${{ steps.scd.outputs.error-message }}
+```
+
+![Comment Parsing](assets/error-message-output.png)
