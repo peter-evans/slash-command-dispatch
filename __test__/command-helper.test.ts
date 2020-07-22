@@ -237,20 +237,26 @@ describe('command-helper tests', () => {
   })
 
   test('slash command payload with named args', async () => {
-    const commandWords = ['test', 'branch=master', 'arg1', 'env=prod', 'arg2']
+    const commandWords = [
+      'test',
+      'branch_name=master',
+      'arg1',
+      'test-id=123',
+      'arg2'
+    ]
     const staticArgs = []
     const payload: SlashCommandPayload = {
       command: 'test',
       args: {
-        all: 'branch=master arg1 env=prod arg2',
+        all: 'branch_name=master arg1 test-id=123 arg2',
         unnamed: {
           all: 'arg1 arg2',
           arg1: 'arg1',
           arg2: 'arg2'
         },
         named: {
-          branch: 'master',
-          env: 'prod'
+          branch_name: 'master',
+          'test-id': '123'
         }
       }
     }
@@ -280,17 +286,17 @@ describe('command-helper tests', () => {
   })
 
   test('slash command payload with malformed named args', async () => {
-    const commandWords = ['test', 'branch=', 'arg1', 'e-nv=prod', 'arg2']
+    const commandWords = ['test', 'branch=', 'arg1', 'e.nv=prod', 'arg2']
     const staticArgs = []
     const payload: SlashCommandPayload = {
       command: 'test',
       args: {
-        all: 'branch= arg1 e-nv=prod arg2',
+        all: 'branch= arg1 e.nv=prod arg2',
         unnamed: {
-          all: 'branch= arg1 e-nv=prod arg2',
+          all: 'branch= arg1 e.nv=prod arg2',
           arg1: 'branch=',
           arg2: 'arg1',
-          arg3: 'e-nv=prod',
+          arg3: 'e.nv=prod',
           arg4: 'arg2'
         },
         named: {}

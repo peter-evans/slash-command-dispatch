@@ -929,7 +929,7 @@ const core = __importStar(__webpack_require__(470));
 const fs = __importStar(__webpack_require__(747));
 const util_1 = __webpack_require__(669);
 const utils = __importStar(__webpack_require__(611));
-const NAMED_ARG_PATTERN = /^(?<name>[a-zA-Z0-9_]+)=(?<value>[^\s]+)$/;
+const NAMED_ARG_PATTERN = /^(?<name>[a-zA-Z0-9_-]+)=(?<value>[^\s]+)$/;
 exports.MAX_ARGS = 50;
 exports.commandDefaults = Object.freeze({
     permission: 'write',

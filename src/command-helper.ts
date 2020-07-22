@@ -3,7 +3,7 @@ import * as fs from 'fs'
 import {inspect} from 'util'
 import * as utils from './utils'
 
-const NAMED_ARG_PATTERN = /^(?<name>[a-zA-Z0-9_]+)=(?<value>[^\s]+)$/
+const NAMED_ARG_PATTERN = /^(?<name>[a-zA-Z0-9_-]+)=(?<value>[^\s]+)$/
 
 export const MAX_ARGS = 50
 
