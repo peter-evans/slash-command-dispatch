@@ -85,7 +85,7 @@ This action also features [advanced configuration](docs/advanced-configuration.m
 
 #### `token`
 
-This action creates [`repository_dispatch`](https://developer.github.com/v3/repos/#create-a-repository-dispatch-event) and [workflow_dispatch](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch) events.
+This action creates [repository_dispatch](https://developer.github.com/v3/repos/#create-a-repository-dispatch-event) and [workflow_dispatch](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch) events.
 The default `GITHUB_TOKEN` does not have scopes to create these events, so a `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line) is required.
 If you will be dispatching commands to public repositories *only* then you can use the more limited `public_repo` scope.
 
@@ -109,7 +109,7 @@ You can use a [PAT](https://help.github.com/en/github/authenticating-to-github/c
 
 #### `dispatch-type`
 
-By default, the action creates [`repository_dispatch`](https://developer.github.com/v3/repos/#create-a-repository-dispatch-event) events.
+By default, the action creates [repository_dispatch](https://developer.github.com/v3/repos/#create-a-repository-dispatch-event) events.
 Setting `dispatch-type` to `workflow` will instead create [workflow_dispatch](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch) events.
 
 There are significant differences in the action's behaviour when using `workflow` dispatch. See [workflow dispatch](docs/workflow-dispatch.md) for usage details.
@@ -126,7 +126,7 @@ Slash commands must be placed in the first line of the comment to be interpreted
 
 ## Handling dispatched commands
 
-The following documentation applies to the `dispatch-type` default, `repository`, which creates [`repository_dispatch`](https://developer.github.com/v3/repos/#create-a-repository-dispatch-event) events.
+The following documentation applies to the `dispatch-type` default, `repository`, which creates [repository_dispatch](https://developer.github.com/v3/repos/#create-a-repository-dispatch-event) events.
 For `workflow` dispatch documentation, see [workflow dispatch](docs/workflow-dispatch.md).
 
 ### Event types
