@@ -190,7 +190,17 @@ async function run(): Promise<void> {
       )
   } catch (error) {
     core.debug(inspect(error))
-    core.setFailed(error.message)
+    const message: string = error.message
+    if (message == 'Unexpected inputs provided') {
+      core.warning(message)
+    } else if (
+      message.startsWith('Required input') &&
+      message.endsWith('not provided')
+    ) {
+      core.warning(message)
+    } else {
+      core.setFailed(error.message)
+    }
   }
 }
 

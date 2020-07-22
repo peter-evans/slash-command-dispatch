@@ -646,7 +646,17 @@ function run() {
         }
         catch (error) {
             core.debug(util_1.inspect(error));
-            core.setFailed(error.message);
+            const message = error.message;
+            if (message == 'Unexpected inputs provided') {
+                core.warning(message);
+            }
+            else if (message.startsWith('Required input') &&
+                message.endsWith('not provided')) {
+                core.warning(message);
+            }
+            else {
+                core.setFailed(error.message);
+            }
         }
     });
 }
