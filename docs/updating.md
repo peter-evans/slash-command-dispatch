@@ -4,25 +4,24 @@
 
 - The format of the `slash_command` context has been changed to prevent an issue where named arguments can overwrite other properties of the payload.
 
-  The following is an example of the new `slash_command` context. The slash command `/deploy branch=master env=prod some other args` will be converted to a JSON payload as follows.
+  The following is an example of the new `slash_command` context. The slash command `/deploy branch=master smoke-test dry-run reason="new feature"` will be converted to a JSON payload as follows.
 
   ```json
-      "slash_command": {
-          "command": "deploy",
-          "args": {
-              "all": "branch=master env=prod some other args",
-              "unnamed": {
-                  "all": "some other args",
-                  "arg1": "some",
-                  "arg2": "other",
-                  "arg3": "args"
-              },
-              "named": {
-                  "branch": "master",
-                  "env": "prod"
-              },
-          }
-      }
+    "slash_command": {
+        "command": "deploy",
+        "args": {
+            "all": "branch=master smoke-test dry-run reason=\"new feature\"",
+            "unnamed": {
+                "all": "smoke-test dry-run",
+                "arg1": "smoke-test",
+                "arg2": "dry-run"
+            },
+            "named": {
+                "branch": "master",
+                "reason": "new feature"
+            },
+        }
+    }
   ```
 
 - The `named-args` input (standard configuration) and `named_args` JSON property (advanced configuration) have been removed. Named arguments will now always be parsed and added to the `slash_command` context.
@@ -31,15 +30,8 @@
 
 ### New features
 
-- The `commands` input can now be newline separated, or comma separated.
-
-  e.g.
-  ```yml
-          commands: |
-            deploy
-            integration-test
-            build-docs
-  ```
+- Commands can now be dispatched via the new [workflow_dispatch](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch) event. For standard configuration, set the new `dispatch-type` input to `workflow`. For advanced configuration, set the `dispatch_type` JSON property of a command to `workflow`.
+  There are significant differences in the action's behaviour when using `workflow` dispatch. See [workflow dispatch](workflow-dispatch.md) for usage details.
 
 - Added a new input `static-args` (standard configuration), and a new JSON property `static_args` (advanced configuration). This is a list of arguments that will always be dispatched with commands.
 
@@ -67,5 +59,12 @@
   /send "hello world!"
   ```
 
-- Commands can now be dispatched via the new [workflow_dispatch](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch) event. For standard configuration, set the new `dispatch-type` input to `workflow`. For advanced configuration, set the `dispatch_type` JSON property of a command to `workflow`.
-  There are significant differences in the action's behaviour when using `workflow` dispatch. See [workflow dispatch](workflow-dispatch.md) for usage details.
+- The `commands` input can now be newline separated, or comma separated.
+
+  e.g.
+  ```yml
+          commands: |
+            deploy
+            integration-test
+            build-docs
+  ```
