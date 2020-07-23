@@ -162,23 +162,22 @@ To demonstrate, take the following configuration as an example.
             region=us-east-1
 ```
 
-For the above example configuration, the slash command `/deploy branch=master some other args` will be converted to a JSON payload as follows.
+For the above example configuration, the slash command `/deploy branch=master dry-run reason="new feature"` will be converted to a JSON payload as follows.
 
 ```json
     "slash_command": {
         "command": "deploy",
         "args": {
-            "all": "production region=us-east-1 branch=master some other args",
+            "all": "production region=us-east-1 branch=master dry-run reason=\"new feature\"",
             "unnamed": {
-                "all": "production some other args",
+                "all": "production dry-run",
                 "arg1": "production",
-                "arg2": "some",
-                "arg3": "other",
-                "arg4": "args"
+                "arg2": "dry-run"
             },
             "named": {
                 "region": "us-east-1",
-                "branch": "master"
+                "branch": "master",
+                "reason": "new feature"
             },
         }
     }
@@ -194,10 +193,9 @@ The properties in the `slash_command` context from the above example can be used
           echo ${{ github.event.client_payload.slash_command.args.unnamed.all }}
           echo ${{ github.event.client_payload.slash_command.args.unnamed.arg1 }}
           echo ${{ github.event.client_payload.slash_command.args.unnamed.arg2 }}
-          echo ${{ github.event.client_payload.slash_command.args.unnamed.arg3 }}
-          echo ${{ github.event.client_payload.slash_command.args.unnamed.arg4 }}
           echo ${{ github.event.client_payload.slash_command.args.named.region }}
           echo ${{ github.event.client_payload.slash_command.args.named.branch }}
+          echo ${{ github.event.client_payload.slash_command.args.named.reason }}
           # etc.
 ```
 

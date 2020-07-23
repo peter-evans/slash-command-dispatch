@@ -559,16 +559,16 @@ function run() {
                 console.debug('The first line of the comment is not a valid slash command.');
                 return;
             }
-            // Split the first line into "words"
-            const commandWords = firstLine.slice(1).split(' ');
-            core.debug(`Command words: ${util_1.inspect(commandWords)}`);
+            // Tokenise the first line (minus the leading slash)
+            const commandTokens = command_helper_1.tokeniseCommand(firstLine.slice(1));
+            core.debug(`Command tokens: ${util_1.inspect(commandTokens)}`);
             // Check if the command is registered for dispatch
             let configMatches = config.filter(function (cmd) {
-                return cmd.command == commandWords[0];
+                return cmd.command == commandTokens[0];
             });
             core.debug(`Config matches on 'command': ${util_1.inspect(configMatches)}`);
             if (configMatches.length == 0) {
-                core.info(`Command '${commandWords[0]}' is not registered for dispatch.`);
+                core.info(`Command '${commandTokens[0]}' is not registered for dispatch.`);
                 return;
             }
             // Filter matching commands by issue type
@@ -581,7 +581,7 @@ function run() {
             core.debug(`Config matches on 'issue_type': ${util_1.inspect(configMatches)}`);
             if (configMatches.length == 0) {
                 const issueType = isPullRequest ? 'pull request' : 'issue';
-                core.info(`Command '${commandWords[0]}' is not configured for the issue type '${issueType}'.`);
+                core.info(`Command '${commandTokens[0]}' is not configured for the issue type '${issueType}'.`);
                 return;
             }
             // Filter matching commands by whether or not to allow edits
@@ -591,7 +591,7 @@ function run() {
                 });
                 core.debug(`Config matches on 'allow_edits': ${util_1.inspect(configMatches)}`);
                 if (configMatches.length == 0) {
-                    core.info(`Command '${commandWords[0]}' is not configured to allow edits.`);
+                    core.info(`Command '${commandTokens[0]}' is not configured to allow edits.`);
                     return;
                 }
             }
@@ -611,11 +611,11 @@ function run() {
             });
             core.debug(`Config matches on 'permission': ${util_1.inspect(configMatches)}`);
             if (configMatches.length == 0) {
-                core.info(`Command '${commandWords[0]}' is not configured for the user's permission level '${actorPermission}'.`);
+                core.info(`Command '${commandTokens[0]}' is not configured for the user's permission level '${actorPermission}'.`);
                 return;
             }
             // Determined that the command should be dispatched
-            core.info(`Command '${commandWords[0]}' to be dispatched.`);
+            core.info(`Command '${commandTokens[0]}' to be dispatched.`);
             // Define payload
             const clientPayload = {
                 github: github.context
@@ -635,7 +635,7 @@ function run() {
             // Dispatch for each matching configuration
             for (const cmd of configMatches) {
                 // Generate slash command payload
-                clientPayload.slash_command = command_helper_1.getSlashCommandPayload(commandWords, cmd.static_args);
+                clientPayload.slash_command = command_helper_1.getSlashCommandPayload(commandTokens, cmd.static_args);
                 core.debug(`Slash command payload: ${util_1.inspect(clientPayload.slash_command)}`);
                 // Dispatch the command
                 yield githubHelper.createDispatch(cmd, clientPayload);
@@ -932,12 +932,15 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getSlashCommandPayload = exports.actorHasPermission = exports.configIsValid = exports.getCommandsConfigFromJson = exports.getCommandsConfigFromInputs = exports.getCommandsConfig = exports.getInputs = exports.toBool = exports.commandDefaults = exports.MAX_ARGS = void 0;
+exports.getSlashCommandPayload = exports.tokeniseCommand = exports.actorHasPermission = exports.configIsValid = exports.getCommandsConfigFromJson = exports.getCommandsConfigFromInputs = exports.getCommandsConfig = exports.getInputs = exports.toBool = exports.commandDefaults = exports.MAX_ARGS = void 0;
 const core = __importStar(__webpack_require__(470));
 const fs = __importStar(__webpack_require__(747));
 const util_1 = __webpack_require__(669);
 const utils = __importStar(__webpack_require__(611));
-const NAMED_ARG_PATTERN = /^(?<name>[a-zA-Z0-9_-]+)=(?<value>[^\s]+)$/;
+// Tokenise command and arguments
+// Support escaped quotes within quotes. https://stackoverflow.com/a/5696141/11934042
+const TOKENISE_REGEX = /\S+="[^"\\]*(?:\\.[^"\\]*)*"|"[^"\\]*(?:\\.[^"\\]*)*"|\S+/g;
+const NAMED_ARG_REGEX = /^(?<name>[a-zA-Z0-9_-]+)=(?<value>.+)$/;
 exports.MAX_ARGS = 50;
 exports.commandDefaults = Object.freeze({
     permission: 'write',
@@ -1073,9 +1076,26 @@ function actorHasPermission(actorPermission, commandPermission) {
     return (permissionLevels[actorPermission] >= permissionLevels[commandPermission]);
 }
 exports.actorHasPermission = actorHasPermission;
-function getSlashCommandPayload(commandWords, staticArgs) {
+function tokeniseCommand(command) {
+    let matches;
+    const output = [];
+    while ((matches = TOKENISE_REGEX.exec(command))) {
+        output.push(matches[0]);
+    }
+    return output;
+}
+exports.tokeniseCommand = tokeniseCommand;
+function stripQuotes(input) {
+    if (input.startsWith(`"`) && input.endsWith(`"`)) {
+        return input.slice(1, input.length - 1);
+    }
+    else {
+        return input;
+    }
+}
+function getSlashCommandPayload(commandTokens, staticArgs) {
     const payload = {
-        command: commandWords[0],
+        command: commandTokens[0],
         args: {
             all: '',
             unnamed: {
@@ -1085,7 +1105,7 @@ function getSlashCommandPayload(commandWords, staticArgs) {
         }
     };
     // Get arguments if they exist
-    const argWords = commandWords.length > 1 ? commandWords.slice(1, exports.MAX_ARGS + 1) : [];
+    const argWords = commandTokens.length > 1 ? commandTokens.slice(1, exports.MAX_ARGS + 1) : [];
     // Add static arguments if they exist
     argWords.unshift(...staticArgs);
     if (argWords.length > 0) {
@@ -1094,16 +1114,15 @@ function getSlashCommandPayload(commandWords, staticArgs) {
         let unnamedCount = 1;
         const unnamedArgs = [];
         for (const argWord of argWords) {
-            if (NAMED_ARG_PATTERN.test(argWord)) {
-                const result = NAMED_ARG_PATTERN.exec(argWord);
+            if (NAMED_ARG_REGEX.test(argWord)) {
+                const result = NAMED_ARG_REGEX.exec(argWord);
                 if (result && result.groups) {
-                    payload.args.named[`${result.groups['name']}`] =
-                        result.groups['value'];
+                    payload.args.named[`${result.groups['name']}`] = stripQuotes(result.groups['value']);
                 }
             }
             else {
                 unnamedArgs.push(argWord);
-                payload.args.unnamed[`arg${unnamedCount}`] = argWord;
+                payload.args.unnamed[`arg${unnamedCount}`] = stripQuotes(argWord);
                 unnamedCount += 1;
             }
         }

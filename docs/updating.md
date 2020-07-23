@@ -57,5 +57,15 @@
           ]
   ```
 
+- Slash command arguments can now be double-quoted to allow for argument values containing spaces.
+
+  e.g.
+  ```
+  /deploy branch=master dry-run reason="new feature"
+  ```
+  ```
+  /send "hello world!"
+  ```
+
 - Commands can now be dispatched via the new [workflow_dispatch](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch) event. For standard configuration, set the new `dispatch-type` input to `workflow`. For advanced configuration, set the `dispatch_type` JSON property of a command to `workflow`.
   There are significant differences in the action's behaviour when using `workflow` dispatch. See [workflow dispatch](workflow-dispatch.md) for usage details.

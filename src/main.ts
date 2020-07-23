@@ -3,6 +3,7 @@ import * as github from '@actions/github'
 import {inspect} from 'util'
 import {
   getInputs,
+  tokeniseCommand,
   getCommandsConfig,
   configIsValid,
   actorHasPermission,
@@ -60,17 +61,17 @@ async function run(): Promise<void> {
       return
     }
 
-    // Split the first line into "words"
-    const commandWords = firstLine.slice(1).split(' ')
-    core.debug(`Command words: ${inspect(commandWords)}`)
+    // Tokenise the first line (minus the leading slash)
+    const commandTokens = tokeniseCommand(firstLine.slice(1))
+    core.debug(`Command tokens: ${inspect(commandTokens)}`)
 
     // Check if the command is registered for dispatch
     let configMatches = config.filter(function (cmd) {
-      return cmd.command == commandWords[0]
+      return cmd.command == commandTokens[0]
     })
     core.debug(`Config matches on 'command': ${inspect(configMatches)}`)
     if (configMatches.length == 0) {
-      core.info(`Command '${commandWords[0]}' is not registered for dispatch.`)
+      core.info(`Command '${commandTokens[0]}' is not registered for dispatch.`)
       return
     }
 
@@ -87,7 +88,7 @@ async function run(): Promise<void> {
     if (configMatches.length == 0) {
       const issueType = isPullRequest ? 'pull request' : 'issue'
       core.info(
-        `Command '${commandWords[0]}' is not configured for the issue type '${issueType}'.`
+        `Command '${commandTokens[0]}' is not configured for the issue type '${issueType}'.`
       )
       return
     }
@@ -100,7 +101,7 @@ async function run(): Promise<void> {
       core.debug(`Config matches on 'allow_edits': ${inspect(configMatches)}`)
       if (configMatches.length == 0) {
         core.info(
-          `Command '${commandWords[0]}' is not configured to allow edits.`
+          `Command '${commandTokens[0]}' is not configured to allow edits.`
         )
         return
       }
@@ -133,13 +134,13 @@ async function run(): Promise<void> {
     core.debug(`Config matches on 'permission': ${inspect(configMatches)}`)
     if (configMatches.length == 0) {
       core.info(
-        `Command '${commandWords[0]}' is not configured for the user's permission level '${actorPermission}'.`
+        `Command '${commandTokens[0]}' is not configured for the user's permission level '${actorPermission}'.`
       )
       return
     }
 
     // Determined that the command should be dispatched
-    core.info(`Command '${commandWords[0]}' to be dispatched.`)
+    core.info(`Command '${commandTokens[0]}' to be dispatched.`)
 
     // Define payload
     const clientPayload: ClientPayload = {
@@ -171,7 +172,7 @@ async function run(): Promise<void> {
     for (const cmd of configMatches) {
       // Generate slash command payload
       clientPayload.slash_command = getSlashCommandPayload(
-        commandWords,
+        commandTokens,
         cmd.static_args
       )
       core.debug(

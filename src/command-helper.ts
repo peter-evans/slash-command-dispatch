@@ -3,7 +3,10 @@ import * as fs from 'fs'
 import {inspect} from 'util'
 import * as utils from './utils'
 
-const NAMED_ARG_PATTERN = /^(?<name>[a-zA-Z0-9_-]+)=(?<value>[^\s]+)$/
+// Tokenise command and arguments
+// Support escaped quotes within quotes. https://stackoverflow.com/a/5696141/11934042
+const TOKENISE_REGEX = /\S+="[^"\\]*(?:\\.[^"\\]*)*"|"[^"\\]*(?:\\.[^"\\]*)*"|\S+/g
+const NAMED_ARG_REGEX = /^(?<name>[a-zA-Z0-9_-]+)=(?<value>.+)$/
 
 export const MAX_ARGS = 50
 
@@ -188,12 +191,29 @@ export function actorHasPermission(
   )
 }
 
+export function tokeniseCommand(command: string): string[] {
+  let matches
+  const output: string[] = []
+  while ((matches = TOKENISE_REGEX.exec(command))) {
+    output.push(matches[0])
+  }
+  return output
+}
+
+function stripQuotes(input: string): string {
+  if (input.startsWith(`"`) && input.endsWith(`"`)) {
+    return input.slice(1, input.length - 1)
+  } else {
+    return input
+  }
+}
+
 export function getSlashCommandPayload(
-  commandWords: string[],
+  commandTokens: string[],
   staticArgs: string[]
 ): SlashCommandPayload {
   const payload: SlashCommandPayload = {
-    command: commandWords[0],
+    command: commandTokens[0],
     args: {
       all: '',
       unnamed: {
@@ -204,7 +224,7 @@ export function getSlashCommandPayload(
   }
   // Get arguments if they exist
   const argWords =
-    commandWords.length > 1 ? commandWords.slice(1, MAX_ARGS + 1) : []
+    commandTokens.length > 1 ? commandTokens.slice(1, MAX_ARGS + 1) : []
   // Add static arguments if they exist
   argWords.unshift(...staticArgs)
   if (argWords.length > 0) {
@@ -213,15 +233,16 @@ export function getSlashCommandPayload(
     let unnamedCount = 1
     const unnamedArgs: string[] = []
     for (const argWord of argWords) {
-      if (NAMED_ARG_PATTERN.test(argWord)) {
-        const result = NAMED_ARG_PATTERN.exec(argWord)
+      if (NAMED_ARG_REGEX.test(argWord)) {
+        const result = NAMED_ARG_REGEX.exec(argWord)
         if (result && result.groups) {
-          payload.args.named[`${result.groups['name']}`] =
+          payload.args.named[`${result.groups['name']}`] = stripQuotes(
             result.groups['value']
+          )
         }
       } else {
         unnamedArgs.push(argWord)
-        payload.args.unnamed[`arg${unnamedCount}`] = argWord
+        payload.args.unnamed[`arg${unnamedCount}`] = stripQuotes(argWord)
         unnamedCount += 1
       }
     }

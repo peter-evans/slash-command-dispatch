@@ -7,6 +7,7 @@ import {
   getCommandsConfigFromJson,
   actorHasPermission,
   configIsValid,
+  tokeniseCommand,
   getSlashCommandPayload
 } from '../lib/command-helper'
 
@@ -216,8 +217,36 @@ describe('command-helper tests', () => {
     expect(actorHasPermission('write', 'write')).toBeTruthy()
   })
 
-  test('slash command payload', async () => {
-    const commandWords = ['test', 'arg1', 'arg2', 'arg3']
+  test('command arguments are correctly tokenised', async () => {
+    const command = `a b=c "d e" f-g="h i" "j \\"k\\"" l="m \\"n\\" o"`
+    const commandTokens = [
+      `a`,
+      `b=c`,
+      `"d e"`,
+      `f-g="h i"`,
+      `"j \\"k\\""`,
+      `l="m \\"n\\" o"`
+    ]
+    expect(tokeniseCommand(command)).toEqual(commandTokens)
+  })
+
+  test('tokenisation of malformed command arguments', async () => {
+    const command = `test arg named= quoted arg" named-arg="with \\"quoted value`
+    const commandTokens = [
+      'test',
+      'arg',
+      'named=',
+      'quoted',
+      `arg"`,
+      `named-arg="with`,
+      '\\"quoted',
+      'value'
+    ]
+    expect(tokeniseCommand(command)).toEqual(commandTokens)
+  })
+
+  test('slash command payload with unnamed args', async () => {
+    const commandTokens = ['test', 'arg1', 'arg2', 'arg3']
     const staticArgs = []
     const payload: SlashCommandPayload = {
       command: 'test',
@@ -232,11 +261,11 @@ describe('command-helper tests', () => {
         named: {}
       }
     }
-    expect(getSlashCommandPayload(commandWords, staticArgs)).toEqual(payload)
+    expect(getSlashCommandPayload(commandTokens, staticArgs)).toEqual(payload)
   })
 
   test('slash command payload with named args', async () => {
-    const commandWords = [
+    const commandTokens = [
       'test',
       'branch_name=master',
       'arg1',
@@ -259,21 +288,21 @@ describe('command-helper tests', () => {
         }
       }
     }
-    expect(getSlashCommandPayload(commandWords, staticArgs)).toEqual(payload)
+    expect(getSlashCommandPayload(commandTokens, staticArgs)).toEqual(payload)
   })
 
   test('slash command payload with named args and static args', async () => {
-    const commandWords = ['test', 'branch=master', 'arg1', 'arg2']
+    const commandTokens = ['test', 'branch=master', 'arg1', 'dry-run']
     const staticArgs = ['production', 'region=us-east-1']
     const payload: SlashCommandPayload = {
       command: 'test',
       args: {
-        all: 'production region=us-east-1 branch=master arg1 arg2',
+        all: 'production region=us-east-1 branch=master arg1 dry-run',
         unnamed: {
-          all: 'production arg1 arg2',
+          all: 'production arg1 dry-run',
           arg1: 'production',
           arg2: 'arg1',
-          arg3: 'arg2'
+          arg3: 'dry-run'
         },
         named: {
           region: 'us-east-1',
@@ -281,11 +310,43 @@ describe('command-helper tests', () => {
         }
       }
     }
-    expect(getSlashCommandPayload(commandWords, staticArgs)).toEqual(payload)
+    expect(getSlashCommandPayload(commandTokens, staticArgs)).toEqual(payload)
+  })
+
+  test('slash command payload with quoted args', async () => {
+    const commandTokens = [
+      `test`,
+      `a`,
+      `b=c`,
+      `"d e"`,
+      `f-g="h i"`,
+      `"j \\"k\\""`,
+      `l="m \\"n\\" o"`
+    ]
+    const staticArgs = [`msg="x y z"`]
+    const payload: SlashCommandPayload = {
+      command: `test`,
+      args: {
+        all: `msg="x y z" a b=c "d e" f-g="h i" "j \\"k\\"" l="m \\"n\\" o"`,
+        unnamed: {
+          all: `a "d e" "j \\"k\\""`,
+          arg1: `a`,
+          arg2: `d e`,
+          arg3: `j \\"k\\"`
+        },
+        named: {
+          msg: `x y z`,
+          b: `c`,
+          'f-g': `h i`,
+          l: `m \\"n\\" o`
+        }
+      }
+    }
+    expect(getSlashCommandPayload(commandTokens, staticArgs)).toEqual(payload)
   })
 
   test('slash command payload with malformed named args', async () => {
-    const commandWords = ['test', 'branch=', 'arg1', 'e.nv=prod', 'arg2']
+    const commandTokens = ['test', 'branch=', 'arg1', 'e.nv=prod', 'arg2']
     const staticArgs = []
     const payload: SlashCommandPayload = {
       command: 'test',
@@ -301,6 +362,39 @@ describe('command-helper tests', () => {
         named: {}
       }
     }
-    expect(getSlashCommandPayload(commandWords, staticArgs)).toEqual(payload)
+    expect(getSlashCommandPayload(commandTokens, staticArgs)).toEqual(payload)
+  })
+
+  test('slash command payload with malformed quoted args', async () => {
+    const commandTokens = [
+      'test',
+      'arg',
+      'named=',
+      'quoted',
+      `arg"`,
+      `named-arg="with`,
+      `\\"quoted`,
+      'value'
+    ]
+    const staticArgs = []
+    const payload: SlashCommandPayload = {
+      command: 'test',
+      args: {
+        all: `arg named= quoted arg" named-arg="with \\"quoted value`,
+        unnamed: {
+          all: `arg named= quoted arg" \\"quoted value`,
+          arg1: 'arg',
+          arg2: 'named=',
+          arg3: 'quoted',
+          arg4: `arg"`,
+          arg5: `\\"quoted`,
+          arg6: 'value'
+        },
+        named: {
+          'named-arg': `"with`
+        }
+      }
+    }
+    expect(getSlashCommandPayload(commandTokens, staticArgs)).toEqual(payload)
   })
 })
