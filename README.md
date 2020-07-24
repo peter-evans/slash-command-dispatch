@@ -17,7 +17,7 @@ In repositories with a lot of activity, the workflow queue will get backed up ve
 
 Dispatching commands to be processed elsewhere keeps the workflow queue moving quickly. It essentially enables parallel processing of workflows.
 
-A additional benefit of dispatching is that it allows non-sensitive workloads to be run in public repositories to save using private repository Action minutes.
+A additional benefit of dispatching is that it allows non-sensitive workloads to be run in public repositories to save using private repository GitHub Action minutes.
 
 <div align="center"><img src="docs/assets/slash-command-dispatch.png" width="550"></div>
 
