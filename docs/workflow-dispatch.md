@@ -11,7 +11,7 @@ There are significant differences in the action's behaviour when using `workflow
 - When issuing a slash command with arguments, *only named arguments are accepted*. Unnamed arguments will be ignored.
 - A maximum of 10 named arguments are accepted. Additional named arguments after the first 10 will be ignored.
 - `ref` is a reserved named argument that does not count towards the maximum of 10. This is used to specify the target reference of the command. The reference can be a branch, tag, or a commit SHA. If you omit the `ref` argument, the target repository's default branch will be used.
-- A `client_payload` context cannot be sent with [workflow_dispatch](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch) events. The target workflow can only make use of up to 10 pre-defined inputs, the names of which must match the named arguments supplied with the slash command.
+- A `client_payload` context cannot be sent with [workflow_dispatch](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch) events. The target workflow can only make use of up to 10 pre-defined inputs, the names of which must match named arguments supplied with the slash command.
 
 ## Handling dispatched commands
 
