@@ -97,6 +97,8 @@ When creating the [workflow_dispatch](https://docs.github.com/en/actions/referen
 
 - `Required input '...' not provided` - A required input for the workflow was not supplied as a named argument.
 - `Unexpected inputs provided` - Named arguments were supplied that are not defined as workflow inputs.
+- `No ref found for: ...` - The supplied `ref` does not exist in the target repository.
+- `Workflow does not have 'workflow_dispatch' trigger` - The target workflow doesn't define `on: workflow_dispatch`, OR, the supplied `ref` doesn't contain the target workflow.
 
 The `error-message` output can be used to provide feedback to the user as follows. Note that the action step needs an `id` to access outputs.
 
