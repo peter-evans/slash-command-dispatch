@@ -4,23 +4,29 @@
 
 - The format of the `slash_command` context has been changed to prevent an issue where named arguments can overwrite other properties of the payload.
 
-  The following is an example of the new `slash_command` context. The slash command `/deploy branch=master smoke-test dry-run reason="new feature"` will be converted to a JSON payload as follows.
+  The following diff shows how the `slash_command` context has changed for the example command `/deploy branch=master smoke-test dry-run reason="new feature"`.
 
-  ```json
+  ```diff
     "slash_command": {
         "command": "deploy",
-        "args": {
-            "all": "branch=master smoke-test dry-run reason=\"new feature\"",
-            "unnamed": {
-                "all": "smoke-test dry-run",
-                "arg1": "smoke-test",
-                "arg2": "dry-run"
-            },
-            "named": {
-                "branch": "master",
-                "reason": "new feature"
-            },
-        }
+  -     "args": "branch=master smoke-test dry-run reason=\"new feature\"",
+  -     "unnamed_args": "smoke-test dry-run",
+  -     "arg1": "smoke-test",
+  -     "arg2": "dry-run"
+  -     "branch": "master",
+  -     "reason": "new feature"
+  +     "args": {
+  +         "all": "branch=master smoke-test dry-run reason=\"new feature\"",
+  +         "unnamed": {
+  +             "all": "smoke-test dry-run",
+  +             "arg1": "smoke-test",
+  +             "arg2": "dry-run"
+  +         },
+  +         "named": {
+  +             "branch": "master",
+  +             "reason": "new feature"
+  +         },
+  +     }
     }
   ```
 
