@@ -121,7 +121,7 @@ If you already have `workflow_dispatch` workflows, you can execute them with sla
 | Repository Dispatch (default) | Workflow Dispatch |
 | --- | --- |
 | Events are created with a `client_payload` giving the target workflow access to a wealth of useful [context properties](https://github.com/peter-evans/slash-command-dispatch/tree/dev#accessing-contexts). | A `client_payload` cannot be sent with [workflow_dispatch](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch) events. The target workflow can only make use of up to 10 pre-defined inputs, the names of which must match named arguments supplied with the slash command. |
-| Slash commands can only execute workflows in the target repository's default branch. | Slash commands can execute workflows in any branch using the `ref` named argument. The reference can be a branch, tag, or a commit SHA. |
+| Slash commands can only execute workflows in the target repository's default branch. | Slash commands can execute workflows in any branch using the `ref` named argument. The reference can be a branch, tag, or a commit SHA. This can be useful to test workflows in PR branches before merging. |
 | Immediate command validation feedback is unavailable when creating the dispatch event. | Immediate command [validation feedback](https://github.com/peter-evans/slash-command-dispatch/blob/dev/docs/workflow-dispatch.md#validation-errors) is available as an action output. |
 
 ### How comments are parsed for slash commands
