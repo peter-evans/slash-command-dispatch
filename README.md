@@ -54,7 +54,7 @@ jobs:
       - name: Slash Command Dispatch
         uses: peter-evans/slash-command-dispatch@v2
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.PAT }}
           commands: |
             deploy
             integration-test
@@ -69,8 +69,8 @@ This action also features [advanced configuration](docs/advanced-configuration.m
 
 | Input | Description | Default |
 | --- | --- | --- |
-| `token` | (**required**) A `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). Note: `GITHUB_TOKEN` *does not* work here. See [token](#token) for further details. | |
-| `reaction-token` | `GITHUB_TOKEN` or a `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). See [reaction-token](#reaction-token) for further details. | `GITHUB_TOKEN` |
+| `token` | (**required**) A `repo` scoped [Personal Access Token (PAT)](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). Note: `GITHUB_TOKEN` *does not* work here. See [token](#token) for further details. | |
+| `reaction-token` | `GITHUB_TOKEN` or a `repo` scoped [Personal Access Token (PAT)](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). See [reaction-token](#reaction-token) for further details. | `GITHUB_TOKEN` |
 | `reactions` | Add reactions. :eyes: = seen, :rocket: = dispatched | `true` |
 | `commands` | (**required**) A comma or newline separated list of commands. | |
 | `permission` | The repository permission level required by the user to dispatch commands. (`none`, `read`, `write`, `admin`) | `write` |
@@ -99,8 +99,8 @@ You can use a [PAT](https://help.github.com/en/github/authenticating-to-github/c
       - name: Slash Command Dispatch
         uses: peter-evans/slash-command-dispatch@v2
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
-          reaction-token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.PAT }}
+          reaction-token: ${{ secrets.PAT }}
           commands: |
             deploy
             integration-test
@@ -162,7 +162,7 @@ To demonstrate, take the following configuration as an example.
 ```yml
       - uses: peter-evans/slash-command-dispatch@v2
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.PAT }}
           commands: |
             deploy
           static-args: |
@@ -232,7 +232,7 @@ The simplest response is to add a :tada: reaction to the comment.
       - name: Add reaction
         uses: peter-evans/create-or-update-comment@v1
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.PAT }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
           reaction-type: hooray
@@ -248,7 +248,7 @@ Another option is to reply with a new comment containing a link to the run outpu
       - name: Create comment
         uses: peter-evans/create-or-update-comment@v1
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.PAT }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
           issue-number: ${{ github.event.client_payload.github.payload.issue.number }}
           body: |

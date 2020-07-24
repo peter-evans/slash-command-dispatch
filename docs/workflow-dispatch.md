@@ -36,7 +36,7 @@ jobs:
       - name: Slash Command Dispatch
         uses: peter-evans/slash-command-dispatch@v2
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.PAT }}
           commands: |
             deploy
             integration-test
@@ -85,7 +85,7 @@ The simplest response is to add a :tada: reaction to the comment.
       - name: Add reaction
         uses: peter-evans/create-or-update-comment@v1
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.PAT }}
           repository: ${{ github.event.inputs.repository }}
           comment-id: ${{ github.event.inputs.comment-id }}
           reaction-type: hooray
@@ -107,7 +107,7 @@ The `error-message` output can be used to provide feedback to the user as follow
         id: scd
         uses: peter-evans/slash-command-dispatch@v2
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.PAT }}
           commands: |
             deploy
             integration-test
