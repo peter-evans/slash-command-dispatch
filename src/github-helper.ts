@@ -5,12 +5,16 @@ import {Command, SlashCommandPayload} from './command-helper'
 type ReposCreateDispatchEventParamsClientPayload = {
   [key: string]: ReposCreateDispatchEventParamsClientPayloadKeyString
 }
+// eslint-disable-next-line
 type ReposCreateDispatchEventParamsClientPayloadKeyString = {}
 
 export interface ClientPayload
   extends ReposCreateDispatchEventParamsClientPayload {
+  // eslint-disable-next-line
   github: any
+  // eslint-disable-next-line
   pull_request?: any
+  // eslint-disable-next-line
   slash_command?: SlashCommandPayload | any
 }
 
