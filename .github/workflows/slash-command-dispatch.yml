@@ -26,6 +26,7 @@ jobs:
 
       # Advanced JSON configuration
       - name: Slash Command Dispatch (JSON)
+        id: scd
         uses: ./
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
@@ -101,6 +102,14 @@ jobs:
                 "repository": "peter-evans/slash-command-dispatch-processor"
               }
             ]
+
+      - name: Edit comment with error message
+        if: steps.scd.outputs.error-message
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          comment-id: ${{ github.event.comment.id }}
+          body: |
+            > ${{ steps.scd.outputs.error-message }}
 
       # Advanced JSON configuration from file
       # (These commands do not do anything and are just a reference example)
