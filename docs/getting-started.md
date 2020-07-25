@@ -21,7 +21,7 @@ Follow this guide to get started with a working `/example` command.
           - name: Add reaction
             uses: peter-evans/create-or-update-comment@v1
             with:
-              token: ${{ secrets.REPO_ACCESS_TOKEN }}
+              token: ${{ secrets.PAT }}
               repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
               comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
               reaction-type: hooray
@@ -31,7 +31,7 @@ Follow this guide to get started with a working `/example` command.
 
 4. Go to your repository `Settings` -> `Secrets` and `Add a new secret`.
 
-   **Name**: `REPO_ACCESS_TOKEN`
+   **Name**: `PAT`
 
    **Value**: (The PAT created in step 3)
 
@@ -56,9 +56,9 @@ Command processing setup is complete! Now we need to setup command dispatch for 
         runs-on: ubuntu-latest
         steps:
           - name: Slash Command Dispatch
-            uses: peter-evans/slash-command-dispatch@v1
+            uses: peter-evans/slash-command-dispatch@v2
             with:
-              token: ${{ secrets.REPO_ACCESS_TOKEN }}
+              token: ${{ secrets.PAT }}
               commands: example
               repository: your-github-username/slash-command-processor
     ```
@@ -67,7 +67,7 @@ Command processing setup is complete! Now we need to setup command dispatch for 
 
 3. Go to your repository `Settings` -> `Secrets` and `Add a new secret`.
 
-   **Name**: `REPO_ACCESS_TOKEN`
+   **Name**: `PAT`
 
    **Value**: (The PAT created in step 2)
 

@@ -2,19 +2,22 @@
 [![CI](https://github.com/peter-evans/slash-command-dispatch/workflows/CI/badge.svg)](https://github.com/peter-evans/slash-command-dispatch/actions?query=workflow%3ACI)
 [![GitHub Marketplace](https://img.shields.io/badge/Marketplace-Slash%20Command%20Dispatch-blue.svg?colorA=24292e&colorB=0366d6&style=flat&longCache=true&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAM6wAADOsB5dZE0gAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAERSURBVCiRhZG/SsMxFEZPfsVJ61jbxaF0cRQRcRJ9hlYn30IHN/+9iquDCOIsblIrOjqKgy5aKoJQj4O3EEtbPwhJbr6Te28CmdSKeqzeqr0YbfVIrTBKakvtOl5dtTkK+v4HfA9PEyBFCY9AGVgCBLaBp1jPAyfAJ/AAdIEG0dNAiyP7+K1qIfMdonZic6+WJoBJvQlvuwDqcXadUuqPA1NKAlexbRTAIMvMOCjTbMwl1LtI/6KWJ5Q6rT6Ht1MA58AX8Apcqqt5r2qhrgAXQC3CZ6i1+KMd9TRu3MvA3aH/fFPnBodb6oe6HM8+lYHrGdRXW8M9bMZtPXUji69lmf5Cmamq7quNLFZXD9Rq7v0Bpc1o/tp0fisAAAAASUVORK5CYII=)](https://github.com/marketplace/actions/slash-command-dispatch)
 
-A GitHub action that facilitates ["ChatOps"](https://www.pagerduty.com/blog/what-is-chatops/) by creating repository dispatch events for slash commands.
+A GitHub action that facilitates ["ChatOps"](https://www.pagerduty.com/blog/what-is-chatops/) by creating dispatch events for slash commands.
 
 ### How does it work?
 
 The action runs in `issue_comment` event workflows and checks the first line of comments for slash commands.
-When a valid command is found it creates a repository dispatch event that includes a payload containing full details of the command and its context.
+When a valid command is found it creates a [repository dispatch](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#repository_dispatch) event that includes a payload containing full details of the command and its context.
+It also supports creating [workflow dispatch](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch) events with defined input parameters.
 
-### Why repository dispatch?
+### Why create dispatch events?
 
 "ChatOps" with slash commands can work in a basic way by parsing the commands during `issue_comment` events and immediately processing the command.
 In repositories with a lot of activity, the workflow queue will get backed up very quickly trying to handle new `issue_comment` events *and* process the commands themselves.
 
 Dispatching commands to be processed elsewhere keeps the workflow queue moving quickly. It essentially enables parallel processing of workflows.
+
+A additional benefit of dispatching is that it allows non-sensitive workloads to be run in public repositories to save using private repository GitHub Action minutes.
 
 <div align="center"><img src="docs/assets/slash-command-dispatch.png" width="550"></div>
 
@@ -32,6 +35,8 @@ See it in action with the following live demos.
 - [Examples](docs/examples.md)
 - [Standard configuration](#standard-configuration)
 - [Advanced configuration](docs/advanced-configuration.md)
+- [Workflow dispatch](docs/workflow-dispatch.md)
+- [Updating to v2](docs/updating.md)
 
 ## Dispatching commands
 
@@ -49,13 +54,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Slash Command Dispatch
-        uses: peter-evans/slash-command-dispatch@v1
+        uses: peter-evans/slash-command-dispatch@v2
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
-          commands: deploy, integration-test, build-docs
+          token: ${{ secrets.PAT }}
+          commands: |
+            deploy
+            integration-test
+            build-docs
 ```
 
-Note that not specifying the `repository` input will mean that `repository_dispatch` events are created in the *current* repository by default. It's perfectly fine to use the current repository and not dispatch events to a seperate "processor" repository.
+Note that not specifying the `repository` input will mean that dispatch events are created in the *current* repository by default. It's perfectly fine to use the current repository and not dispatch events to a seperate "processor" repository.
 
 This action also features [advanced configuration](docs/advanced-configuration.md) that allows each command to be configured individually if necessary. Use the standard configuration shown above unless you require advanced features.
 
@@ -63,23 +71,24 @@ This action also features [advanced configuration](docs/advanced-configuration.m
 
 | Input | Description | Default |
 | --- | --- | --- |
-| `token` | (**required**) A `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). Note: `GITHUB_TOKEN` *does not* work here. See [token](#token) for further details. | |
-| `reaction-token` | `GITHUB_TOKEN` or a `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). See [reaction-token](#reaction-token) for further details. | `GITHUB_TOKEN` |
+| `token` | (**required**) A `repo` scoped [Personal Access Token (PAT)](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). Note: `GITHUB_TOKEN` *does not* work here. See [token](#token) for further details. | |
+| `reaction-token` | `GITHUB_TOKEN` or a `repo` scoped [Personal Access Token (PAT)](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). See [reaction-token](#reaction-token) for further details. | `GITHUB_TOKEN` |
 | `reactions` | Add reactions. :eyes: = seen, :rocket: = dispatched | `true` |
-| `commands` | (**required**) A comma separated list of commands. | |
+| `commands` | (**required**) A comma or newline separated list of commands. | |
 | `permission` | The repository permission level required by the user to dispatch commands. (`none`, `read`, `write`, `admin`) | `write` |
 | `issue-type` | The issue type required for commands. (`issue`, `pull-request`, `both`) | `both` |
 | `allow-edits` | Allow edited comments to trigger command dispatches. | `false` |
 | `repository` | The full name of the repository to send the dispatch events. | Current repository |
 | `event-type-suffix` | The repository dispatch event type suffix for the commands. | `-command` |
-| `named-args` | Parse named arguments and add them to the command payload. | `false` |
+| `static-args` | A comma or newline separated list of arguments that will be dispatched with every command. | |
+| `dispatch-type` | The dispatch type; `repository` or `workflow`. See [dispatch-type](#dispatch-type) for further details. | `repository` |
 | `config` | | JSON configuration for commands. See [Advanced configuration](docs/advanced-configuration.md) | |
 | `config-from-file` | | JSON configuration from a file for commands. See [Advanced configuration](docs/advanced-configuration.md) | |
 
 #### `token`
 
-This action creates [`repository_dispatch`](https://developer.github.com/v3/repos/#create-a-repository-dispatch-event) events.
-The default `GITHUB_TOKEN` does not have scopes to do this so a `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line) is required.
+This action creates [repository_dispatch](https://developer.github.com/v3/repos/#create-a-repository-dispatch-event) and [workflow_dispatch](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch) events.
+The default `GITHUB_TOKEN` does not have scopes to create these events, so a `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line) is required.
 If you will be dispatching commands to public repositories *only* then you can use the more limited `public_repo` scope.
 
 #### `reaction-token`
@@ -90,12 +99,30 @@ You can use a [PAT](https://help.github.com/en/github/authenticating-to-github/c
 
 ```yml
       - name: Slash Command Dispatch
-        uses: peter-evans/slash-command-dispatch@v1
+        uses: peter-evans/slash-command-dispatch@v2
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
-          reaction-token: ${{ secrets.REPO_ACCESS_TOKEN }}
-          commands: deploy, integration-test, build-docs
+          token: ${{ secrets.PAT }}
+          reaction-token: ${{ secrets.PAT }}
+          commands: |
+            deploy
+            integration-test
+            build-docs
 ```
+
+#### `dispatch-type`
+
+By default, the action creates [repository_dispatch](https://developer.github.com/v3/repos/#create-a-repository-dispatch-event) events.
+Setting `dispatch-type` to `workflow` will instead create [workflow_dispatch](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch) events.
+There are significant differences in the action's behaviour when using `workflow` dispatch. See [workflow dispatch](docs/workflow-dispatch.md) for usage details.
+
+For the majority of use cases, the default `repository` dispatch will likely be the most suitable for new workflows.
+If you already have `workflow_dispatch` workflows, you can execute them with slash commands using this action.
+
+| Repository Dispatch (default) | Workflow Dispatch |
+| --- | --- |
+| Events are created with a `client_payload` giving the target workflow access to a wealth of useful [context properties](#accessing-contexts). | A `client_payload` cannot be sent with [workflow_dispatch](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch) events. The target workflow can only make use of up to 10 pre-defined inputs, the names of which must match named arguments supplied with the slash command. |
+| Slash commands can only execute workflows in the target repository's default branch. | Slash commands can execute workflows in any branch using the `ref` named argument. The reference can be a branch, tag, or a commit SHA. This can be useful to test workflows in PR branches before merging. |
+| Immediate command validation feedback is unavailable when creating the dispatch event. | Immediate command [validation feedback](docs/workflow-dispatch.md#validation-errors) is available as an action output. |
 
 ### How comments are parsed for slash commands
 
@@ -108,6 +135,9 @@ Slash commands must be placed in the first line of the comment to be interpreted
 ![Comment Parsing](docs/assets/comment-parsing.png)
 
 ## Handling dispatched commands
+
+The following documentation applies to the `dispatch-type` default, `repository`, which creates [repository_dispatch](https://developer.github.com/v3/repos/#create-a-repository-dispatch-event) events.
+For `workflow` dispatch documentation, see [workflow dispatch](docs/workflow-dispatch.md).
 
 ### Event types
 
@@ -127,52 +157,61 @@ Commands are dispatched with a payload containing a number of contexts.
 
 #### `slash_command` context
 
-The slash command context can be accessed as follows.
-`args` is a space separated string of all the supplied arguments.
-Each argument is also supplied in a numbered property, i.e. `arg1`, `arg2`, `arg3`, etc. 
+The slash command context contains the command and any arguments that were supplied by the user.
+It will also contain any static arguments, if configured.
+
+To demonstrate, take the following configuration as an example.
+```yml
+      - uses: peter-evans/slash-command-dispatch@v2
+        with:
+          token: ${{ secrets.PAT }}
+          commands: |
+            deploy
+          static-args: |
+            production
+            region=us-east-1
+```
+
+For the above example configuration, the slash command `/deploy branch=master dry-run reason="new feature"` will be converted to a JSON payload as follows.
+
+```json
+    "slash_command": {
+        "command": "deploy",
+        "args": {
+            "all": "production region=us-east-1 branch=master dry-run reason=\"new feature\"",
+            "unnamed": {
+                "all": "production dry-run",
+                "arg1": "production",
+                "arg2": "dry-run"
+            },
+            "named": {
+                "region": "us-east-1",
+                "branch": "master",
+                "reason": "new feature"
+            },
+        }
+    }
+```
+
+The properties in the `slash_command` context from the above example can be used in a workflow as follows.
 
 ```yml
       - name: Output command and arguments
         run: |
           echo ${{ github.event.client_payload.slash_command.command }}
-          echo ${{ github.event.client_payload.slash_command.args }}
-          echo ${{ github.event.client_payload.slash_command.arg1 }}
-          echo ${{ github.event.client_payload.slash_command.arg2 }}
-          echo ${{ github.event.client_payload.slash_command.arg3 }}
+          echo ${{ github.event.client_payload.slash_command.args.all }}
+          echo ${{ github.event.client_payload.slash_command.args.unnamed.all }}
+          echo ${{ github.event.client_payload.slash_command.args.unnamed.arg1 }}
+          echo ${{ github.event.client_payload.slash_command.args.unnamed.arg2 }}
+          echo ${{ github.event.client_payload.slash_command.args.named.region }}
+          echo ${{ github.event.client_payload.slash_command.args.named.branch }}
+          echo ${{ github.event.client_payload.slash_command.args.named.reason }}
           # etc.
-```
-
-If the `named-args` input is set to `true`, any arguments that are prefixed in the format `name=argument` will be parsed and added to the payload.
-
-For example, the slash command `/deploy branch=master env=prod some other args` will be set in the JSON payload as follows.
-
-```json
-    "slash_command": {
-        "command": "deploy",
-        "args": "branch=master env=prod some other args",
-        "unnamed_args": "some other args",
-        "branch": "master",
-        "env": "prod",
-        "arg1": "some",
-        "arg2": "other",
-        "arg3": "args"
-    }
-```
-
-These named arguments can be accessed in a workflow as follows.
-
-```yml
-      - name: Output command and named arguments
-        run: |
-          echo ${{ github.event.client_payload.slash_command.command }}
-          echo ${{ github.event.client_payload.slash_command.branch }}
-          echo ${{ github.event.client_payload.slash_command.env }}
-          echo ${{ github.event.client_payload.slash_command.unnamed_args }}
 ```
 
 #### `github` and `pull_request` contexts
 
-The payload contains the complete `github` context of the `issue_comment` event at path `github.event.client_payload.github`.
+The payload contains the `github` context of the `issue_comment` event at path `github.event.client_payload.github`.
 Additionally, if the comment was made in a pull request, the action calls the [GitHub API to fetch the pull request detail](https://developer.github.com/v3/pulls/#get-a-single-pull-request) and attach it to the payload at path `github.event.client_payload.pull_request`.
 
 You can inspect the payload with the following step.
@@ -182,6 +221,8 @@ You can inspect the payload with the following step.
           PAYLOAD_CONTEXT: ${{ toJson(github.event.client_payload) }}
         run: echo "$PAYLOAD_CONTEXT"
 ```
+
+Note that the `client_payload.github.payload.issue.body` and `client_payload.pull_request.body` context properties will be truncated if they exceed 1000 characters.
 
 ### Responding to the comment on command completion
 
@@ -193,7 +234,7 @@ The simplest response is to add a :tada: reaction to the comment.
       - name: Add reaction
         uses: peter-evans/create-or-update-comment@v1
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.PAT }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
           reaction-type: hooray
@@ -209,7 +250,7 @@ Another option is to reply with a new comment containing a link to the run outpu
       - name: Create comment
         uses: peter-evans/create-or-update-comment@v1
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.PAT }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
           issue-number: ${{ github.event.client_payload.github.payload.issue.number }}
           body: |

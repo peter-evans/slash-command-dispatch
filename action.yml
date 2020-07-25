@@ -1,5 +1,5 @@
 name: 'Slash Command Dispatch'
-description: 'Facilitates "ChatOps" by creating repository dispatch events for slash commands'
+description: 'Facilitates "ChatOps" by creating dispatch events for slash commands'
 inputs:
   token:
     description: 'A repo scoped GitHub Personal Access Token.'
@@ -9,25 +9,37 @@ inputs:
     default: ${{ github.token }}
   reactions:
     description: 'Add reactions to comments containing commands.'
+    default: true
   commands:
-    description: 'A comma separated list of commands.'
+    description: 'A comma or newline separated list of commands.'
     required: true
   permission:
     description: 'The repository permission level required by the user to dispatch commands.'
+    default: write
   issue-type:
     description: 'The issue type required for commands.'
+    default: both
   allow-edits:
     description: 'Allow edited comments to trigger command dispatches.'
+    default: false
   repository:
     description: 'The full name of the repository to send the dispatch events.'
+    default: ${{ github.repository }}
   event-type-suffix:
     description: 'The repository dispatch event type suffix for the commands.'
-  named-args:
-    description: 'Parse named arguments and add them to the command payload.'
+    default: -command
+  static-args:
+    description: 'A comma or newline separated list of arguments that will be dispatched with every command.'
+  dispatch-type:
+    description: 'The dispatch type; `repository` or `workflow`.'
+    default: repository
   config:
     description: 'JSON configuration for commands.'
   config-from-file:
     description: 'JSON configuration from a file for commands.'
+outputs:
+  error-message:
+    description: 'Validation errors when using `workflow` dispatch.'
 runs:
   using: 'node12'
   main: 'dist/index.js'

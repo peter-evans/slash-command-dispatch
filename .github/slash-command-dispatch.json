@@ -3,14 +3,23 @@
     "command": "create",
     "permission": "write",
     "issue_type": "issue",
-    "event_type_suffix": "-cmd",
-    "named_args": true
+    "event_type_suffix": "-cmd"
   },
   {
     "command": "delete",
     "permission": "write",
     "issue_type": "both",
-    "allow_edits": true
+    "allow_edits": true,
+    "static_args": [
+      "some-unnamed-arg",
+      "foo=bar"
+    ]
+  },
+  {
+    "command": "update",
+    "permission": "write",
+    "issue_type": "issue",
+    "dispatch_type": "workflow"
   },
   {
     "command": "do-something-remotely",

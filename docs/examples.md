@@ -15,9 +15,7 @@ This is pattern for a slash command where a named argument specifies the branch 
 /do-something branch=develop
 ```
 
-In the dispatch configuration for this command pattern, `named-args` should be set to `true`.
-
-In the following command workflow, `REPO_ACCESS_TOKEN` is a `repo` scoped [Personal Access Token](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line).
+In the following command workflow, `PAT` is a `repo` scoped [Personal Access Token](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line).
 
 ```yml
 name: do-something-command
@@ -32,14 +30,14 @@ jobs:
       - name: Get the target branch name
         id: vars
         run: |
-          branch=${{ github.event.client_payload.slash_command.branch }}
+          branch=${{ github.event.client_payload.slash_command.args.named.branch }}
           if [[ -z "$branch" ]]; then branch="master"; fi
           echo ::set-output name=branch::$branch
 
       # Checkout the branch to test
       - uses: actions/checkout@v2
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.PAT }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
           ref: ${{ steps.vars.outputs.branch }}
 
@@ -54,7 +52,7 @@ jobs:
       - name: Add reaction
         uses: peter-evans/create-or-update-comment@v1
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.PAT }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
           reaction-type: hooray
@@ -68,7 +66,7 @@ This is a real example that uses this pattern to execute the Python test tool [p
 /pytest branch=develop -v -s
 ```
 
-In the following command workflow, note how the remaining `unnamed_args` are passed to the `pytest` tool.
+In the following command workflow, note how the unnamed arguments are passed to the `pytest` tool with the property `args.unnamed.all`.
 
 ```yml
 name: pytest
@@ -83,14 +81,14 @@ jobs:
       - name: Get the target branch name
         id: vars
         run: |
-          branch=${{ github.event.client_payload.slash_command.branch }}
+          branch=${{ github.event.client_payload.slash_command.args.named.branch }}
           if [[ -z "$branch" ]]; then branch="master"; fi
           echo ::set-output name=branch::$branch
 
       # Checkout the branch to test
       - uses: actions/checkout@v2
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.PAT }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
           ref: ${{ steps.vars.outputs.branch }}
 
@@ -109,13 +107,13 @@ jobs:
 
       # Execute pytest
       - name: Execute pytest
-        run: pytest ${{ github.event.client_payload.slash_command.unnamed_args }}
+        run: pytest ${{ github.event.client_payload.slash_command.args.unnamed.all }}
 
       # Add reaction to the comment
       - name: Add reaction
         uses: peter-evans/create-or-update-comment@v1
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.PAT }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
           reaction-type: hooray
@@ -131,7 +129,7 @@ This is pattern for a slash command used in pull request comments. It checks out
 
 In the dispatch configuration for this command pattern, `issue-type` should be set to `pull-request`. This will prevent it from being dispatched from regular issue comments where it will fail. 
 
-In the following command workflow, `REPO_ACCESS_TOKEN` is a `repo` scoped [Personal Access Token](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line).
+In the following command workflow, `PAT` is a `repo` scoped [Personal Access Token](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line).
 
 ```yml
 name: fix-pr-command
@@ -145,7 +143,7 @@ jobs:
       # Checkout the pull request branch
       - uses: actions/checkout@v2
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.PAT }}
           repository: ${{ github.event.client_payload.pull_request.head.repo.full_name }}
           ref: ${{ github.event.client_payload.pull_request.head.ref }}
 
@@ -162,7 +160,7 @@ jobs:
       - name: Add reaction
         uses: peter-evans/create-or-update-comment@v1
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.PAT }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
           reaction-type: hooray
@@ -191,7 +189,7 @@ jobs:
       - name: Checkout pull request
         uses: actions/checkout@v2
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.PAT }}
           repository: ${{ github.event.client_payload.pull_request.head.repo.full_name }}
           ref: ${{ github.event.client_payload.pull_request.head.ref }}
           fetch-depth: 0
@@ -200,7 +198,7 @@ jobs:
         run: |
           git config --global user.name '${{ github.event.client_payload.github.actor }}'
           git config --global user.email '${{ github.event.client_payload.github.actor }}@users.noreply.github.com'
-          git remote add base https://x-access-token:${{ secrets.REPO_ACCESS_TOKEN }}@github.com/${{ github.event.client_payload.pull_request.base.repo.full_name }}.git
+          git remote add base https://x-access-token:${{ secrets.PAT }}@github.com/${{ github.event.client_payload.pull_request.base.repo.full_name }}.git
           git fetch base ${{ github.event.client_payload.pull_request.base.ref }}
           git rebase base/${{ github.event.client_payload.pull_request.base.ref }}
           git push --force-with-lease
@@ -208,7 +206,7 @@ jobs:
       - name: Update comment
         uses: peter-evans/create-or-update-comment@v1
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.PAT }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
           body: |
@@ -222,7 +220,7 @@ jobs:
       - name: Update comment
         uses: peter-evans/create-or-update-comment@v1
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.PAT }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
           body: |
@@ -252,7 +250,7 @@ jobs:
       # Checkout the pull request branch
       - uses: actions/checkout@v2
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.PAT }}
           repository: ${{ github.event.client_payload.pull_request.head.repo.full_name }}
           ref: ${{ github.event.client_payload.pull_request.head.ref }}
 
@@ -281,7 +279,7 @@ jobs:
       - name: Add reaction
         uses: peter-evans/create-or-update-comment@v1
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.PAT }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
           reaction-type: hooray

@@ -18,7 +18,9 @@ jobs:
         uses: ./
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
-          commands: hello-world-local, ping-local
+          commands: |
+            hello-world-local
+            ping-local
           permission: none
           issue-type: issue
 
@@ -66,6 +68,19 @@ jobs:
                 "issue_type": "pull-request",
                 "repository": "peter-evans/slash-command-dispatch-processor",
                 "event_type_suffix": "-pr-command"
+              },
+              {
+                "command": "hello-workflow",
+                "permission": "none",
+                "issue_type": "issue",
+                "repository": "peter-evans/slash-command-dispatch-processor",
+                "static_args": [
+                  "repository=${{ github.repository }}",
+                  "comment-id=${{ github.event.comment.id }}",
+                  "issue-number=${{ github.event.issue.number }}",
+                  "actor=${{ github.actor }}"
+                ],
+                "dispatch_type": "workflow"
               },
               {
                 "command": "ping",
