@@ -1052,7 +1052,7 @@ function getCommandsConfigFromJson(json) {
 exports.getCommandsConfigFromJson = getCommandsConfigFromJson;
 function configIsValid(config) {
     for (const command of config) {
-        if (!['none', 'read', 'write', 'admin'].includes(command.permission)) {
+        if (!['none', 'read', 'triage', 'write', 'maintain', 'admin'].includes(command.permission)) {
             core.setFailed(`'${command.permission}' is not a valid 'permission'.`);
             return false;
         }
@@ -1072,8 +1072,10 @@ function actorHasPermission(actorPermission, commandPermission) {
     const permissionLevels = Object.freeze({
         none: 1,
         read: 2,
-        write: 3,
-        admin: 4
+        triage: 3,
+        write: 4,
+        maintain: 5,
+        admin: 6
     });
     core.debug(`Actor permission level: ${permissionLevels[actorPermission]}`);
     core.debug(`Command permission level: ${permissionLevels[commandPermission]}`);
@@ -4720,6 +4722,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.GitHubHelper = void 0;
 const core = __importStar(__webpack_require__(470));
 const octokit_client_1 = __webpack_require__(921);
+const util_1 = __webpack_require__(669);
 class GitHubHelper {
     constructor(token) {
         const options = {};
@@ -4727,6 +4730,11 @@ class GitHubHelper {
             options.auth = `${token}`;
         }
         this.octokit = new octokit_client_1.Octokit(options);
+        this.graphqlClient = octokit_client_1.graphql.defaults({
+            headers: {
+                authorization: `token ${token}`
+            }
+        });
     }
     parseRepository(repository) {
         const [owner, repo] = repository.split('/');
@@ -4737,8 +4745,23 @@ class GitHubHelper {
     }
     getActorPermission(repo, actor) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { data: { permission } } = yield this.octokit.repos.getCollaboratorPermissionLevel(Object.assign(Object.assign({}, repo), { username: actor }));
-            return permission;
+            // https://docs.github.com/en/graphql/reference/enums#repositorypermission
+            // https://docs.github.com/en/graphql/reference/objects#repositorycollaboratoredge
+            // Returns 'READ', 'TRIAGE', 'WRITE', 'MAINTAIN', 'ADMIN'
+            const query = `query CollaboratorPermission($owner: String!, $repo: String!, $collaborator: String) {
+      repository(owner:$owner, name:$repo) {
+        collaborators(query: $collaborator) {
+          edges {
+            permission
+          }
+        }
+      }
+    }`;
+            const collaboratorPermission = yield this.graphqlClient(query, Object.assign(Object.assign({}, repo), { collaborator: actor }));
+            core.debug(`CollaboratorPermission: ${util_1.inspect(collaboratorPermission.repository.collaborators.edges)}`);
+            return collaboratorPermission.repository.collaborators.edges.length > 0
+                ? collaboratorPermission.repository.collaborators.edges[0].permission.toLowerCase()
+                : 'none';
         });
     }
     tryAddReaction(repo, commentId, reaction) {
@@ -6327,13 +6350,16 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var request = __webpack_require__(753);
 var universalUserAgent = __webpack_require__(796);
 
-const VERSION = "4.5.2";
+const VERSION = "4.5.3";
 
 class GraphqlError extends Error {
   constructor(request, response) {
     const message = response.data.errors[0].message;
     super(message);
     Object.assign(this, response.data);
+    Object.assign(this, {
+      headers: response.headers
+    });
     this.name = "GraphqlError";
     this.request = request; // Maintains proper stack trace (only available on V8)
 
@@ -6366,7 +6392,14 @@ function graphql(request, query, options) {
   }, {});
   return request(requestOptions).then(response => {
     if (response.data.errors) {
+      const headers = {};
+
+      for (const key of Object.keys(response.headers)) {
+        headers[key] = response.headers[key];
+      }
+
       throw new GraphqlError(requestOptions, {
+        headers,
         data: response.data
       });
     }
@@ -6420,6 +6453,8 @@ const core_1 = __webpack_require__(448);
 const plugin_paginate_rest_1 = __webpack_require__(299);
 const plugin_rest_endpoint_methods_1 = __webpack_require__(842);
 exports.Octokit = core_1.Octokit.plugin(plugin_paginate_rest_1.paginateRest, plugin_rest_endpoint_methods_1.restEndpointMethods);
+var graphql_1 = __webpack_require__(898);
+Object.defineProperty(exports, "graphql", { enumerable: true, get: function () { return graphql_1.graphql; } });
 
 
 /***/ }),

@@ -9,7 +9,8 @@
     "format": "prettier --write '**/*.ts'",
     "format-check": "prettier --check '**/*.ts'",
     "lint": "eslint src/**/*.ts",
-    "test": "jest"
+    "test": "jest unit",
+    "test:int": "jest int"
   },
   "repository": {
     "type": "git",
@@ -30,6 +31,7 @@
     "@actions/core": "1.2.4",
     "@actions/github": "4.0.0",
     "@octokit/core": "3.1.1",
+    "@octokit/graphql": "4.5.3",
     "@octokit/plugin-paginate-rest": "2.2.3",
     "@octokit/plugin-rest-endpoint-methods": "4.1.0",
     "@octokit/types": "5.1.0"
