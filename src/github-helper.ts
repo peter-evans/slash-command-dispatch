@@ -1,6 +1,13 @@
 import * as core from '@actions/core'
-import {Octokit, OctokitOptions, PullsGetResponseData} from './octokit-client'
+import {
+  graphql,
+  Graphql,
+  Octokit,
+  OctokitOptions,
+  PullsGetResponseData
+} from './octokit-client'
 import {Command, SlashCommandPayload} from './command-helper'
+import {inspect} from 'util'
 
 type ReposCreateDispatchEventParamsClientPayload = {
   [key: string]: ReposCreateDispatchEventParamsClientPayloadKeyString
@@ -23,8 +30,21 @@ interface Repository {
   repo: string
 }
 
+type CollaboratorPermission = {
+  repository: {
+    collaborators: {
+      edges: [
+        {
+          permission: string
+        }
+      ]
+    }
+  }
+}
+
 export class GitHubHelper {
   private octokit: InstanceType<typeof Octokit>
+  private graphqlClient: Graphql
 
   constructor(token: string) {
     const options: OctokitOptions = {}
@@ -32,6 +52,11 @@ export class GitHubHelper {
       options.auth = `${token}`
     }
     this.octokit = new Octokit(options)
+    this.graphqlClient = graphql.defaults({
+      headers: {
+        authorization: `token ${token}`
+      }
+    })
   }
 
   private parseRepository(repository: string): Repository {
@@ -43,13 +68,32 @@ export class GitHubHelper {
   }
 
   async getActorPermission(repo: Repository, actor: string): Promise<string> {
-    const {
-      data: {permission}
-    } = await this.octokit.repos.getCollaboratorPermissionLevel({
+    // https://docs.github.com/en/graphql/reference/enums#repositorypermission
+    // https://docs.github.com/en/graphql/reference/objects#repositorycollaboratoredge
+    // Returns 'READ', 'TRIAGE', 'WRITE', 'MAINTAIN', 'ADMIN'
+    const query = `query CollaboratorPermission($owner: String!, $repo: String!, $collaborator: String) {
+      repository(owner:$owner, name:$repo) {
+        collaborators(query: $collaborator) {
+          edges {
+            permission
+          }
+        }
+      }
+    }`
+    const collaboratorPermission = await this.graphqlClient<
+      CollaboratorPermission
+    >(query, {
       ...repo,
-      username: actor
+      collaborator: actor
     })
-    return permission
+    core.debug(
+      `CollaboratorPermission: ${inspect(
+        collaboratorPermission.repository.collaborators.edges
+      )}`
+    )
+    return collaboratorPermission.repository.collaborators.edges.length > 0
+      ? collaboratorPermission.repository.collaborators.edges[0].permission.toLowerCase()
+      : 'none'
   }
 
   async tryAddReaction(

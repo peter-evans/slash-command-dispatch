@@ -156,7 +156,11 @@ export function getCommandsConfigFromJson(json: string): Command[] {
 
 export function configIsValid(config: Command[]): boolean {
   for (const command of config) {
-    if (!['none', 'read', 'write', 'admin'].includes(command.permission)) {
+    if (
+      !['none', 'read', 'triage', 'write', 'maintain', 'admin'].includes(
+        command.permission
+      )
+    ) {
       core.setFailed(`'${command.permission}' is not a valid 'permission'.`)
       return false
     }
@@ -181,8 +185,10 @@ export function actorHasPermission(
   const permissionLevels = Object.freeze({
     none: 1,
     read: 2,
-    write: 3,
-    admin: 4
+    triage: 3,
+    write: 4,
+    maintain: 5,
+    admin: 6
   })
   core.debug(`Actor permission level: ${permissionLevels[actorPermission]}`)
   core.debug(`Command permission level: ${permissionLevels[commandPermission]}`)

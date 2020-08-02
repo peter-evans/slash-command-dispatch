@@ -75,7 +75,7 @@ This action also features [advanced configuration](docs/advanced-configuration.m
 | `reaction-token` | `GITHUB_TOKEN` or a `repo` scoped [Personal Access Token (PAT)](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). See [reaction-token](#reaction-token) for further details. | `GITHUB_TOKEN` |
 | `reactions` | Add reactions. :eyes: = seen, :rocket: = dispatched | `true` |
 | `commands` | (**required**) A comma or newline separated list of commands. | |
-| `permission` | The repository permission level required by the user to dispatch commands. (`none`, `read`, `write`, `admin`) | `write` |
+| `permission` | The repository permission level required by the user to dispatch commands. See [permission](#permission) for further details. (`none`, `read`, `triage`, `write`, `maintain`, `admin`) | `write` |
 | `issue-type` | The issue type required for commands. (`issue`, `pull-request`, `both`) | `both` |
 | `allow-edits` | Allow edited comments to trigger command dispatches. | `false` |
 | `repository` | The full name of the repository to send the dispatch events. | Current repository |
@@ -108,6 +108,17 @@ You can use a [PAT](https://help.github.com/en/github/authenticating-to-github/c
             integration-test
             build-docs
 ```
+
+#### `permission`
+
+This input sets the repository permission level required by the user to dispatch commands.
+It expects one of the [five repository permission levels](https://docs.github.com/en/github/setting-up-and-managing-organizations-and-teams/repository-permission-levels-for-an-organization#permission-levels-for-repositories-owned-by-an-organization), or `none`.
+From the least to greatest permission level they are `none`, `read`, `triage`, `write`, `maintain` and `admin`.
+
+Setting `write` as the required permission level means that any user with `write`, `maintain` or `admin` will be able to execute commands.
+
+Note that `read`, `triage` and `maintain` only make sense for organization repositories.
+For repositories owned by a user account there are only two permission levels, the repository owner (`admin`) and collaborators (`write`).
 
 #### `dispatch-type`
 

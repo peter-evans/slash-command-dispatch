@@ -206,13 +206,16 @@ describe('command-helper tests', () => {
 
   test('actor does not have permission', async () => {
     expect(actorHasPermission('none', 'read')).toBeFalsy()
-    expect(actorHasPermission('read', 'write')).toBeFalsy()
-    expect(actorHasPermission('write', 'admin')).toBeFalsy()
+    expect(actorHasPermission('read', 'triage')).toBeFalsy()
+    expect(actorHasPermission('triage', 'write')).toBeFalsy()
+    expect(actorHasPermission('write', 'maintain')).toBeFalsy()
+    expect(actorHasPermission('maintain', 'admin')).toBeFalsy()
   })
 
   test('actor has permission', async () => {
     expect(actorHasPermission('read', 'none')).toBeTruthy()
-    expect(actorHasPermission('write', 'read')).toBeTruthy()
+    expect(actorHasPermission('triage', 'read')).toBeTruthy()
+    expect(actorHasPermission('write', 'triage')).toBeTruthy()
     expect(actorHasPermission('admin', 'write')).toBeTruthy()
     expect(actorHasPermission('write', 'write')).toBeTruthy()
   })

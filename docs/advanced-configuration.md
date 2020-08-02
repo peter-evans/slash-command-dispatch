@@ -100,7 +100,7 @@ Advanced configuration requires a combination of yaml based inputs and JSON conf
 | `reaction-token` | | `GITHUB_TOKEN` or a `repo` scoped [Personal Access Token (PAT)](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). See [reaction-token](https://github.com/peter-evans/slash-command-dispatch#reaction-token) for further details. | `GITHUB_TOKEN` |
 | `reactions` | | Add reactions. :eyes: = seen, :rocket: = dispatched | `true` |
 | | `command` | (**required**) The slash command. | |
-| | `permission` | The repository permission level required by the user to dispatch the command. (`none`, `read`, `write`, `admin`) | `write` |
+| | `permission` | The repository permission level required by the user to dispatch the command. (`none`, `read`, `triage`, `write`, `maintain`, `admin`) | `write` |
 | | `issue_type` | The issue type required for the command. (`issue`, `pull-request`, `both`) | `both` |
 | | `allow_edits` | Allow edited comments to trigger command dispatches. | `false` |
 | | `repository` | The full name of the repository to send the dispatch events. | Current repository |
