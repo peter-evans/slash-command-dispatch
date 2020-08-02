@@ -115,7 +115,7 @@ This input sets the repository permission level required by the user to dispatch
 It expects one of the [five repository permission levels](https://docs.github.com/en/github/setting-up-and-managing-organizations-and-teams/repository-permission-levels-for-an-organization#permission-levels-for-repositories-owned-by-an-organization), or `none`.
 From the least to greatest permission level they are `none`, `read`, `triage`, `write`, `maintain` and `admin`.
 
-Setting `write` as the required permission level means that any user with `write`, `maintain` or `admin` will be able to execute commands.
+Setting `write` as the required permission level means that any user with `write`, `maintain` or `admin` permission level will be able to execute commands.
 
 Note that `read`, `triage` and `maintain` only make sense for organization repositories.
 For repositories owned by a user account there are only two permission levels, the repository owner (`admin`) and collaborators (`write`).
