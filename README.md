@@ -117,7 +117,7 @@ From the least to greatest permission level they are `none`, `read`, `triage`, `
 
 Setting `write` as the required permission level means that any user with `write`, `maintain` or `admin` permission level will be able to execute commands.
 
-Note that `read`, `triage` and `maintain` only make sense for organization repositories.
+Note that `read`, `triage` and `maintain` are only applicable to organization repositories.
 For repositories owned by a user account there are only two permission levels, the repository owner (`admin`) and collaborators (`write`).
 
 #### `dispatch-type`
