@@ -27,7 +27,7 @@ Follow this guide to get started with a working `/example` command.
               reaction-type: hooray
     ```
 
-3. Create a `repo` scoped Personal Access Token (PAT) by following [this guide](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line).
+3. Create a `repo` scoped Personal Access Token (PAT) by following [this guide](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token).
 
 4. Go to your repository `Settings` -> `Secrets` and `Add a new secret`.
 
@@ -63,7 +63,7 @@ Command processing setup is complete! Now we need to setup command dispatch for 
               repository: your-github-username/slash-command-processor
     ```
 
-2. Create a new `repo` scoped [PAT](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line), OR, use the one created at step 3 of the [previous section](#command-processing-setup).
+2. Create a new `repo` scoped [PAT](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token), OR, use the one created at step 3 of the [previous section](#command-processing-setup).
 
 3. Go to your repository `Settings` -> `Secrets` and `Add a new secret`.
 

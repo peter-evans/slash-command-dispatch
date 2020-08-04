@@ -15,7 +15,7 @@ This is pattern for a slash command where a named argument specifies the branch 
 /do-something branch=develop
 ```
 
-In the following command workflow, `PAT` is a `repo` scoped [Personal Access Token](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line).
+In the following command workflow, `PAT` is a `repo` scoped [Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token).
 
 ```yml
 name: do-something-command
@@ -129,7 +129,7 @@ This is pattern for a slash command used in pull request comments. It checks out
 
 In the dispatch configuration for this command pattern, `issue-type` should be set to `pull-request`. This will prevent it from being dispatched from regular issue comments where it will fail. 
 
-In the following command workflow, `PAT` is a `repo` scoped [Personal Access Token](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line).
+In the following command workflow, `PAT` is a `repo` scoped [Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token).
 
 ```yml
 name: fix-pr-command

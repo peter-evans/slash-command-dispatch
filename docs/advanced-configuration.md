@@ -96,8 +96,8 @@ Advanced configuration requires a combination of yaml based inputs and JSON conf
 
 | Input | JSON Property | Description | Default |
 | --- | --- | --- | --- |
-| `token` | | (**required**) A `repo` scoped [Personal Access Token (PAT)](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). Note: `GITHUB_TOKEN` *does not* work here. See [token](https://github.com/peter-evans/slash-command-dispatch#token) for further details. | |
-| `reaction-token` | | `GITHUB_TOKEN` or a `repo` scoped [Personal Access Token (PAT)](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line). See [reaction-token](https://github.com/peter-evans/slash-command-dispatch#reaction-token) for further details. | `GITHUB_TOKEN` |
+| `token` | | (**required**) A `repo` scoped [Personal Access Token (PAT)](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token). Note: `GITHUB_TOKEN` *does not* work here. See [token](https://github.com/peter-evans/slash-command-dispatch#token) for further details. | |
+| `reaction-token` | | `GITHUB_TOKEN` or a `repo` scoped [Personal Access Token (PAT)](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token). See [reaction-token](https://github.com/peter-evans/slash-command-dispatch#reaction-token) for further details. | `GITHUB_TOKEN` |
 | `reactions` | | Add reactions. :eyes: = seen, :rocket: = dispatched | `true` |
 | | `command` | (**required**) The slash command. | |
 | | `permission` | The repository permission level required by the user to dispatch the command. (`none`, `read`, `triage`, `write`, `maintain`, `admin`) | `write` |
