@@ -17,7 +17,7 @@ In repositories with a lot of activity, the workflow queue will get backed up ve
 
 Dispatching commands to be processed elsewhere keeps the workflow queue moving quickly. It essentially enables parallel processing of workflows.
 
-A additional benefit of dispatching is that it allows non-sensitive workloads to be run in public repositories to save using private repository GitHub Action minutes.
+An additional benefit of dispatching is that it allows non-sensitive workloads to be run in public repositories to save using private repository GitHub Action minutes.
 
 <div align="center"><img src="docs/assets/slash-command-dispatch.png" width="550"></div>
 
@@ -63,7 +63,7 @@ jobs:
             build-docs
 ```
 
-Note that not specifying the `repository` input will mean that dispatch events are created in the *current* repository by default. It's perfectly fine to use the current repository and not dispatch events to a seperate "processor" repository.
+Note that not specifying the `repository` input will mean that dispatch events are created in the *current* repository by default. It's perfectly fine to use the current repository and not dispatch events to a separate "processor" repository.
 
 This action also features [advanced configuration](docs/advanced-configuration.md) that allows each command to be configured individually if necessary. Use the standard configuration shown above unless you require advanced features.
 
@@ -169,7 +169,7 @@ Commands are dispatched with a payload containing a number of contexts.
 #### `slash_command` context
 
 The slash command context contains the command and any arguments that were supplied by the user.
-It will also contain any static arguments, if configured.
+It will also contain any static arguments if configured.
 
 To demonstrate, take the following configuration as an example.
 ```yml

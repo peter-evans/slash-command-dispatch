@@ -2,7 +2,7 @@
 
 ## What is advanced configuration?
 
-Due to the limitations of yaml based action inputs, basic configuration is not adequate enough to support unique configuration *per command*.
+Due to the limitations of YAML based action inputs, basic configuration is not adequate to support unique configuration *per command*.
 
 For example, the following basic configuration means that all commands must have the same `admin` permission.
 
@@ -22,7 +22,7 @@ To solve this issue, advanced JSON configuration allows each command to be confi
 
 ## Dispatching commands
 
-There are two ways to specify JSON configuration for command dispatch. Directly in the workflow via the `config` input, OR, specifing a JSON config file via the `config-from-file` input.
+There are two ways to specify JSON configuration for command dispatch. Directly in the workflow via the `config` input, OR, specifying a JSON config file via the `config-from-file` input.
 
 **Note**: It is recommended to write the JSON configuration directly in the workflow rather than use a file. Using the `config-from-file` input will be slightly slower due to requiring the repository to be checked out with `actions/checkout` so the file can be accessed.
 
@@ -92,7 +92,7 @@ jobs:
 
 ## Advanced action inputs
 
-Advanced configuration requires a combination of yaml based inputs and JSON configuration.
+Advanced configuration requires a combination of YAML based inputs and JSON configuration.
 
 | Input | JSON Property | Description | Default |
 | --- | --- | --- | --- |

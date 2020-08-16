@@ -9,7 +9,7 @@
 
 ## Use case: Execute command using a specific repository branch
 
-This is pattern for a slash command where a named argument specifies the branch to checkout. If the named argument is missing it defaults to `master`. For example, the following command will cause the command workflow to checkout the `develop` branch of the repository where the command was dispatched from. After the branch has been checked out in the command workflow, scripts, tools or actions may be executed against it.
+This is a pattern for a slash command where a named argument specifies the branch to checkout. If the named argument is missing it defaults to `master`. For example, the following command will cause the command workflow to checkout the `develop` branch of the repository where the command was dispatched from. After the branch has been checked out in the command workflow, scripts, tools or actions may be executed against it.
 
 ```
 /do-something branch=develop
@@ -121,7 +121,7 @@ jobs:
 
 ## Use case: Execute command to modify a pull request branch
 
-This is pattern for a slash command used in pull request comments. It checks out the pull request branch and allows further scripts, tools and action steps to modify it.
+This is a pattern for a slash command used in pull request comments. It checks out the pull request branch and allows further scripts, tools and action steps to modify it.
 
 ```
 /fix-pr

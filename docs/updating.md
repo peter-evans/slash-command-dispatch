@@ -65,7 +65,7 @@
   /send "hello world!"
   ```
 
-- The `commands` input can now be newline separated, or comma separated.
+- The `commands` input can now be newline separated, or comma-separated.
 
   e.g.
   ```yml
