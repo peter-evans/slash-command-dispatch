@@ -164,7 +164,9 @@ async function run(): Promise<void> {
         github.context.payload.issue.number
       )
       // Truncate the body to keep the size of the payload under the max
-      pullRequest.body = pullRequest.body.slice(0, 1000)
+      if (pullRequest.body) {
+        pullRequest.body = pullRequest.body.slice(0, 1000)
+      }
       clientPayload['pull_request'] = pullRequest
     }
 
