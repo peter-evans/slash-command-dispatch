@@ -17,7 +17,9 @@ There are significant differences in the action's behaviour when using `workflow
 
 ### Workflow name
 
-It is important to name the `workflow_dispatch` event workflow correctly since the action targets the workflow based on its filename. The target filename is a combination of the command name and the `event-type-suffix`.
+It is important to name the `workflow_dispatch` event workflow correctly since the action targets the workflow based on its filename.
+The target filename is a combination of the command name and the `event-type-suffix`.
+Additionally, the file extension must be `.yml`.
 
 For the following example configuration, the target workflows are:
 - `deploy-command.yml`
