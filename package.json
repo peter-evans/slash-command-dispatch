@@ -33,8 +33,7 @@
     "@octokit/core": "3.2.4",
     "@octokit/graphql": "4.5.8",
     "@octokit/plugin-paginate-rest": "2.6.2",
-    "@octokit/plugin-rest-endpoint-methods": "4.4.1",
-    "@octokit/types": "6.1.2"
+    "@octokit/plugin-rest-endpoint-methods": "4.4.1"
   },
   "devDependencies": {
     "@types/jest": "26.0.19",
