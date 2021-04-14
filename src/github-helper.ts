@@ -196,7 +196,7 @@ export class GitHubHelper {
   }
 
   private async getDefaultBranch(repository: string): Promise<string> {
-    const {data: repo} = await this.octokit.repos.get({
+    const {data: repo} = await this.octokit.rest.repos.get({
       ...this.parseRepository(repository)
     })
     return repo.default_branch
