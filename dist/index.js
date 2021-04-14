@@ -317,7 +317,7 @@ class GitHubHelper {
     tryAddReaction(repo, commentId, reaction) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                yield this.octokit.reactions.createForIssueComment(Object.assign(Object.assign({}, repo), { comment_id: commentId, content: reaction }));
+                yield this.octokit.rest.reactions.createForIssueComment(Object.assign(Object.assign({}, repo), { comment_id: commentId, content: reaction }));
             }
             catch (error) {
                 core.debug(error);
@@ -327,7 +327,7 @@ class GitHubHelper {
     }
     getPull(repo, pullNumber) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { data: pullRequest } = yield this.octokit.pulls.get(Object.assign(Object.assign({}, repo), { pull_number: pullNumber }));
+            const { data: pullRequest } = yield this.octokit.rest.pulls.get(Object.assign(Object.assign({}, repo), { pull_number: pullNumber }));
             return pullRequest;
         });
     }
@@ -344,7 +344,7 @@ class GitHubHelper {
     createRepositoryDispatch(cmd, clientPayload) {
         return __awaiter(this, void 0, void 0, function* () {
             const eventType = `${cmd.command}${cmd.event_type_suffix}`;
-            yield this.octokit.repos.createDispatchEvent(Object.assign(Object.assign({}, this.parseRepository(cmd.repository)), { event_type: `${cmd.command}${cmd.event_type_suffix}`, client_payload: clientPayload }));
+            yield this.octokit.rest.repos.createDispatchEvent(Object.assign(Object.assign({}, this.parseRepository(cmd.repository)), { event_type: `${cmd.command}${cmd.event_type_suffix}`, client_payload: clientPayload }));
             core.info(`Command '${cmd.command}' dispatched to '${cmd.repository}' ` +
                 `with event type '${eventType}'.`);
         });
