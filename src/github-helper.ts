@@ -111,7 +111,7 @@ export class GitHubHelper {
       | 'eyes'
   ): Promise<void> {
     try {
-      await this.octokit.reactions.createForIssueComment({
+      await this.octokit.rest.reactions.createForIssueComment({
         ...repo,
         comment_id: commentId,
         content: reaction
@@ -126,7 +126,7 @@ export class GitHubHelper {
     repo: Repository,
     pullNumber: number
   ): Promise<PullsGetResponseData> {
-    const {data: pullRequest} = await this.octokit.pulls.get({
+    const {data: pullRequest} = await this.octokit.rest.pulls.get({
       ...repo,
       pull_number: pullNumber
     })
@@ -149,7 +149,7 @@ export class GitHubHelper {
     clientPayload: ClientPayload
   ): Promise<void> {
     const eventType = `${cmd.command}${cmd.event_type_suffix}`
-    await this.octokit.repos.createDispatchEvent({
+    await this.octokit.rest.repos.createDispatchEvent({
       ...this.parseRepository(cmd.repository),
       event_type: `${cmd.command}${cmd.event_type_suffix}`,
       client_payload: clientPayload
