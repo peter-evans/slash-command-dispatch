@@ -373,7 +373,7 @@ class GitHubHelper {
     }
     getDefaultBranch(repository) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { data: repo } = yield this.octokit.repos.get(Object.assign({}, this.parseRepository(repository)));
+            const { data: repo } = yield this.octokit.rest.repos.get(Object.assign({}, this.parseRepository(repository)));
             return repo.default_branch;
         });
     }
