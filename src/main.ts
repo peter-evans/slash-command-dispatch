@@ -151,10 +151,8 @@ async function run(): Promise<void> {
       clientPayload.github.payload.issue &&
       clientPayload.github.payload.issue.body
     ) {
-      clientPayload.github.payload.issue.body = clientPayload.github.payload.issue.body.slice(
-        0,
-        1000
-      )
+      clientPayload.github.payload.issue.body =
+        clientPayload.github.payload.issue.body.slice(0, 1000)
     }
 
     // Get the pull request context for the dispatch payload
