@@ -80,13 +80,11 @@ export class GitHubHelper {
         }
       }
     }`
-    const collaboratorPermission = await this.graphqlClient<CollaboratorPermission>(
-      query,
-      {
+    const collaboratorPermission =
+      await this.graphqlClient<CollaboratorPermission>(query, {
         ...repo,
         collaborator: actor
-      }
-    )
+      })
     core.debug(
       `CollaboratorPermission: ${inspect(
         collaboratorPermission.repository.collaborators.edges

@@ -5,7 +5,8 @@ import * as utils from './utils'
 
 // Tokenise command and arguments
 // Support escaped quotes within quotes. https://stackoverflow.com/a/5696141/11934042
-const TOKENISE_REGEX = /\S+="[^"\\]*(?:\\.[^"\\]*)*"|"[^"\\]*(?:\\.[^"\\]*)*"|\S+/g
+const TOKENISE_REGEX =
+  /\S+="[^"\\]*(?:\\.[^"\\]*)*"|"[^"\\]*(?:\\.[^"\\]*)*"|\S+/g
 const NAMED_ARG_REGEX = /^(?<name>[a-zA-Z0-9_-]+)=(?<value>.+)$/
 
 export const MAX_ARGS = 50
