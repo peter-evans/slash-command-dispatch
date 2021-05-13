@@ -9,7 +9,7 @@
 
 ## Use case: Execute command using a specific repository branch
 
-This is a pattern for a slash command where a named argument specifies the branch to checkout. If the named argument is missing it defaults to `master`. For example, the following command will cause the command workflow to checkout the `develop` branch of the repository where the command was dispatched from. After the branch has been checked out in the command workflow, scripts, tools or actions may be executed against it.
+This is a pattern for a slash command where a named argument specifies the branch to checkout. If the named argument is missing it defaults to `main`. For example, the following command will cause the command workflow to checkout the `develop` branch of the repository where the command was dispatched from. After the branch has been checked out in the command workflow, scripts, tools or actions may be executed against it.
 
 ```
 /do-something branch=develop
@@ -31,7 +31,7 @@ jobs:
         id: vars
         run: |
           branch=${{ github.event.client_payload.slash_command.args.named.branch }}
-          if [[ -z "$branch" ]]; then branch="master"; fi
+          if [[ -z "$branch" ]]; then branch="main"; fi
           echo ::set-output name=branch::$branch
 
       # Checkout the branch to test
@@ -82,7 +82,7 @@ jobs:
         id: vars
         run: |
           branch=${{ github.event.client_payload.slash_command.args.named.branch }}
-          if [[ -z "$branch" ]]; then branch="master"; fi
+          if [[ -z "$branch" ]]; then branch="main"; fi
           echo ::set-output name=branch::$branch
 
       # Checkout the branch to test

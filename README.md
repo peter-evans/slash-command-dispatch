@@ -183,13 +183,13 @@ To demonstrate, take the following configuration as an example.
             region=us-east-1
 ```
 
-For the above example configuration, the slash command `/deploy branch=master dry-run reason="new feature"` will be converted to a JSON payload as follows.
+For the above example configuration, the slash command `/deploy branch=main dry-run reason="new feature"` will be converted to a JSON payload as follows.
 
 ```json
     "slash_command": {
         "command": "deploy",
         "args": {
-            "all": "production region=us-east-1 branch=master dry-run reason=\"new feature\"",
+            "all": "production region=us-east-1 branch=main dry-run reason=\"new feature\"",
             "unnamed": {
                 "all": "production dry-run",
                 "arg1": "production",
@@ -197,7 +197,7 @@ For the above example configuration, the slash command `/deploy branch=master dr
             },
             "named": {
                 "region": "us-east-1",
-                "branch": "master",
+                "branch": "main",
                 "reason": "new feature"
             },
         }

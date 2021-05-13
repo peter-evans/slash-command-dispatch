@@ -270,7 +270,7 @@ describe('command-helper tests', () => {
   test('slash command payload with named args', async () => {
     const commandTokens = [
       'test',
-      'branch_name=master',
+      'branch_name=main',
       'arg1',
       'test-id=123',
       'arg2'
@@ -279,14 +279,14 @@ describe('command-helper tests', () => {
     const payload: SlashCommandPayload = {
       command: 'test',
       args: {
-        all: 'branch_name=master arg1 test-id=123 arg2',
+        all: 'branch_name=main arg1 test-id=123 arg2',
         unnamed: {
           all: 'arg1 arg2',
           arg1: 'arg1',
           arg2: 'arg2'
         },
         named: {
-          branch_name: 'master',
+          branch_name: 'main',
           'test-id': '123'
         }
       }
@@ -295,12 +295,12 @@ describe('command-helper tests', () => {
   })
 
   test('slash command payload with named args and static args', async () => {
-    const commandTokens = ['test', 'branch=master', 'arg1', 'dry-run']
+    const commandTokens = ['test', 'branch=main', 'arg1', 'dry-run']
     const staticArgs = ['production', 'region=us-east-1']
     const payload: SlashCommandPayload = {
       command: 'test',
       args: {
-        all: 'production region=us-east-1 branch=master arg1 dry-run',
+        all: 'production region=us-east-1 branch=main arg1 dry-run',
         unnamed: {
           all: 'production arg1 dry-run',
           arg1: 'production',
@@ -309,7 +309,7 @@ describe('command-helper tests', () => {
         },
         named: {
           region: 'us-east-1',
-          branch: 'master'
+          branch: 'main'
         }
       }
     }

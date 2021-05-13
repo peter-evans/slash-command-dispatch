@@ -4,26 +4,26 @@
 
 - The format of the `slash_command` context has been changed to prevent an issue where named arguments can overwrite other properties of the payload.
 
-  The following diff shows how the `slash_command` context has changed for the example command `/deploy branch=master smoke-test dry-run reason="new feature"`.
+  The following diff shows how the `slash_command` context has changed for the example command `/deploy branch=main smoke-test dry-run reason="new feature"`.
 
   ```diff
     "slash_command": {
         "command": "deploy",
-  -     "args": "branch=master smoke-test dry-run reason=\"new feature\"",
+  -     "args": "branch=main smoke-test dry-run reason=\"new feature\"",
   -     "unnamed_args": "smoke-test dry-run",
   -     "arg1": "smoke-test",
   -     "arg2": "dry-run"
-  -     "branch": "master",
+  -     "branch": "main",
   -     "reason": "new feature"
   +     "args": {
-  +         "all": "branch=master smoke-test dry-run reason=\"new feature\"",
+  +         "all": "branch=main smoke-test dry-run reason=\"new feature\"",
   +         "unnamed": {
   +             "all": "smoke-test dry-run",
   +             "arg1": "smoke-test",
   +             "arg2": "dry-run"
   +         },
   +         "named": {
-  +             "branch": "master",
+  +             "branch": "main",
   +             "reason": "new feature"
   +         },
   +     }
@@ -59,7 +59,7 @@
 
   e.g.
   ```
-  /deploy branch=master dry-run reason="new feature"
+  /deploy branch=main dry-run reason="new feature"
   ```
   ```
   /send "hello world!"
