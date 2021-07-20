@@ -1,11 +1,5 @@
 import * as core from '@actions/core'
-import {
-  graphql,
-  Graphql,
-  Octokit,
-  OctokitOptions,
-  PullsGetResponseData
-} from './octokit-client'
+import {Octokit, PullsGetResponseData} from './octokit-client'
 import {Command, SlashCommandPayload} from './command-helper'
 import {inspect} from 'util'
 
@@ -44,18 +38,11 @@ type CollaboratorPermission = {
 
 export class GitHubHelper {
   private octokit: InstanceType<typeof Octokit>
-  private graphqlClient: Graphql
 
   constructor(token: string) {
-    const options: OctokitOptions = {}
-    if (token) {
-      options.auth = `${token}`
-    }
-    this.octokit = new Octokit(options)
-    this.graphqlClient = graphql.defaults({
-      headers: {
-        authorization: `token ${token}`
-      }
+    this.octokit = new Octokit({
+      auth: token,
+      baseUrl: process.env['GITHUB_API_URL'] || 'https://api.github.com'
     })
   }
 
@@ -81,7 +68,7 @@ export class GitHubHelper {
       }
     }`
     const collaboratorPermission =
-      await this.graphqlClient<CollaboratorPermission>(query, {
+      await this.octokit.graphql<CollaboratorPermission>(query, {
         ...repo,
         collaborator: actor
       })
