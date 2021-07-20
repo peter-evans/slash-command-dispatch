@@ -274,15 +274,9 @@ const octokit_client_1 = __nccwpck_require__(40);
 const util_1 = __nccwpck_require__(669);
 class GitHubHelper {
     constructor(token) {
-        const options = {};
-        if (token) {
-            options.auth = `${token}`;
-        }
-        this.octokit = new octokit_client_1.Octokit(options);
-        this.graphqlClient = octokit_client_1.graphql.defaults({
-            headers: {
-                authorization: `token ${token}`
-            }
+        this.octokit = new octokit_client_1.Octokit({
+            auth: token,
+            baseUrl: process.env['GITHUB_API_URL'] || 'https://api.github.com'
         });
     }
     parseRepository(repository) {
@@ -306,7 +300,7 @@ class GitHubHelper {
         }
       }
     }`;
-            const collaboratorPermission = yield this.graphqlClient(query, Object.assign(Object.assign({}, repo), { collaborator: actor }));
+            const collaboratorPermission = yield this.octokit.graphql(query, Object.assign(Object.assign({}, repo), { collaborator: actor }));
             core.debug(`CollaboratorPermission: ${util_1.inspect(collaboratorPermission.repository.collaborators.edges)}`);
             return collaboratorPermission.repository.collaborators.edges.length > 0
                 ? collaboratorPermission.repository.collaborators.edges[0].permission.toLowerCase()
@@ -576,13 +570,11 @@ run();
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.graphql = exports.Octokit = void 0;
+exports.Octokit = void 0;
 const core_1 = __nccwpck_require__(762);
 const plugin_paginate_rest_1 = __nccwpck_require__(193);
 const plugin_rest_endpoint_methods_1 = __nccwpck_require__(44);
 exports.Octokit = core_1.Octokit.plugin(plugin_paginate_rest_1.paginateRest, plugin_rest_endpoint_methods_1.restEndpointMethods);
-var graphql_1 = __nccwpck_require__(668);
-Object.defineProperty(exports, "graphql", ({ enumerable: true, get: function () { return graphql_1.graphql; } }));
 
 
 /***/ }),
