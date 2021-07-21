@@ -194,7 +194,7 @@ async function run(): Promise<void> {
     const message: string = error.message
     // Handle validation errors from workflow dispatch
     if (
-      message == 'Unexpected inputs provided' ||
+      message.startsWith('Unexpected inputs provided') ||
       (message.startsWith('Required input') &&
         message.endsWith('not provided')) ||
       message.startsWith('No ref found for:') ||
