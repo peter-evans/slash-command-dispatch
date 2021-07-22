@@ -545,7 +545,7 @@ function run() {
             core.debug(util_1.inspect(error));
             const message = error.message;
             // Handle validation errors from workflow dispatch
-            if (message == 'Unexpected inputs provided' ||
+            if (message.startsWith('Unexpected inputs provided') ||
                 (message.startsWith('Required input') &&
                     message.endsWith('not provided')) ||
                 message.startsWith('No ref found for:') ||
