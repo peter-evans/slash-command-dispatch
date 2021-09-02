@@ -189,7 +189,7 @@ async function run(): Promise<void> {
         commentId,
         'rocket'
       )
-  } catch (error) {
+  } catch (error: any) {
     core.debug(inspect(error))
     const message: string = error.message
     // Handle validation errors from workflow dispatch
