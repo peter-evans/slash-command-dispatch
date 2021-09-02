@@ -101,7 +101,7 @@ export class GitHubHelper {
         comment_id: commentId,
         content: reaction
       })
-    } catch (error) {
+    } catch (error: any) {
       core.debug(error)
       core.warning(`Failed to set reaction on comment ID ${commentId}.`)
     }
