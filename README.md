@@ -120,6 +120,8 @@ Setting `write` as the required permission level means that any user with `write
 Note that `read`, `triage` and `maintain` are only applicable to organization repositories.
 For repositories owned by a user account there are only two permission levels, the repository owner (`admin`) and collaborators (`write`).
 
+Permission validation will fail if you use organization's nested teams. In this case GitHub's GraphQL API will not return permission level for user. This is a known limitation of GraphQL API.
+
 #### `dispatch-type`
 
 By default, the action creates [repository_dispatch](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#repository_dispatch) events.
