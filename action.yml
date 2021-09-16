@@ -7,6 +7,9 @@ inputs:
   reaction-token:
     description: 'An optional GitHub token to use for reactions.'
     default: ${{ github.token }}
+  github-token:
+    description: 'The default GitHub token.'
+    default: ${{ github.token }}
   reactions:
     description: 'Add reactions to comments containing commands.'
     default: true

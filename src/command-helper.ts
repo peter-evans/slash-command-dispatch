@@ -14,6 +14,7 @@ export const MAX_ARGS = 50
 export interface Inputs {
   token: string
   reactionToken: string
+  githubToken: string
   reactions: boolean
   commands: string[]
   permission: string
@@ -77,6 +78,7 @@ export function getInputs(): Inputs {
   return {
     token: core.getInput('token'),
     reactionToken: core.getInput('reaction-token'),
+    githubToken: core.getInput('github-token'),
     reactions: core.getInput('reactions') === 'true',
     commands: utils.getInputAsArray('commands'),
     permission: core.getInput('permission'),

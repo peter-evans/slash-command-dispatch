@@ -110,6 +110,7 @@ async function run(): Promise<void> {
     // Create github clients
     const githubHelper = new GitHubHelper(inputs.token)
     const githubHelperReaction = new GitHubHelper(inputs.reactionToken)
+    const githubHelperPermission = new GitHubHelper(inputs.githubToken)
 
     // At this point we know the command is registered
     // Add the "eyes" reaction to the comment
@@ -121,7 +122,7 @@ async function run(): Promise<void> {
       )
 
     // Get the actor permission
-    const actorPermission = await githubHelper.getActorPermission(
+    const actorPermission = await githubHelperPermission.getActorPermission(
       github.context.repo,
       github.context.actor
     )

@@ -17,6 +17,7 @@ describe('command-helper tests', () => {
     const inputs: Inputs = {
       token: '',
       reactionToken: '',
+      githubToken: '',
       reactions: true,
       commands: commands,
       permission: 'write',
@@ -50,6 +51,7 @@ describe('command-helper tests', () => {
     const inputs: Inputs = {
       token: '',
       reactionToken: '',
+      githubToken: '',
       reactions: true,
       commands: commands,
       permission: 'admin',

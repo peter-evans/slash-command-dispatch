@@ -62,6 +62,7 @@ function getInputs() {
     return {
         token: core.getInput('token'),
         reactionToken: core.getInput('reaction-token'),
+        githubToken: core.getInput('github-token'),
         reactions: core.getInput('reactions') === 'true',
         commands: utils.getInputAsArray('commands'),
         permission: core.getInput('permission'),
@@ -492,12 +493,13 @@ function run() {
             // Create github clients
             const githubHelper = new github_helper_1.GitHubHelper(inputs.token);
             const githubHelperReaction = new github_helper_1.GitHubHelper(inputs.reactionToken);
+            const githubHelperPermission = new github_helper_1.GitHubHelper(inputs.githubToken);
             // At this point we know the command is registered
             // Add the "eyes" reaction to the comment
             if (inputs.reactions)
                 yield githubHelperReaction.tryAddReaction(github.context.repo, commentId, 'eyes');
             // Get the actor permission
-            const actorPermission = yield githubHelper.getActorPermission(github.context.repo, github.context.actor);
+            const actorPermission = yield githubHelperPermission.getActorPermission(github.context.repo, github.context.actor);
             core.debug(`Actor permission: ${actorPermission}`);
             // Filter matching commands by the user's permission level
             configMatches = configMatches.filter(function (cmd) {
