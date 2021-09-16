@@ -71,7 +71,8 @@ This action also features [advanced configuration](docs/advanced-configuration.m
 
 | Input | Description | Default |
 | --- | --- | --- |
-| `token` | (**required**) A `repo` scoped [Personal Access Token (PAT)](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token). Note: `GITHUB_TOKEN` *does not* work here. See [token](#token) for further details. | |
+| `token` | `GITHUB_TOKEN` (`contents: write`, `pull-requests: write`). See [token](#token) for further details. | `GITHUB_TOKEN` |
+| `dispatch-token` | (**required**) A `repo` scoped [Personal Access Token (PAT)](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token) created on a user with `write` access to the target repository. Note: `GITHUB_TOKEN` *does not* work here. See [dispatch-token](#dispatch-token) for further details. | |
 | `reaction-token` | `GITHUB_TOKEN` or a `repo` scoped [Personal Access Token (PAT)](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token). See [reaction-token](#reaction-token) for further details. | `GITHUB_TOKEN` |
 | `reactions` | Add reactions. :eyes: = seen, :rocket: = dispatched | `true` |
 | `commands` | (**required**) A comma or newline separated list of commands. | |
@@ -87,8 +88,12 @@ This action also features [advanced configuration](docs/advanced-configuration.m
 
 #### `token`
 
+TODO
+
+#### `dispatch-token`
+
 This action creates [repository_dispatch](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#repository_dispatch) and [workflow_dispatch](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch) events.
-The default `GITHUB_TOKEN` does not have scopes to create these events, so a `repo` scoped [PAT](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token) is required.
+The default `GITHUB_TOKEN` does not have scopes to create these events, so a `repo` scoped [PAT](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token) created on a user with `write` access to the target repository is required.
 If you will be dispatching commands to public repositories *only* then you can use the more limited `public_repo` scope.
 
 #### `reaction-token`
