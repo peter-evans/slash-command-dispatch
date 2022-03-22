@@ -1,3 +1,15 @@
+## Updating from `v2` to `v3`
+
+### Breaking changes
+
+- If using self-hosted runners or GitHub Enterprise Server, there are minimum requirements for `v4` to run. See "What's new" below for details.
+
+### What's new
+
+- Updated runtime to Node.js 16
+  - The action now requires a minimum version of v2.285.0 for the [Actions Runner](https://github.com/actions/runner/releases/tag/v2.285.0).
+  - If using GitHub Enterprise Server, the action requires [GHES 3.4](https://docs.github.com/en/enterprise-server@3.4/admin/release-notes) or later.
+
 ## Updating from `v1` to `v2`
 
 ### Breaking changes

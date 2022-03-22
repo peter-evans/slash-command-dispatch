@@ -19,7 +19,7 @@ Follow this guide to get started with a working `/example` command.
         runs-on: ubuntu-latest
         steps:
           - name: Add reaction
-            uses: peter-evans/create-or-update-comment@v1
+            uses: peter-evans/create-or-update-comment@v2
             with:
               token: ${{ secrets.PAT }}
               repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
@@ -56,7 +56,7 @@ Command processing setup is complete! Now we need to setup command dispatch for 
         runs-on: ubuntu-latest
         steps:
           - name: Slash Command Dispatch
-            uses: peter-evans/slash-command-dispatch@v2
+            uses: peter-evans/slash-command-dispatch@v3
             with:
               token: ${{ secrets.PAT }}
               commands: example

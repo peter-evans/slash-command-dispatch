@@ -36,7 +36,7 @@ See it in action with the following live demos.
 - [Standard configuration](#standard-configuration)
 - [Advanced configuration](docs/advanced-configuration.md)
 - [Workflow dispatch](docs/workflow-dispatch.md)
-- [Updating to v2](docs/updating.md)
+- [Updating to v3](docs/updating.md)
 
 ## Dispatching commands
 
