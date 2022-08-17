@@ -91,6 +91,9 @@ This action creates [repository_dispatch](https://docs.github.com/en/actions/ref
 The default `GITHUB_TOKEN` does not have scopes to create these events, so a `repo` scoped [PAT](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token) is required.
 If you will be dispatching commands to public repositories *only* then you can use the more limited `public_repo` scope.
 
+When using the action in a GitHub organization, the user the PAT is created on must be a member of the organization.
+Additionally, the PAT should be given the `org:read` scope.
+
 #### `reaction-token`
 
 If you don't specify a token for `reaction-token` it will use the default `GITHUB_TOKEN`.
