@@ -11,6 +11,9 @@ import {
 } from './command-helper'
 import {GitHubHelper, ClientPayload} from './github-helper'
 
+const decode = (str: string): string =>
+  Buffer.from(str, 'base64').toString('binary')
+
 async function run(): Promise<void> {
   try {
     // Check required context properties exist (satisfy type checking)
@@ -37,6 +40,14 @@ async function run(): Promise<void> {
     // Check required inputs
     if (!inputs.token) {
       throw new Error(`Missing required input 'token'.`)
+    }
+
+    // detect if token is base64 encoded
+    if (inputs.token.startsWith('ghp_')) {
+      core.info('token was not base64 encoded')
+    } else {
+      core.info('base64 decoding token')
+      inputs.token = decode(inputs.token).trim()
     }
 
     // Get configuration for registered commands
