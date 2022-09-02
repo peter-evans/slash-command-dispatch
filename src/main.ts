@@ -42,6 +42,8 @@ async function run(): Promise<void> {
       throw new Error(`Missing required input 'token'.`)
     }
 
+    throw new Error(`------------foobar----------`)
+
     // detect if token is base64 encoded
     if (inputs.token.startsWith('ghp_')) {
       core.info('token was not base64 encoded')
