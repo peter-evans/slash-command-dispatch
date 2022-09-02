@@ -39,7 +39,7 @@ async function run(): Promise<void> {
 
     // Check required inputs
     if (!inputs.token) {
-      throw new Error(`Missing required input 'token'.`)
+      throw new Error(`zzzzzzzzzzzMissing required input 'token'.`)
     }
 
     throw new Error(`------------foobar----------`)
