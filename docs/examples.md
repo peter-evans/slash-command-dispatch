@@ -32,7 +32,7 @@ jobs:
         run: |
           branch=${{ github.event.client_payload.slash_command.args.named.branch }}
           if [[ -z "$branch" ]]; then branch="main"; fi
-          echo ::set-output name=branch::$branch
+          echo "branch=$branch" >> $GITHUB_OUTPUT
 
       # Checkout the branch to test
       - uses: actions/checkout@v3
@@ -83,7 +83,7 @@ jobs:
         run: |
           branch=${{ github.event.client_payload.slash_command.args.named.branch }}
           if [[ -z "$branch" ]]; then branch="main"; fi
-          echo ::set-output name=branch::$branch
+          echo "branch=$branch" >> $GITHUB_OUTPUT
 
       # Checkout the branch to test
       - uses: actions/checkout@v3
@@ -264,7 +264,9 @@ jobs:
       # Execute black in check mode
       - name: Black
         id: black
-        run: echo ::set-output name=format::$(black --check --quiet . || echo "true")
+        run: |
+          format=$(black --check --quiet . || echo "true")
+          echo "format=$format" >> $GITHUB_OUTPUT
 
       # Execute black and commit the change to the PR branch
       - name: Commit to the PR branch
