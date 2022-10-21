@@ -272,6 +272,7 @@ exports.GitHubHelper = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const octokit_client_1 = __nccwpck_require__(5040);
 const util_1 = __nccwpck_require__(3837);
+const utils = __importStar(__nccwpck_require__(918));
 class GitHubHelper {
     constructor(token) {
         this.octokit = new octokit_client_1.Octokit({
@@ -313,7 +314,7 @@ class GitHubHelper {
                 yield this.octokit.rest.reactions.createForIssueComment(Object.assign(Object.assign({}, repo), { comment_id: commentId, content: reaction }));
             }
             catch (error) {
-                core.debug(error);
+                core.debug(utils.getErrorMessage(error));
                 core.warning(`Failed to set reaction on comment ID ${commentId}.`);
             }
         });
@@ -415,6 +416,7 @@ const github = __importStar(__nccwpck_require__(5438));
 const util_1 = __nccwpck_require__(3837);
 const command_helper_1 = __nccwpck_require__(9622);
 const github_helper_1 = __nccwpck_require__(446);
+const utils = __importStar(__nccwpck_require__(918));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -543,7 +545,7 @@ function run() {
         }
         catch (error) {
             core.debug((0, util_1.inspect)(error));
-            const message = error.message;
+            const message = utils.getErrorMessage(error);
             // Handle validation errors from workflow dispatch
             if (message.startsWith('Unexpected inputs provided') ||
                 (message.startsWith('Required input') &&
@@ -554,7 +556,7 @@ function run() {
                 core.warning(message);
             }
             else {
-                core.setFailed(error.message);
+                core.setFailed(message);
             }
         }
     });
@@ -619,7 +621,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getStringAsArray = exports.getInputAsArray = void 0;
+exports.getErrorMessage = exports.getStringAsArray = exports.getInputAsArray = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 function getInputAsArray(name, options) {
     return getStringAsArray(core.getInput(name, options));
@@ -632,6 +634,12 @@ function getStringAsArray(str) {
         .filter(x => x !== '');
 }
 exports.getStringAsArray = getStringAsArray;
+function getErrorMessage(error) {
+    if (error instanceof Error)
+        return error.message;
+    return String(error);
+}
+exports.getErrorMessage = getErrorMessage;
 
 
 /***/ }),

@@ -13,3 +13,8 @@ export function getStringAsArray(str: string): string[] {
     .map(s => s.trim())
     .filter(x => x !== '')
 }
+
+export function getErrorMessage(error: unknown) {
+  if (error instanceof Error) return error.message
+  return String(error)
+}

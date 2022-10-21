@@ -10,6 +10,7 @@ import {
   getSlashCommandPayload
 } from './command-helper'
 import {GitHubHelper, ClientPayload} from './github-helper'
+import * as utils from './utils'
 
 async function run(): Promise<void> {
   try {
@@ -189,9 +190,9 @@ async function run(): Promise<void> {
         commentId,
         'rocket'
       )
-  } catch (error: any) {
+  } catch (error) {
     core.debug(inspect(error))
-    const message: string = error.message
+    const message: string = utils.getErrorMessage(error)
     // Handle validation errors from workflow dispatch
     if (
       message.startsWith('Unexpected inputs provided') ||
@@ -203,7 +204,7 @@ async function run(): Promise<void> {
       core.setOutput('error-message', message)
       core.warning(message)
     } else {
-      core.setFailed(error.message)
+      core.setFailed(message)
     }
   }
 }
