@@ -8,7 +8,11 @@
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -241,7 +245,11 @@ exports.getSlashCommandPayload = getSlashCommandPayload;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -384,7 +392,11 @@ exports.GitHubHelper = GitHubHelper;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -603,7 +615,11 @@ function autoProxyAgent(octokit) {
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -6537,13 +6553,10 @@ class HttpsProxyAgent extends agent_base_1.Agent {
             if (statusCode === 200) {
                 req.once('socket', resume);
                 if (opts.secureEndpoint) {
-                    const servername = opts.servername || opts.host;
-                    if (!servername) {
-                        throw new Error('Could not determine "servername"');
-                    }
                     // The proxy is connecting to a TLS server, so upgrade
                     // this socket connection to a TLS connection.
                     debug('Upgrading socket connection to TLS');
+                    const servername = opts.servername || opts.host;
                     return tls_1.default.connect(Object.assign(Object.assign({}, omit(opts, 'host', 'hostname', 'path', 'port')), { socket,
                         servername }));
                 }
@@ -6560,7 +6573,7 @@ class HttpsProxyAgent extends agent_base_1.Agent {
             //
             // See: https://hackerone.com/reports/541502
             socket.destroy();
-            const fakeSocket = new net_1.default.Socket();
+            const fakeSocket = new net_1.default.Socket({ writable: false });
             fakeSocket.readable = true;
             // Need to wait for the "socket" event to re-play the "data" events.
             req.once('socket', (s) => {
