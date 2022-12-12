@@ -32,7 +32,7 @@
     "@actions/github": "^5.1.1",
     "@octokit/core": "^3.5.1",
     "@octokit/plugin-paginate-rest": "^2.17.0",
-    "@octokit/plugin-rest-endpoint-methods": "^5.13.0",
+    "@octokit/plugin-rest-endpoint-methods": "^6.7.0",
     "http-proxy-agent": "^5.0.0",
     "https-proxy-agent": "^5.0.1"
   },
