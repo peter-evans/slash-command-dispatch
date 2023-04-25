@@ -156,3 +156,4 @@ Hello @dnlo!
 Hello @steveclarke!
 Hello @keifgwinn!
 Hello @vkazmirchuk!
+Hello @jinfudong!
