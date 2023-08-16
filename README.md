@@ -71,7 +71,7 @@ This action also features [advanced configuration](docs/advanced-configuration.m
 
 | Input | Description | Default |
 | --- | --- | --- |
-| `token` | (**required**) A `repo` scoped [Personal Access Token (PAT)](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token). Note: `GITHUB_TOKEN` *does not* work here. See [token](#token) for further details. | |
+| `token` | (**required**) A `repo` scoped [Personal Access Token (PAT)](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token) or GitHub App config (see [app auth](#app-auth)). Note: `GITHUB_TOKEN` *does not* work here. See [token](#token) for further details. | |
 | `reaction-token` | `GITHUB_TOKEN` or a `repo` scoped [Personal Access Token (PAT)](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token). See [reaction-token](#reaction-token) for further details. | `GITHUB_TOKEN` |
 | `reactions` | Add reactions. :eyes: = seen, :rocket: = dispatched | `true` |
 | `commands` | (**required**) A comma or newline separated list of commands. | |
@@ -93,6 +93,18 @@ If you will be dispatching commands to public repositories *only* then you can u
 
 When using the action in a GitHub organization, the user the PAT is created on must be a member of the organization.
 Additionally, the PAT should be given the `org:read` scope.
+
+#### `App auth`
+
+In order to not rely on a GitHub user's PAT, we can use a [GitHub App](https://docs.github.com/apps) instead.
+
+Create a GitHub App, it requires `actions: read and write`, `pr: read` and `contents: read and write` permissions for the repository(s) that the slash commands will trigger. It will also need `org:read` permission.
+
+Generate a private key for the App, convert new lines to `\n` and set it as a secret. Then configure the following as the token value;
+
+```yml
+token: '{ "appId": 1234567, "installationId": 987654321, "privateKey": "${{ secrets.SLASH_ACTION_APP_KEY }}" }'
+```
 
 #### `reaction-token`
 

@@ -1,7 +1,8 @@
 import * as core from '@actions/core'
-import {Octokit, PullsGetResponseData} from './octokit-client'
-import {Command, SlashCommandPayload} from './command-helper'
+import {createAppAuth} from '@octokit/auth-app'
 import {inspect} from 'util'
+import {Command, SlashCommandPayload} from './command-helper'
+import {Octokit, PullsGetResponseData} from './octokit-client'
 import * as utils from './utils'
 
 type ReposCreateDispatchEventParamsClientPayload = {
@@ -37,14 +38,36 @@ type CollaboratorPermission = {
   }
 }
 
+function isJsonString(input: string) {
+  try {
+    JSON.parse(input)
+  } catch (e) {
+    return false
+  }
+  return true
+}
+
 export class GitHubHelper {
   private octokit: InstanceType<typeof Octokit>
 
   constructor(token: string) {
-    this.octokit = new Octokit({
-      auth: token,
-      baseUrl: process.env['GITHUB_API_URL'] || 'https://api.github.com'
-    })
+    if (isJsonString(token)) {
+      //token is an app auth configuration
+      console.log("Using App auth")
+      const auth = JSON.parse(token)
+      this.octokit = new Octokit({
+        authStrategy: createAppAuth,
+        auth: auth,
+        baseUrl: process.env['GITHUB_API_URL'] || 'https://api.github.com'
+      })
+    } else {
+      // token is a PAT
+      console.log("Using token auth")
+      this.octokit = new Octokit({
+        auth: token,
+        baseUrl: process.env['GITHUB_API_URL'] || 'https://api.github.com'
+      })
+    }
   }
 
   private parseRepository(repository: string): Repository {
