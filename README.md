@@ -228,7 +228,7 @@ The properties in the `slash_command` context from the above example can be used
 #### `github` and `pull_request` contexts
 
 The payload contains the `github` context of the `issue_comment` event at path `github.event.client_payload.github`.
-Additionally, if the comment was made in a pull request, the action calls the [GitHub API to fetch the pull request detail](https://docs.github.com/en/rest/reference/pulls#get-a-pull-request) and attach it to the payload at path `github.event.client_payload.pull_request`.
+Additionally, if the comment was made in a pull request, the action calls the [GitHub API to fetch the pull request detail](https://docs.github.com/en/rest/pulls/pulls#get-a-pull-request) and attaches it to the payload at path `github.event.client_payload.pull_request`.
 
 You can inspect the payload with the following step.
 ```yml
