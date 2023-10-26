@@ -29,7 +29,7 @@ Follow this guide to get started with a working `/example` command.
 
 3. Create a `repo` scoped Personal Access Token (PAT) by following [this guide](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token).
 
-4. Go to your repository `Settings` -> `Secrets` and `Add a new secret`.
+4. Go to your repository `Settings` -> `Secrets and variables` -> `Actions` and `New repository secret`.
 
    **Name**: `PAT`
 
