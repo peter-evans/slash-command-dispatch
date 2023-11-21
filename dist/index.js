@@ -445,6 +445,7 @@ const command_helper_1 = __nccwpck_require__(9622);
 const github_helper_1 = __nccwpck_require__(446);
 const utils = __importStar(__nccwpck_require__(918));
 function run() {
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         try {
             // Check required context properties exist (satisfy type checking)
@@ -525,18 +526,30 @@ function run() {
             // Add the "eyes" reaction to the comment
             if (inputs.reactions)
                 yield githubHelperReaction.tryAddReaction(github.context.repo, commentId, 'eyes');
-            // Get the actor permission
-            const actorPermission = yield githubHelper.getActorPermission(github.context.repo, github.context.actor);
-            core.debug(`Actor permission: ${actorPermission}`);
-            core.debug(`Try to check bot actor: ${(0, util_1.inspect)(github.context)}`);
-            // Filter matching commands by the user's permission level
-            configMatches = configMatches.filter(function (cmd) {
-                return (0, command_helper_1.actorHasPermission)(actorPermission, cmd.permission);
-            });
-            core.debug(`Config matches on 'permission': ${(0, util_1.inspect)(configMatches)}`);
-            if (configMatches.length == 0) {
-                core.info(`Command '${commandTokens[0]}' is not configured for the user's permission level '${actorPermission}'.`);
-                return;
+            const isBot = ((_a = github.context.payload.sender) === null || _a === void 0 ? void 0 : _a.type) === 'Bot';
+            if (!isBot) {
+                // Get the actor permission
+                const actorPermission = yield githubHelper.getActorPermission(github.context.repo, github.context.actor);
+                core.debug(`Actor permission: ${actorPermission}`);
+                // Filter matching commands by the user's permission level
+                configMatches = configMatches.filter(function (cmd) {
+                    return (0, command_helper_1.actorHasPermission)(actorPermission, cmd.permission);
+                });
+                core.debug(`Config matches on 'permission': ${(0, util_1.inspect)(configMatches)}`);
+                if (configMatches.length == 0) {
+                    core.info(`Command '${commandTokens[0]}' is not configured for the user's permission level '${actorPermission}'.`);
+                    return;
+                }
+            }
+            else {
+                core.debug(`Bot actor: ${github.context.actor}`);
+                configMatches = configMatches.filter(function (cmd) {
+                    return cmd.allow_bots.includes(github.context.actor);
+                });
+                if (configMatches.length == 0) {
+                    core.info(`Command '${commandTokens[0]}' is not configured to allow bot '${github.context.actor}'.`);
+                    return;
+                }
             }
             // Determined that the command should be dispatched
             core.info(`Command '${commandTokens[0]}' to be dispatched.`);

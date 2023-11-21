@@ -121,24 +121,39 @@ async function run(): Promise<void> {
         'eyes'
       )
 
-    // Get the actor permission
-    const actorPermission = await githubHelper.getActorPermission(
-      github.context.repo,
-      github.context.actor
-    )
-    core.debug(`Actor permission: ${actorPermission}`)
-    
-    core.debug(`Try to check bot actor: ${inspect(github.context)}`)
-    // Filter matching commands by the user's permission level
-    configMatches = configMatches.filter(function (cmd) {
-      return actorHasPermission(actorPermission, cmd.permission)
-    })
-    core.debug(`Config matches on 'permission': ${inspect(configMatches)}`)
-    if (configMatches.length == 0) {
-      core.info(
-        `Command '${commandTokens[0]}' is not configured for the user's permission level '${actorPermission}'.`
+    const isBot = github.context.payload.sender?.type === 'Bot'
+
+    if (!isBot) {
+      // Get the actor permission
+      const actorPermission = await githubHelper.getActorPermission(
+        github.context.repo,
+        github.context.actor
       )
-      return
+      core.debug(`Actor permission: ${actorPermission}`)
+
+      // Filter matching commands by the user's permission level
+      configMatches = configMatches.filter(function (cmd) {
+        return actorHasPermission(actorPermission, cmd.permission)
+      })
+      core.debug(`Config matches on 'permission': ${inspect(configMatches)}`)
+      if (configMatches.length == 0) {
+        core.info(
+          `Command '${commandTokens[0]}' is not configured for the user's permission level '${actorPermission}'.`
+        )
+        return
+      }
+    } else {
+      core.debug(`Bot actor: ${github.context.actor}`)
+      configMatches = configMatches.filter(function (cmd) {
+        return cmd.allow_bots.includes(github.context.actor)
+      })
+
+      if (configMatches.length == 0) {
+        core.info(
+          `Command '${commandTokens[0]}' is not configured to allow bot '${github.context.actor}'.`
+        )
+        return
+      }
     }
 
     // Determined that the command should be dispatched
