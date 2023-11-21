@@ -127,7 +127,8 @@ async function run(): Promise<void> {
       github.context.actor
     )
     core.debug(`Actor permission: ${actorPermission}`)
-
+    
+    core.debug(`Try to check bot actor: ${inspect(github.context)}`)
     // Filter matching commands by the user's permission level
     configMatches = configMatches.filter(function (cmd) {
       return actorHasPermission(actorPermission, cmd.permission)
