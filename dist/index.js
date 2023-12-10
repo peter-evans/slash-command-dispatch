@@ -302,7 +302,7 @@ class GitHubHelper {
             // Returns 'READ', 'TRIAGE', 'WRITE', 'MAINTAIN', 'ADMIN'
             const query = `query CollaboratorPermission($owner: String!, $repo: String!, $collaborator: String) {
       repository(owner:$owner, name:$repo) {
-        collaborators(query: $collaborator) {
+        collaborators(login: $collaborator) {
           edges {
             permission
           }
