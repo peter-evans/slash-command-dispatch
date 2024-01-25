@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Slash Command Dispatch
-        uses: peter-evans/slash-command-dispatch@v3
+        uses: peter-evans/slash-command-dispatch@v4
         with:
           token: ${{ secrets.PAT }}
           commands: |
@@ -85,12 +85,12 @@ The simplest response is to add a :tada: reaction to the comment.
 
 ```yml
       - name: Add reaction
-        uses: peter-evans/create-or-update-comment@v2
+        uses: peter-evans/create-or-update-comment@v4
         with:
           token: ${{ secrets.PAT }}
           repository: ${{ github.event.inputs.repository }}
           comment-id: ${{ github.event.inputs.comment-id }}
-          reaction-type: hooray
+          reactions: hooray
 ```
 
 ## Validation errors
@@ -107,7 +107,7 @@ The `error-message` output can be used to provide feedback to the user as follow
 ```yml
       - name: Slash Command Dispatch
         id: scd
-        uses: peter-evans/slash-command-dispatch@v3
+        uses: peter-evans/slash-command-dispatch@v4
         with:
           token: ${{ secrets.PAT }}
           commands: |
@@ -118,7 +118,7 @@ The `error-message` output can be used to provide feedback to the user as follow
 
       - name: Edit comment with error message
         if: steps.scd.outputs.error-message
-        uses: peter-evans/create-or-update-comment@v2
+        uses: peter-evans/create-or-update-comment@v4
         with:
           comment-id: ${{ github.event.comment.id }}
           body: |

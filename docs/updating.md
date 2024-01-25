@@ -1,8 +1,19 @@
-## Updating from `v2` to `v3`
+## Updating from `v3` to `v4`
 
 ### Breaking changes
 
 - If using self-hosted runners or GitHub Enterprise Server, there are minimum requirements for `v4` to run. See "What's new" below for details.
+
+### What's new
+
+- Updated runtime to Node.js 20
+  - The action now requires a minimum version of [v2.308.0](https://github.com/actions/runner/releases/tag/v2.308.0) for the Actions runner. Update self-hosted runners to v2.308.0 or later to ensure compatibility.
+
+## Updating from `v2` to `v3`
+
+### Breaking changes
+
+- If using self-hosted runners or GitHub Enterprise Server, there are minimum requirements for `v3` to run. See "What's new" below for details.
 
 ### What's new
 
