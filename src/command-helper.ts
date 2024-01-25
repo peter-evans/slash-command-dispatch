@@ -155,28 +155,23 @@ export function getCommandsConfigFromJson(json: string): Command[] {
   return config
 }
 
-export function configIsValid(config: Command[]): boolean {
+export function configIsValid(config: Command[]): string | null {
   for (const command of config) {
     if (
       !['none', 'read', 'triage', 'write', 'maintain', 'admin'].includes(
         command.permission
       )
     ) {
-      core.setFailed(`'${command.permission}' is not a valid 'permission'.`)
-      return false
+      return `'${command.permission}' is not a valid 'permission'.`
     }
     if (!['issue', 'pull-request', 'both'].includes(command.issue_type)) {
-      core.setFailed(`'${command.issue_type}' is not a valid 'issue-type'.`)
-      return false
+      return `'${command.issue_type}' is not a valid 'issue-type'.`
     }
     if (!['repository', 'workflow'].includes(command.dispatch_type)) {
-      core.setFailed(
-        `'${command.dispatch_type}' is not a valid 'dispatch-type'.`
-      )
-      return false
+      return `'${command.dispatch_type}' is not a valid 'dispatch-type'.`
     }
   }
-  return true
+  return null
 }
 
 export function actorHasPermission(

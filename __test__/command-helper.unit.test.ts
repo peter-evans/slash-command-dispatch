@@ -153,7 +153,7 @@ describe('command-helper tests', () => {
         dispatch_type: 'repository'
       }
     ]
-    expect(configIsValid(config)).toBeTruthy()
+    expect(configIsValid(config)).toEqual(null)
   })
 
   test('invalid permission level in config', async () => {
@@ -169,7 +169,9 @@ describe('command-helper tests', () => {
         dispatch_type: 'repository'
       }
     ]
-    expect(configIsValid(config)).toBeFalsy()
+    expect(configIsValid(config)).toEqual(
+      `'test-case-invalid-permission' is not a valid 'permission'.`
+    )
   })
 
   test('invalid issue type in config', async () => {
@@ -185,7 +187,9 @@ describe('command-helper tests', () => {
         dispatch_type: 'repository'
       }
     ]
-    expect(configIsValid(config)).toBeFalsy()
+    expect(configIsValid(config)).toEqual(
+      `'test-case-invalid-issue-type' is not a valid 'issue-type'.`
+    )
   })
 
   test('invalid dispatch type in config', async () => {
@@ -193,7 +197,7 @@ describe('command-helper tests', () => {
       {
         command: 'test',
         permission: 'write',
-        issue_type: 'test-case-invalid-issue-type',
+        issue_type: 'both',
         allow_edits: false,
         repository: 'peter-evans/slash-command-dispatch',
         event_type_suffix: '-command',
@@ -201,7 +205,9 @@ describe('command-helper tests', () => {
         dispatch_type: 'test-case-invalid-dispatch-type'
       }
     ]
-    expect(configIsValid(config)).toBeFalsy()
+    expect(configIsValid(config)).toEqual(
+      `'test-case-invalid-dispatch-type' is not a valid 'dispatch-type'.`
+    )
   })
 
   test('actor does not have permission', async () => {
