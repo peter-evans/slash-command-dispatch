@@ -8,7 +8,7 @@ For example, the following basic configuration means that all commands must have
 
 ```yml
       - name: Slash Command Dispatch
-        uses: peter-evans/slash-command-dispatch@v3
+        uses: peter-evans/slash-command-dispatch@v4
         with:
           token: ${{ secrets.PAT }}
           commands: |
@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Slash Command Dispatch
-        uses: peter-evans/slash-command-dispatch@v3
+        uses: peter-evans/slash-command-dispatch@v4
         with:
           token: ${{ secrets.PAT }}
           config: >
@@ -84,7 +84,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Slash Command Dispatch
-        uses: peter-evans/slash-command-dispatch@v3
+        uses: peter-evans/slash-command-dispatch@v4
         with:
           token: ${{ secrets.PAT }}
           config-from-file: .github/slash-command-dispatch.json

@@ -19,12 +19,12 @@ Follow this guide to get started with a working `/example` command.
         runs-on: ubuntu-latest
         steps:
           - name: Add reaction
-            uses: peter-evans/create-or-update-comment@v2
+            uses: peter-evans/create-or-update-comment@v4
             with:
               token: ${{ secrets.PAT }}
               repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
               comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
-              reaction-type: hooray
+              reactions: hooray
     ```
 
 3. Create a `repo` scoped Personal Access Token (PAT) by following [this guide](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token).
@@ -56,7 +56,7 @@ Command processing setup is complete! Now we need to setup command dispatch for 
         runs-on: ubuntu-latest
         steps:
           - name: Slash Command Dispatch
-            uses: peter-evans/slash-command-dispatch@v3
+            uses: peter-evans/slash-command-dispatch@v4
             with:
               token: ${{ secrets.PAT }}
               commands: example

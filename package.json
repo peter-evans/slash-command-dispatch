@@ -1,6 +1,6 @@
 {
   "name": "slash-command-dispatch",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "private": true,
   "description": "Facilitates 'ChatOps' by creating dispatch events for slash commands",
   "main": "lib/main.js",

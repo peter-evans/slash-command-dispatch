@@ -147,19 +147,16 @@ exports.getCommandsConfigFromJson = getCommandsConfigFromJson;
 function configIsValid(config) {
     for (const command of config) {
         if (!['none', 'read', 'triage', 'write', 'maintain', 'admin'].includes(command.permission)) {
-            core.setFailed(`'${command.permission}' is not a valid 'permission'.`);
-            return false;
+            return `'${command.permission}' is not a valid 'permission'.`;
         }
         if (!['issue', 'pull-request', 'both'].includes(command.issue_type)) {
-            core.setFailed(`'${command.issue_type}' is not a valid 'issue-type'.`);
-            return false;
+            return `'${command.issue_type}' is not a valid 'issue-type'.`;
         }
         if (!['repository', 'workflow'].includes(command.dispatch_type)) {
-            core.setFailed(`'${command.dispatch_type}' is not a valid 'dispatch-type'.`);
-            return false;
+            return `'${command.dispatch_type}' is not a valid 'dispatch-type'.`;
         }
     }
-    return true;
+    return null;
 }
 exports.configIsValid = configIsValid;
 function actorHasPermission(actorPermission, commandPermission) {
@@ -454,8 +451,10 @@ function run() {
             const config = (0, command_helper_1.getCommandsConfig)(inputs);
             core.debug(`Commands config: ${(0, util_1.inspect)(config)}`);
             // Check the config is valid
-            if (!(0, command_helper_1.configIsValid)(config))
-                return;
+            const configError = (0, command_helper_1.configIsValid)(config);
+            if (configError) {
+                throw new Error(configError);
+            }
             // Get the comment body and id
             const commentBody = github.context.payload.comment.body;
             const commentId = github.context.payload.comment.id;

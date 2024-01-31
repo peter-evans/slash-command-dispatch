@@ -45,7 +45,10 @@ async function run(): Promise<void> {
     core.debug(`Commands config: ${inspect(config)}`)
 
     // Check the config is valid
-    if (!configIsValid(config)) return
+    const configError = configIsValid(config)
+    if (configError) {
+      throw new Error(configError)
+    }
 
     // Get the comment body and id
     const commentBody: string = github.context.payload.comment.body
