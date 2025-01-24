@@ -40,9 +40,11 @@ inputs:
 outputs:
   error-message:
     description: 'Validation errors when using `workflow` dispatch.'
+  dispatched:
+    description: 'Boolean `true` if a command was dispatched. Otherwise `false`.'
 runs:
   using: 'node20'
   main: 'dist/index.js'
 branding:
-  icon: 'target'  
+  icon: 'target'
   color: 'gray-dark'
