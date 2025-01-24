@@ -429,7 +429,7 @@ const utils = __importStar(__nccwpck_require__(9277));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            core.setOutput('dispatched', true);
+            core.setOutput('dispatched', false);
             // Check required context properties exist (satisfy type checking)
             if (!github.context.payload.action ||
                 !github.context.payload.issue ||
