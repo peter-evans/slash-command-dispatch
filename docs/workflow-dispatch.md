@@ -2,7 +2,7 @@
 
 This documentation applies when the `dispatch-type` input is set to `workflow`, which instructs the action to create [workflow_dispatch](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch) events.
 
-To learn about the `workflow_dispatch` event, see GitHub's documentation on [manually running a workflow](https://docs.github.com/en/actions/configuring-and-managing-workflows/configuring-a-workflow#manually-running-a-workflow).
+To learn about the `workflow_dispatch` event, see GitHub's documentation on [manually running a workflow](https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/manually-running-a-workflow).
 
 ## Action behaviour
 
