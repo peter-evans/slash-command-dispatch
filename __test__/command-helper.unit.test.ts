@@ -97,8 +97,8 @@ describe('command-helper tests', () => {
       expect(config[i].event_type_suffix).toEqual(
         commandDefaults.event_type_suffix
       )
-      expect(config[i].static_args).toEqual(commandDefaults.static_args),
-        expect(config[i].dispatch_type).toEqual(commandDefaults.dispatch_type)
+      expect(config[i].static_args).toEqual(commandDefaults.static_args)
+      expect(config[i].dispatch_type).toEqual(commandDefaults.dispatch_type)
     }
   })
 
