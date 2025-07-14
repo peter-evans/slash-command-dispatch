@@ -30,7 +30,7 @@
   "dependencies": {
     "@actions/core": "^1.11.1",
     "@actions/github": "^6.0.1",
-    "@octokit/core": "^6.1.5",
+    "@octokit/core": "^6.1.6",
     "@octokit/plugin-paginate-rest": "^11.6.0",
     "@octokit/plugin-rest-endpoint-methods": "^6.8.1",
     "http-proxy-agent": "^5.0.0",
