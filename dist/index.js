@@ -294,23 +294,23 @@ class GitHubHelper {
     }
     getActorPermission(repo, actor) {
         return __awaiter(this, void 0, void 0, function* () {
-            // https://docs.github.com/en/graphql/reference/enums#repositorypermission
-            // https://docs.github.com/en/graphql/reference/objects#repositorycollaboratoredge
-            // Returns 'READ', 'TRIAGE', 'WRITE', 'MAINTAIN', 'ADMIN'
-            const query = `query CollaboratorPermission($owner: String!, $repo: String!, $collaborator: String) {
-      repository(owner:$owner, name:$repo) {
-        collaborators(login: $collaborator) {
-          edges {
-            permission
-          }
-        }
-      }
-    }`;
-            const collaboratorPermission = yield this.octokit.graphql(query, Object.assign(Object.assign({}, repo), { collaborator: actor }));
-            core.debug(`CollaboratorPermission: ${(0, util_1.inspect)(collaboratorPermission.repository.collaborators.edges)}`);
-            return collaboratorPermission.repository.collaborators.edges.length > 0
-                ? collaboratorPermission.repository.collaborators.edges[0].permission.toLowerCase()
-                : 'none';
+            // Use the REST API approach which can detect both direct and team-based permissions
+            // This is more reliable than the GraphQL approach for team permissions and works better with default GITHUB_TOKEN
+            core.debug(`Checking permissions using REST API for user ${actor}`);
+            try {
+                const { data: collaboratorPermission } = yield this.octokit.rest.repos.getCollaboratorPermissionLevel(Object.assign(Object.assign({}, repo), { username: actor }));
+                core.debug(`REST API collaborator permission: ${(0, util_1.inspect)(collaboratorPermission)}`);
+                if (collaboratorPermission.permission) {
+                    const permission = collaboratorPermission.permission.toLowerCase();
+                    core.debug(`User ${actor} has ${permission} permission via REST API`);
+                    return permission;
+                }
+                return 'none';
+            }
+            catch (restError) {
+                core.debug(`REST API permission check failed: ${utils.getErrorMessage(restError)}`);
+                return 'none';
+            }
         });
     }
     tryAddReaction(repo, commentId, reaction) {

@@ -56,31 +56,33 @@ export class GitHubHelper {
   }
 
   async getActorPermission(repo: Repository, actor: string): Promise<string> {
-    // https://docs.github.com/en/graphql/reference/enums#repositorypermission
-    // https://docs.github.com/en/graphql/reference/objects#repositorycollaboratoredge
-    // Returns 'READ', 'TRIAGE', 'WRITE', 'MAINTAIN', 'ADMIN'
-    const query = `query CollaboratorPermission($owner: String!, $repo: String!, $collaborator: String) {
-      repository(owner:$owner, name:$repo) {
-        collaborators(login: $collaborator) {
-          edges {
-            permission
-          }
-        }
+    // Use the REST API approach which can detect both direct and team-based permissions
+    // This is more reliable than the GraphQL approach for team permissions and works better with default GITHUB_TOKEN
+    core.debug(`Checking permissions using REST API for user ${actor}`)
+    try {
+      const {data: collaboratorPermission} =
+        await this.octokit.rest.repos.getCollaboratorPermissionLevel({
+          ...repo,
+          username: actor
+        })
+
+      core.debug(
+        `REST API collaborator permission: ${inspect(collaboratorPermission)}`
+      )
+
+      if (collaboratorPermission.permission) {
+        const permission = collaboratorPermission.permission.toLowerCase()
+        core.debug(`User ${actor} has ${permission} permission via REST API`)
+        return permission
       }
-    }`
-    const collaboratorPermission =
-      await this.octokit.graphql<CollaboratorPermission>(query, {
-        ...repo,
-        collaborator: actor
-      })
-    core.debug(
-      `CollaboratorPermission: ${inspect(
-        collaboratorPermission.repository.collaborators.edges
-      )}`
-    )
-    return collaboratorPermission.repository.collaborators.edges.length > 0
-      ? collaboratorPermission.repository.collaborators.edges[0].permission.toLowerCase()
-      : 'none'
+
+      return 'none'
+    } catch (restError) {
+      core.debug(
+        `REST API permission check failed: ${utils.getErrorMessage(restError)}`
+      )
+      return 'none'
+    }
   }
 
   async tryAddReaction(
