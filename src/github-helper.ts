@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
-import {Octokit, PullsGetResponseData} from './octokit-client'
-import {Command, SlashCommandPayload} from './command-helper'
-import {inspect} from 'util'
+import { Octokit, PullsGetResponseData } from './octokit-client'
+import { Command, SlashCommandPayload } from './command-helper'
+import { inspect } from 'util'
 import * as utils from './utils'
 
 type ReposCreateDispatchEventParamsClientPayload = {
@@ -58,28 +58,40 @@ export class GitHubHelper {
   async getActorPermission(repo: Repository, actor: string): Promise<string> {
     // Use the REST API approach which can detect both direct and team-based permissions
     // This is more reliable than the GraphQL approach for team permissions and works better with default GITHUB_TOKEN
-    core.debug(`Checking permissions using REST API for user ${actor}`)
     try {
-      const {data: collaboratorPermission} =
+      const { data: collaboratorPermission } =
         await this.octokit.rest.repos.getCollaboratorPermissionLevel({
           ...repo,
           username: actor
         })
 
+      const permissions = collaboratorPermission.user?.permissions
       core.debug(
-        `REST API collaborator permission: ${inspect(collaboratorPermission)}`
+        `REST API collaborator permission: ${inspect(permissions)}`
       )
 
-      if (collaboratorPermission.permission) {
-        const permission = collaboratorPermission.permission.toLowerCase()
-        core.debug(`User ${actor} has ${permission} permission via REST API`)
-        return permission
+      // Use the detailed permissions object to get the highest permission level
+      if (permissions) {
+        // Check permissions in order of highest to lowest
+        if (permissions.admin) {
+          return 'admin'
+        } else if (permissions.maintain) {
+          return 'maintain'
+        } else if (permissions.push) {
+          return 'write'
+        } else if (permissions.triage) {
+          core.debug(`User ${actor} has triage permission via REST API`)
+          return 'triage'
+        } else if (permissions.pull) {
+          core.debug(`User ${actor} has read permission via REST API`)
+          return 'read'
+        }
       }
 
       return 'none'
-    } catch (restError) {
+    } catch (error) {
       core.debug(
-        `REST API permission check failed: ${utils.getErrorMessage(restError)}`
+        `REST API permission check failed: ${utils.getErrorMessage(error)}`
       )
       return 'none'
     }
@@ -114,7 +126,7 @@ export class GitHubHelper {
     repo: Repository,
     pullNumber: number
   ): Promise<PullsGetResponseData> {
-    const {data: pullRequest} = await this.octokit.rest.pulls.get({
+    const { data: pullRequest } = await this.octokit.rest.pulls.get({
       ...repo,
       pull_number: pullNumber
     })
@@ -144,7 +156,7 @@ export class GitHubHelper {
     })
     core.info(
       `Command '${cmd.command}' dispatched to '${cmd.repository}' ` +
-        `with event type '${eventType}'.`
+      `with event type '${eventType}'.`
     )
   }
 
@@ -184,7 +196,7 @@ export class GitHubHelper {
   }
 
   private async getDefaultBranch(repository: string): Promise<string> {
-    const {data: repo} = await this.octokit.rest.repos.get({
+    const { data: repo } = await this.octokit.rest.repos.get({
       ...this.parseRepository(repository)
     })
     return repo.default_branch
