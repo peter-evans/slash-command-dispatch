@@ -293,22 +293,39 @@ class GitHubHelper {
         };
     }
     getActorPermission(repo, actor) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             // Use the REST API approach which can detect both direct and team-based permissions
             // This is more reliable than the GraphQL approach for team permissions and works better with default GITHUB_TOKEN
-            core.debug(`Checking permissions using REST API for user ${actor}`);
             try {
                 const { data: collaboratorPermission } = yield this.octokit.rest.repos.getCollaboratorPermissionLevel(Object.assign(Object.assign({}, repo), { username: actor }));
-                core.debug(`REST API collaborator permission: ${(0, util_1.inspect)(collaboratorPermission)}`);
-                if (collaboratorPermission.permission) {
-                    const permission = collaboratorPermission.permission.toLowerCase();
-                    core.debug(`User ${actor} has ${permission} permission via REST API`);
-                    return permission;
+                const permissions = (_a = collaboratorPermission.user) === null || _a === void 0 ? void 0 : _a.permissions;
+                core.debug(`REST API collaborator permission: ${(0, util_1.inspect)(permissions)}`);
+                // Use the detailed permissions object to get the highest permission level
+                if (permissions) {
+                    // Check permissions in order of highest to lowest
+                    if (permissions.admin) {
+                        return 'admin';
+                    }
+                    else if (permissions.maintain) {
+                        return 'maintain';
+                    }
+                    else if (permissions.push) {
+                        return 'write';
+                    }
+                    else if (permissions.triage) {
+                        core.debug(`User ${actor} has triage permission via REST API`);
+                        return 'triage';
+                    }
+                    else if (permissions.pull) {
+                        core.debug(`User ${actor} has read permission via REST API`);
+                        return 'read';
+                    }
                 }
                 return 'none';
             }
-            catch (restError) {
-                core.debug(`REST API permission check failed: ${utils.getErrorMessage(restError)}`);
+            catch (error) {
+                core.debug(`REST API permission check failed: ${utils.getErrorMessage(error)}`);
                 return 'none';
             }
         });
