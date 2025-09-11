@@ -1,5 +1,13 @@
 import * as core from '@actions/core'
 
+export type RepoPermission =
+  | 'admin'
+  | 'maintain'
+  | 'write'
+  | 'triage'
+  | 'read'
+  | 'none'
+
 export function getInputAsArray(
   name: string,
   options?: core.InputOptions

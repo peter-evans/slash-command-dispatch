@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
-import { Octokit, PullsGetResponseData } from './octokit-client'
-import { Command, SlashCommandPayload } from './command-helper'
-import { inspect } from 'util'
+import {Octokit, PullsGetResponseData} from './octokit-client'
+import {Command, SlashCommandPayload} from './command-helper'
+import {inspect} from 'util'
 import * as utils from './utils'
 
 type ReposCreateDispatchEventParamsClientPayload = {
@@ -55,20 +55,21 @@ export class GitHubHelper {
     }
   }
 
-  async getActorPermission(repo: Repository, actor: string): Promise<string> {
+  async getActorPermission(
+    repo: Repository,
+    actor: string
+  ): Promise<utils.RepoPermission> {
     // Use the REST API approach which can detect both direct and team-based permissions
     // This is more reliable than the GraphQL approach for team permissions and works better with default GITHUB_TOKEN
     try {
-      const { data: collaboratorPermission } =
+      const {data: collaboratorPermission} =
         await this.octokit.rest.repos.getCollaboratorPermissionLevel({
           ...repo,
           username: actor
         })
 
       const permissions = collaboratorPermission.user?.permissions
-      core.debug(
-        `REST API collaborator permission: ${inspect(permissions)}`
-      )
+      core.debug(`REST API collaborator permission: ${inspect(permissions)}`)
 
       // Use the detailed permissions object to get the highest permission level
       if (permissions) {
@@ -126,7 +127,7 @@ export class GitHubHelper {
     repo: Repository,
     pullNumber: number
   ): Promise<PullsGetResponseData> {
-    const { data: pullRequest } = await this.octokit.rest.pulls.get({
+    const {data: pullRequest} = await this.octokit.rest.pulls.get({
       ...repo,
       pull_number: pullNumber
     })
@@ -156,7 +157,7 @@ export class GitHubHelper {
     })
     core.info(
       `Command '${cmd.command}' dispatched to '${cmd.repository}' ` +
-      `with event type '${eventType}'.`
+        `with event type '${eventType}'.`
     )
   }
 
@@ -196,7 +197,7 @@ export class GitHubHelper {
   }
 
   private async getDefaultBranch(repository: string): Promise<string> {
-    const { data: repo } = await this.octokit.rest.repos.get({
+    const {data: repo} = await this.octokit.rest.repos.get({
       ...this.parseRepository(repository)
     })
     return repo.default_branch
