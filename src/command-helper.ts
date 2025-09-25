@@ -25,6 +25,7 @@ export interface Inputs {
   dispatchType: string
   config: string
   configFromFile: string
+  workflowExtension: string
 }
 
 export interface Command {
@@ -36,6 +37,7 @@ export interface Command {
   event_type_suffix: string
   static_args: string[]
   dispatch_type: string
+  workflow_extension?: string
 }
 
 export interface SlashCommandPayload {
@@ -87,7 +89,8 @@ export function getInputs(): Inputs {
     staticArgs: utils.getInputAsArray('static-args'),
     dispatchType: core.getInput('dispatch-type'),
     config: core.getInput('config'),
-    configFromFile: core.getInput('config-from-file')
+    configFromFile: core.getInput('config-from-file'),
+    workflowExtension: core.getInput('workflow-extension')
   }
 }
 
@@ -110,6 +113,12 @@ export function getCommandsConfig(inputs: Inputs): Command[] {
 export function getCommandsConfigFromInputs(inputs: Inputs): Command[] {
   core.debug(`Commands: ${inspect(inputs.commands)}`)
 
+  if (!['yaml', 'yml'].includes(inputs.workflowExtension)) {
+    core.warning(
+      `'${inputs.workflowExtension}' is not a valid 'workflow-extension'. Using default 'yml'. Valid values are 'yaml' and 'yml'.`
+    )
+    inputs.workflowExtension = 'yml'
+  }
   // Build config
   const config: Command[] = []
   for (const c of inputs.commands) {
@@ -121,7 +130,8 @@ export function getCommandsConfigFromInputs(inputs: Inputs): Command[] {
       repository: inputs.repository,
       event_type_suffix: inputs.eventTypeSuffix,
       static_args: inputs.staticArgs,
-      dispatch_type: inputs.dispatchType
+      dispatch_type: inputs.dispatchType,
+      workflow_extension: inputs.workflowExtension
     }
     config.push(cmd)
   }
