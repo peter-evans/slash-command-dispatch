@@ -150,7 +150,7 @@ export class GitHubHelper {
     cmd: Command,
     clientPayload: ClientPayload
   ): Promise<void> {
-    const workflow = `${cmd.command}${cmd.event_type_suffix}.yml`
+    const workflow = `${cmd.command}${cmd.event_type_suffix}.${cmd.workflow_extension || 'yml'}`
     const slashCommand: SlashCommandPayload = clientPayload.slash_command
     const ref = slashCommand.args.named.ref
       ? slashCommand.args.named.ref
