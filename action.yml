@@ -25,6 +25,9 @@ inputs:
   repository:
     description: 'The full name of the repository to send the dispatch events.'
     default: ${{ github.repository }}
+  workflow-extension:
+    description: 'The workflow file extension to use when dispatching to a workflow.'
+    default: yml
   event-type-suffix:
     description: 'The repository dispatch event type suffix for the commands.'
     default: -command
