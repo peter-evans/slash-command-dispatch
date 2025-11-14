@@ -25,18 +25,6 @@ interface Repository {
   repo: string
 }
 
-type CollaboratorPermission = {
-  repository: {
-    collaborators: {
-      edges: [
-        {
-          permission: string
-        }
-      ]
-    }
-  }
-}
-
 export class GitHubHelper {
   private octokit: InstanceType<typeof Octokit>
 
