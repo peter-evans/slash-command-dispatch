@@ -1,3 +1,13 @@
+## Updating from `v4` to `v5`
+
+### Breaking changes
+
+- If using self-hosted runners or GitHub Enterprise Server, there are minimum requirements for `v5` to run. See "What's new" below for details.
+### What's new
+
+- Updated runtime to Node.js 24
+  - The action now requires a minimum version of [v2.327.1](https://github.com/actions/runner/releases/tag/v2.327.1) for the Actions runner. Update self-hosted runners to v2.327.1 or later to ensure compatibility.
+
 ## Updating from `v3` to `v4`
 
 ### Breaking changes

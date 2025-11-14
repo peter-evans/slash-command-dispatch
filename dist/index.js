@@ -384,8 +384,8 @@ class GitHubHelper {
                 if (count == 10)
                     break;
             }
-            yield this.octokit.request('POST /repos/{owner}/{repo}/actions/workflows/{workflow}/dispatches', Object.assign(Object.assign({}, this.parseRepository(cmd.repository)), { workflow: workflow, ref: ref, inputs: inputs }));
-            core.info(`Command '${cmd.command}' dispatched to workflow '${workflowName}' in '${cmd.repository}'`);
+            yield this.octokit.request('POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches', Object.assign(Object.assign({}, this.parseRepository(cmd.repository)), { workflow_id: workflow, ref: ref, inputs: inputs }));
+            core.info(`Command '${cmd.command}' dispatched to workflow '${workflow}' in '${cmd.repository}'`);
         });
     }
     getWorkflow(repository, workflowName) {
@@ -393,8 +393,9 @@ class GitHubHelper {
             core.debug(`Getting workflow ${workflowName} for repository ${repository}`);
             const { data: workflows } = yield this.octokit.rest.actions.listRepoWorkflows(Object.assign({}, this.parseRepository(repository)));
             for (const workflow of workflows.workflows) {
-                if (workflow.path === `${workflowName}.yml` || workflow.path === `${workflowName}.yaml`) {
-                    core.info(`Selecting workflow file ${workflow.path}`);
+                if (workflow.path === `${workflowName}.yml` ||
+                    workflow.path === `${workflowName}.yaml`) {
+                    core.debug(`Selecting workflow file ${workflow.path}`);
                     return workflow.path;
                 }
             }
