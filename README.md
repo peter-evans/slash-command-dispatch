@@ -82,8 +82,9 @@ This action also features [advanced configuration](docs/advanced-configuration.m
 | `event-type-suffix` | The repository dispatch event type suffix for the commands. | `-command` |
 | `static-args` | A comma or newline separated list of arguments that will be dispatched with every command. | |
 | `dispatch-type` | The dispatch type; `repository` or `workflow`. See [dispatch-type](#dispatch-type) for further details. | `repository` |
-| `config` | | JSON configuration for commands. See [Advanced configuration](docs/advanced-configuration.md) | |
-| `config-from-file` | | JSON configuration from a file for commands. See [Advanced configuration](docs/advanced-configuration.md) | |
+| `config` | JSON configuration for commands. See [Advanced configuration](docs/advanced-configuration.md) | |
+| `config-from-file` | JSON configuration from a file for commands. See [Advanced configuration](docs/advanced-configuration.md) | |
+| `workflow-extension` | The file extension used for workflows (yaml|yml) | `yml` |
 
 #### `token`
 
