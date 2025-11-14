@@ -150,7 +150,8 @@ export class GitHubHelper {
     cmd: Command,
     clientPayload: ClientPayload
   ): Promise<void> {
-    const workflow = `${cmd.command}${cmd.event_type_suffix}.yml`
+    const workflowName = `${cmd.command}${cmd.event_type_suffix}`
+    const workflow = await this.getWorkflow(cmd.repository, workflowName)
     const slashCommand: SlashCommandPayload = clientPayload.slash_command
     const ref = slashCommand.args.named.ref
       ? slashCommand.args.named.ref
@@ -179,6 +180,28 @@ export class GitHubHelper {
     core.info(
       `Command '${cmd.command}' dispatched to workflow '${workflow}' in '${cmd.repository}'`
     )
+  }
+
+  private async getWorkflow(
+    repository: string,
+    workflowName: string
+  ): Promise<string> {
+    core.debug(`Getting workflow ${workflowName} for repository ${repository}`)
+    const {data: workflows} = await this.octokit.rest.actions.listRepoWorkflows(
+      {
+        ...this.parseRepository(repository)
+      }
+    )
+    for (const workflow of workflows.workflows) {
+      if (
+        workflow.path === `${workflowName}.yml` ||
+        workflow.path === `${workflowName}.yaml`
+      ) {
+        core.debug(`Selecting workflow file ${workflow.path}`)
+        return workflow.path
+      }
+    }
+    throw new Error(`Workflow ${workflowName} not found`)
   }
 
   private async getDefaultBranch(repository: string): Promise<string> {

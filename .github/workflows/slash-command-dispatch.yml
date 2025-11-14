@@ -19,6 +19,7 @@ jobs:
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
           commands: |
+            hello-yaml-local
             hello-world-local
             ping-local
           permission: none
