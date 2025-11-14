@@ -41,7 +41,7 @@ outputs:
   error-message:
     description: 'Validation errors when using `workflow` dispatch.'
 runs:
-  using: 'node20'
+  using: 'node24'
   main: 'dist/index.js'
 branding:
   icon: 'target'  

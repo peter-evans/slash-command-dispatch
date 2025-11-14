@@ -19,7 +19,7 @@ There are significant differences in the action's behaviour when using `workflow
 
 It is important to name the `workflow_dispatch` event workflow correctly since the action targets the workflow based on its filename.
 The target filename is a combination of the command name and the `event-type-suffix`.
-Additionally, the file extension must be `.yml`.
+The file extensions `.yml` and `.yaml` are supported.
 
 For the following example configuration, the target workflows are:
 - `deploy-command.yml`
@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Slash Command Dispatch
-        uses: peter-evans/slash-command-dispatch@v4
+        uses: peter-evans/slash-command-dispatch@v5
         with:
           token: ${{ secrets.PAT }}
           commands: |
@@ -85,7 +85,7 @@ The simplest response is to add a :tada: reaction to the comment.
 
 ```yml
       - name: Add reaction
-        uses: peter-evans/create-or-update-comment@v4
+        uses: peter-evans/create-or-update-comment@v5
         with:
           token: ${{ secrets.PAT }}
           repository: ${{ github.event.inputs.repository }}
@@ -107,7 +107,7 @@ The `error-message` output can be used to provide feedback to the user as follow
 ```yml
       - name: Slash Command Dispatch
         id: scd
-        uses: peter-evans/slash-command-dispatch@v4
+        uses: peter-evans/slash-command-dispatch@v5
         with:
           token: ${{ secrets.PAT }}
           commands: |
@@ -118,7 +118,7 @@ The `error-message` output can be used to provide feedback to the user as follow
 
       - name: Edit comment with error message
         if: steps.scd.outputs.error-message
-        uses: peter-evans/create-or-update-comment@v4
+        uses: peter-evans/create-or-update-comment@v5
         with:
           comment-id: ${{ github.event.comment.id }}
           body: |

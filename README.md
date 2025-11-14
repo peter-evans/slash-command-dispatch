@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Slash Command Dispatch
-        uses: peter-evans/slash-command-dispatch@v4
+        uses: peter-evans/slash-command-dispatch@v5
         with:
           token: ${{ secrets.PAT }}
           commands: |
@@ -102,7 +102,7 @@ You can use a [PAT](https://docs.github.com/en/github/authenticating-to-github/c
 
 ```yml
       - name: Slash Command Dispatch
-        uses: peter-evans/slash-command-dispatch@v4
+        uses: peter-evans/slash-command-dispatch@v5
         with:
           token: ${{ secrets.PAT }}
           reaction-token: ${{ secrets.PAT }}
@@ -178,7 +178,7 @@ It will also contain any static arguments if configured.
 
 To demonstrate, take the following configuration as an example.
 ```yml
-      - uses: peter-evans/slash-command-dispatch@v4
+      - uses: peter-evans/slash-command-dispatch@v5
         with:
           token: ${{ secrets.PAT }}
           commands: |
@@ -248,7 +248,7 @@ The simplest response is to add a :tada: reaction to the comment.
 
 ```yml
       - name: Add reaction
-        uses: peter-evans/create-or-update-comment@v4
+        uses: peter-evans/create-or-update-comment@v5
         with:
           token: ${{ secrets.PAT }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
@@ -264,7 +264,7 @@ Another option is to reply with a new comment containing a link to the run outpu
         run: echo "run-url=https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >> $GITHUB_OUTPUT
 
       - name: Create comment
-        uses: peter-evans/create-or-update-comment@v4
+        uses: peter-evans/create-or-update-comment@v5
         with:
           token: ${{ secrets.PAT }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}

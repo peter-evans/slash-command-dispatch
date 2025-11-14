@@ -293,24 +293,41 @@ class GitHubHelper {
         };
     }
     getActorPermission(repo, actor) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            // https://docs.github.com/en/graphql/reference/enums#repositorypermission
-            // https://docs.github.com/en/graphql/reference/objects#repositorycollaboratoredge
-            // Returns 'READ', 'TRIAGE', 'WRITE', 'MAINTAIN', 'ADMIN'
-            const query = `query CollaboratorPermission($owner: String!, $repo: String!, $collaborator: String) {
-      repository(owner:$owner, name:$repo) {
-        collaborators(login: $collaborator) {
-          edges {
-            permission
-          }
-        }
-      }
-    }`;
-            const collaboratorPermission = yield this.octokit.graphql(query, Object.assign(Object.assign({}, repo), { collaborator: actor }));
-            core.debug(`CollaboratorPermission: ${(0, util_1.inspect)(collaboratorPermission.repository.collaborators.edges)}`);
-            return collaboratorPermission.repository.collaborators.edges.length > 0
-                ? collaboratorPermission.repository.collaborators.edges[0].permission.toLowerCase()
-                : 'none';
+            // Use the REST API approach which can detect both direct and team-based permissions
+            // This is more reliable than the GraphQL approach for team permissions and works better with default GITHUB_TOKEN
+            try {
+                const { data: collaboratorPermission } = yield this.octokit.rest.repos.getCollaboratorPermissionLevel(Object.assign(Object.assign({}, repo), { username: actor }));
+                const permissions = (_a = collaboratorPermission.user) === null || _a === void 0 ? void 0 : _a.permissions;
+                core.debug(`REST API collaborator permission: ${(0, util_1.inspect)(permissions)}`);
+                // Use the detailed permissions object to get the highest permission level
+                if (permissions) {
+                    // Check permissions in order of highest to lowest
+                    if (permissions.admin) {
+                        return 'admin';
+                    }
+                    else if (permissions.maintain) {
+                        return 'maintain';
+                    }
+                    else if (permissions.push) {
+                        return 'write';
+                    }
+                    else if (permissions.triage) {
+                        core.debug(`User ${actor} has triage permission via REST API`);
+                        return 'triage';
+                    }
+                    else if (permissions.pull) {
+                        core.debug(`User ${actor} has read permission via REST API`);
+                        return 'read';
+                    }
+                }
+                return 'none';
+            }
+            catch (error) {
+                core.debug(`REST API permission check failed: ${utils.getErrorMessage(error)}`);
+                return 'none';
+            }
         });
     }
     tryAddReaction(repo, commentId, reaction) {
@@ -350,7 +367,8 @@ class GitHubHelper {
     }
     createWorkflowDispatch(cmd, clientPayload) {
         return __awaiter(this, void 0, void 0, function* () {
-            const workflow = `${cmd.command}${cmd.event_type_suffix}.yml`;
+            const workflowName = `${cmd.command}${cmd.event_type_suffix}`;
+            const workflow = yield this.getWorkflow(cmd.repository, workflowName);
             const slashCommand = clientPayload.slash_command;
             const ref = slashCommand.args.named.ref
                 ? slashCommand.args.named.ref
@@ -368,6 +386,20 @@ class GitHubHelper {
             }
             yield this.octokit.request('POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches', Object.assign(Object.assign({}, this.parseRepository(cmd.repository)), { workflow_id: workflow, ref: ref, inputs: inputs }));
             core.info(`Command '${cmd.command}' dispatched to workflow '${workflow}' in '${cmd.repository}'`);
+        });
+    }
+    getWorkflow(repository, workflowName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            core.debug(`Getting workflow ${workflowName} for repository ${repository}`);
+            const { data: workflows } = yield this.octokit.rest.actions.listRepoWorkflows(Object.assign({}, this.parseRepository(repository)));
+            for (const workflow of workflows.workflows) {
+                if (workflow.path === `${workflowName}.yml` ||
+                    workflow.path === `${workflowName}.yaml`) {
+                    core.debug(`Selecting workflow file ${workflow.path}`);
+                    return workflow.path;
+                }
+            }
+            throw new Error(`Workflow ${workflowName} not found`);
         });
     }
     getDefaultBranch(repository) {
