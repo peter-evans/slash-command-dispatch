@@ -175,7 +175,7 @@ export function configIsValid(config: Command[]): string | null {
 }
 
 export function actorHasPermission(
-  actorPermission: string,
+  actorPermission: utils.RepoPermission,
   commandPermission: string
 ): boolean {
   const permissionLevels = Object.freeze({

@@ -55,32 +55,47 @@ export class GitHubHelper {
     }
   }
 
-  async getActorPermission(repo: Repository, actor: string): Promise<string> {
-    // https://docs.github.com/en/graphql/reference/enums#repositorypermission
-    // https://docs.github.com/en/graphql/reference/objects#repositorycollaboratoredge
-    // Returns 'READ', 'TRIAGE', 'WRITE', 'MAINTAIN', 'ADMIN'
-    const query = `query CollaboratorPermission($owner: String!, $repo: String!, $collaborator: String) {
-      repository(owner:$owner, name:$repo) {
-        collaborators(login: $collaborator) {
-          edges {
-            permission
-          }
+  async getActorPermission(
+    repo: Repository,
+    actor: string
+  ): Promise<utils.RepoPermission> {
+    // Use the REST API approach which can detect both direct and team-based permissions
+    // This is more reliable than the GraphQL approach for team permissions and works better with default GITHUB_TOKEN
+    try {
+      const {data: collaboratorPermission} =
+        await this.octokit.rest.repos.getCollaboratorPermissionLevel({
+          ...repo,
+          username: actor
+        })
+
+      const permissions = collaboratorPermission.user?.permissions
+      core.debug(`REST API collaborator permission: ${inspect(permissions)}`)
+
+      // Use the detailed permissions object to get the highest permission level
+      if (permissions) {
+        // Check permissions in order of highest to lowest
+        if (permissions.admin) {
+          return 'admin'
+        } else if (permissions.maintain) {
+          return 'maintain'
+        } else if (permissions.push) {
+          return 'write'
+        } else if (permissions.triage) {
+          core.debug(`User ${actor} has triage permission via REST API`)
+          return 'triage'
+        } else if (permissions.pull) {
+          core.debug(`User ${actor} has read permission via REST API`)
+          return 'read'
         }
       }
-    }`
-    const collaboratorPermission =
-      await this.octokit.graphql<CollaboratorPermission>(query, {
-        ...repo,
-        collaborator: actor
-      })
-    core.debug(
-      `CollaboratorPermission: ${inspect(
-        collaboratorPermission.repository.collaborators.edges
-      )}`
-    )
-    return collaboratorPermission.repository.collaborators.edges.length > 0
-      ? collaboratorPermission.repository.collaborators.edges[0].permission.toLowerCase()
-      : 'none'
+
+      return 'none'
+    } catch (error) {
+      core.debug(
+        `REST API permission check failed: ${utils.getErrorMessage(error)}`
+      )
+      return 'none'
+    }
   }
 
   async tryAddReaction(
