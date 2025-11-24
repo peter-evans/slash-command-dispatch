@@ -25,18 +25,6 @@ interface Repository {
   repo: string
 }
 
-type CollaboratorPermission = {
-  repository: {
-    collaborators: {
-      edges: [
-        {
-          permission: string
-        }
-      ]
-    }
-  }
-}
-
 export class GitHubHelper {
   private octokit: InstanceType<typeof Octokit>
 
@@ -55,32 +43,47 @@ export class GitHubHelper {
     }
   }
 
-  async getActorPermission(repo: Repository, actor: string): Promise<string> {
-    // https://docs.github.com/en/graphql/reference/enums#repositorypermission
-    // https://docs.github.com/en/graphql/reference/objects#repositorycollaboratoredge
-    // Returns 'READ', 'TRIAGE', 'WRITE', 'MAINTAIN', 'ADMIN'
-    const query = `query CollaboratorPermission($owner: String!, $repo: String!, $collaborator: String) {
-      repository(owner:$owner, name:$repo) {
-        collaborators(login: $collaborator) {
-          edges {
-            permission
-          }
+  async getActorPermission(
+    repo: Repository,
+    actor: string
+  ): Promise<utils.RepoPermission> {
+    // Use the REST API approach which can detect both direct and team-based permissions
+    // This is more reliable than the GraphQL approach for team permissions and works better with default GITHUB_TOKEN
+    try {
+      const {data: collaboratorPermission} =
+        await this.octokit.rest.repos.getCollaboratorPermissionLevel({
+          ...repo,
+          username: actor
+        })
+
+      const permissions = collaboratorPermission.user?.permissions
+      core.debug(`REST API collaborator permission: ${inspect(permissions)}`)
+
+      // Use the detailed permissions object to get the highest permission level
+      if (permissions) {
+        // Check permissions in order of highest to lowest
+        if (permissions.admin) {
+          return 'admin'
+        } else if (permissions.maintain) {
+          return 'maintain'
+        } else if (permissions.push) {
+          return 'write'
+        } else if (permissions.triage) {
+          core.debug(`User ${actor} has triage permission via REST API`)
+          return 'triage'
+        } else if (permissions.pull) {
+          core.debug(`User ${actor} has read permission via REST API`)
+          return 'read'
         }
       }
-    }`
-    const collaboratorPermission =
-      await this.octokit.graphql<CollaboratorPermission>(query, {
-        ...repo,
-        collaborator: actor
-      })
-    core.debug(
-      `CollaboratorPermission: ${inspect(
-        collaboratorPermission.repository.collaborators.edges
-      )}`
-    )
-    return collaboratorPermission.repository.collaborators.edges.length > 0
-      ? collaboratorPermission.repository.collaborators.edges[0].permission.toLowerCase()
-      : 'none'
+
+      return 'none'
+    } catch (error) {
+      core.debug(
+        `REST API permission check failed: ${utils.getErrorMessage(error)}`
+      )
+      return 'none'
+    }
   }
 
   async tryAddReaction(
@@ -150,7 +153,8 @@ export class GitHubHelper {
     cmd: Command,
     clientPayload: ClientPayload
   ): Promise<void> {
-    const workflow = `${cmd.command}${cmd.event_type_suffix}.yml`
+    const workflowName = `${cmd.command}${cmd.event_type_suffix}`
+    const workflow = await this.getWorkflow(cmd.repository, workflowName)
     const slashCommand: SlashCommandPayload = clientPayload.slash_command
     const ref = slashCommand.args.named.ref
       ? slashCommand.args.named.ref
@@ -179,6 +183,28 @@ export class GitHubHelper {
     core.info(
       `Command '${cmd.command}' dispatched to workflow '${workflow}' in '${cmd.repository}'`
     )
+  }
+
+  private async getWorkflow(
+    repository: string,
+    workflowName: string
+  ): Promise<string> {
+    core.debug(`Getting workflow ${workflowName} for repository ${repository}`)
+    const {data: workflows} = await this.octokit.rest.actions.listRepoWorkflows(
+      {
+        ...this.parseRepository(repository)
+      }
+    )
+    for (const workflow of workflows.workflows) {
+      if (
+        workflow.path === `${workflowName}.yml` ||
+        workflow.path === `${workflowName}.yaml`
+      ) {
+        core.debug(`Selecting workflow file ${workflow.path}`)
+        return workflow.path
+      }
+    }
+    throw new Error(`Workflow ${workflowName} not found`)
   }
 
   private async getDefaultBranch(repository: string): Promise<string> {
