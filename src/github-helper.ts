@@ -10,8 +10,7 @@ type ReposCreateDispatchEventParamsClientPayload = {
 // eslint-disable-next-line
 type ReposCreateDispatchEventParamsClientPayloadKeyString = {}
 
-export interface ClientPayload
-  extends ReposCreateDispatchEventParamsClientPayload {
+export interface ClientPayload extends ReposCreateDispatchEventParamsClientPayload {
   // eslint-disable-next-line
   github: any
   // eslint-disable-next-line
