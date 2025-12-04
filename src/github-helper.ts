@@ -197,8 +197,8 @@ export class GitHubHelper {
     for (const workflow of workflows.workflows) {
       core.debug(`Found workflow: ${workflow.path}`)
       if (
-        workflow.path === `${workflowName}.yml` ||
-        workflow.path === `${workflowName}.yaml`
+        workflow.path.endsWith(`${workflowName}.yml`) ||
+        workflow.path.endsWith(`${workflowName}.yaml`)
       ) {
         core.debug(`Selecting workflow file ${workflow.path}`)
         return workflow.path
