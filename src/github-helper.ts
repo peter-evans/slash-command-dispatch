@@ -189,12 +189,13 @@ export class GitHubHelper {
     workflowName: string
   ): Promise<string> {
     core.debug(`Getting workflow ${workflowName} for repository ${repository}`)
-    const {data: workflows} = await this.octokit.rest.actions.listRepoWorkflows(
+    const workflows = await this.octokit.paginate("GET /repos/{owner}/{repo}/actions/workflows",
       {
-        ...this.parseRepository(repository)
+        ...this.parseRepository(repository),
+        per_page: 100
       }
     )
-    for (const workflow of workflows.workflows) {
+    for (const workflow of workflows) {
       core.debug(`Found workflow: ${workflow.path}`)
       if (
         workflow.path.endsWith(`${workflowName}.yml`) ||
