@@ -24,7 +24,7 @@ jobs:
       - run: npm run format-check
       - run: npm run lint
       - run: npm run test
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: dist
           path: dist
@@ -35,12 +35,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v7
         with:
           name: dist
           path: dist
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.ACTIONS_BOT_TOKEN }}
           commit-message: 'build: update distribution'
