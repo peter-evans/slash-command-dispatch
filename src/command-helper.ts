@@ -18,6 +18,7 @@ export interface Inputs {
   commands: string[]
   permission: string
   issueType: string
+  allowBots: string[]
   allowEdits: boolean
   repository: string
   eventTypeSuffix: string
@@ -31,6 +32,7 @@ export interface Command {
   command: string
   permission: string
   issue_type: string
+  allow_bots: string[]
   allow_edits: boolean
   repository: string
   event_type_suffix: string
@@ -55,6 +57,7 @@ export interface SlashCommandPayload {
 export const commandDefaults = Object.freeze({
   permission: 'write',
   issue_type: 'both',
+  allow_bots: [],
   allow_edits: false,
   repository: process.env.GITHUB_REPOSITORY || '',
   event_type_suffix: '-command',
@@ -81,6 +84,7 @@ export function getInputs(): Inputs {
     commands: utils.getInputAsArray('commands'),
     permission: core.getInput('permission'),
     issueType: core.getInput('issue-type'),
+    allowBots: utils.getInputAsArray('allow-bots'),
     allowEdits: core.getInput('allow-edits') === 'true',
     repository: core.getInput('repository'),
     eventTypeSuffix: core.getInput('event-type-suffix'),
@@ -117,6 +121,7 @@ export function getCommandsConfigFromInputs(inputs: Inputs): Command[] {
       command: c,
       permission: inputs.permission,
       issue_type: inputs.issueType,
+      allow_bots: inputs.allowBots,
       allow_edits: inputs.allowEdits,
       repository: inputs.repository,
       event_type_suffix: inputs.eventTypeSuffix,
@@ -138,6 +143,7 @@ export function getCommandsConfigFromJson(json: string): Command[] {
       command: jc.command,
       permission: jc.permission ? jc.permission : commandDefaults.permission,
       issue_type: jc.issue_type ? jc.issue_type : commandDefaults.issue_type,
+      allow_bots: jc.allow_bots ? jc.allow_bots : commandDefaults.allow_bots,
       allow_edits: toBool(jc.allow_edits, commandDefaults.allow_edits),
       repository: jc.repository ? jc.repository : commandDefaults.repository,
       event_type_suffix: jc.event_type_suffix
@@ -170,6 +176,19 @@ export function configIsValid(config: Command[]): string | null {
     if (!['repository', 'workflow'].includes(command.dispatch_type)) {
       return `'${command.dispatch_type}' is not a valid 'dispatch-type'.`
     }
+    if (command.allow_bots !== undefined ) {
+      if (!Array.isArray(command.allow_bots)) {
+        core.setFailed(`'allow_bots' must be an array`)
+        return false 
+      }
+      
+      const invalidBotNames = command.allow_bots.filter((name) => !name.endsWith('[bot]'))
+      if (invalidBotNames.length > 0) {
+        core.setFailed(`${invalidBotNames.map((name) => `'${name}'`).join(', ')} are not the valid bot names.` )
+        return false
+      }
+    }
+
   }
   return null
 }
