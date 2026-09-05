@@ -19,9 +19,12 @@ inputs:
   issue-type:
     description: 'The issue type required for commands.'
     default: both
+  allow-bots:
+    description: 'a comma or newline separated list of bots that are allowed to trigger command dispatches.'
+    default: ''
   allow-edits:
     description: 'Allow edited comments to trigger command dispatches.'
-    default: false
+    default: 'false'
   repository:
     description: 'The full name of the repository to send the dispatch events.'
     default: ${{ github.repository }}
